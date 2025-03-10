@@ -4,6 +4,9 @@ from sklearn.preprocessing import StandardScaler
 from typing import Tuple
 
 def preprocess_data(df: pd.DataFrame) -> Tuple[pd.DataFrame, pd.DataFrame]:
+    """
+    Preprocesa el conjunto de datos de reservas de hotel.
+    """
 
     # 1. Conversión de las columnas de fechas a formato datetime
     df["reservation_status_date"] = pd.to_datetime(df["reservation_status_date"])
@@ -22,7 +25,7 @@ def preprocess_data(df: pd.DataFrame) -> Tuple[pd.DataFrame, pd.DataFrame]:
     df["distribution_channel"].fillna(df["distribution_channel"].mode()[0], inplace=True)
     df["rate"].fillna(df["rate"].mean(), inplace=True)
 
-    # 3. Manejo de outliers en 'rate' y 'total_guests' usando el rango intercuartílico (IQR)
+    # 3. Manejo de outliers en 'rate' y 'total_guests' usando el rango intercuartil (IQR)
     q1_rate = df["rate"].quantile(0.25)
     q3_rate = df["rate"].quantile(0.75)
     iqr_rate = q3_rate - q1_rate
@@ -79,9 +82,30 @@ def preprocess_data(df: pd.DataFrame) -> Tuple[pd.DataFrame, pd.DataFrame]:
 
     # 9. Eliminación de columnas y filas innecesarias
     df.drop(df[df["reservation_status"] == "No-Show"].index, inplace=True)
-    df.drop(["reservation_status_date",'booking_date',  "arrival_date", "days_diff", "reservation_status", 'country_x'], axis=1, inplace=True)
+    df.drop(['booking_date','reservation_status', "days_diff", 'country_x', 'arrival_date', 'reservation_status_date'], axis=1, inplace=True)
     df_validation.drop(["reservation_status_date", "country_x", 'hotel_id'], axis=1, inplace=True)
+
+    # Eliminar columnas con alta correlación (feature selection)
     df.drop(["stay_nights", "distribution_channel_GDS", "total_rooms", "board_Undefined", "board_HB", "distribution_channel_Undefined"], axis=1, inplace=True)
     df.drop("hotel_id", axis=1, inplace=True)
 
     return df, df_validation
+
+def preprocess_data_pipeline(input_path: str, output_train_path: str, output_val_path: str) -> None:
+    """
+    Pipeline que carga, preprocesa los datos y guarda los DataFrames resultantes.
+    """
+    df = pd.read_csv(input_path)
+    train_df, val_df = preprocess_data(df)
+
+    train_df.to_csv(output_train_path, index=False)
+    val_df.to_csv(output_val_path, index=False)
+    print(f"Datos de entrenamiento preprocesados y guardados en: {output_train_path}")
+    print(f"Datos de validación preprocesados y guardados en: {output_val_path}")
+
+if __name__ == "__main__":
+    input_file = "data/data_processed/data.csv"  # Nombre del archivo de entrada
+    train_output_file = "data/data_processed/train_preprocessed.csv"  # Nombre del archivo de entrenamiento
+    val_output_file = "data/data_processed/validation_preprocessed.csv"  # Nombre del archivo de validación
+
+    preprocess_data_pipeline(input_file, train_output_file, val_output_file)
