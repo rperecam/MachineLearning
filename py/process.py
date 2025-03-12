@@ -55,4 +55,4 @@ def process_data(X_train, X_test, numerical_cols, categorical_cols):
     X_train_transformed = pd.DataFrame(X_train_transformed, columns=transformed_columns)
     X_test_transformed = pd.DataFrame(X_test_transformed, columns=transformed_columns)
 
-    return X_train_transformed, X_test_transformed
+    return X_train_transformed, X_test_transformed # Importa la función de procesamiento

@@ -1,13 +1,12 @@
-import pandas as pd
 from sklearn.model_selection import train_test_split
-
+import pandas as pd
 def preprocess_data(df_train, test_size=0.3, random_state=42):
     """
     Realiza el preprocesamiento inicial de los datos y los divide en train y test.
     """
 
     # Eliminar hotel_id y country_x y days_diff
-    df_train.drop(columns=['hotel_id', 'country_x', 'days_diff'], errors='ignore', inplace=True)
+    df_train.drop(columns=['hotel_id', 'country_x'], errors='ignore', inplace=True)
 
     # Renombrar la columna 'country_y' a 'country'
     if 'country_y' in df_train.columns:
@@ -20,9 +19,13 @@ def preprocess_data(df_train, test_size=0.3, random_state=42):
 
     df_train["days_diff"] = (pd.to_datetime(df_train["arrival_date"]) - pd.to_datetime(df_train["reservation_status_date"])).dt.days
     df_train["cancelled_last_30_days"] = ((df_train["reservation_status"] == "Canceled") & (df_train["days_diff"] <= 30)).astype(int)
+    df_train.drop(columns=['reservation_status', 'days_diff'], inplace=True)
 
     # Cálculo de la anticipación de la reserva
     df_train['advance_reservation_days'] = (pd.to_datetime(df_train['arrival_date']) - pd.to_datetime(df_train['booking_date'])).dt.days
+    # Eliminar columnas de fecha
+    date_cols = ['booking_date', 'arrival_date', 'reservation_status_date']
+    df_train.drop(columns=date_cols, inplace=True)
 
     # De boleano a entero
     df_train['parking'] = df_train['parking'].astype(int)
@@ -44,16 +47,9 @@ def preprocess_data(df_train, test_size=0.3, random_state=42):
     upper_bound_guests = q3_guests + 1.5 * iqr_guests
     df_train = df_train[(df_train["total_guests"] >= lower_bound_guests) & (df_train["total_guests"] <= upper_bound_guests)]
 
-    # Eliminar columnas de fecha
-    date_cols = ['booking_date', 'arrival_date', 'reservation_status_date']
-    df_train.drop(columns=date_cols, inplace=True)
-
     # Imputar valores nulos específicos
     df_train['special_requests'].fillna(0, inplace=True)
     df_train['required_car_parking_spaces'].fillna(0, inplace=True)
-
-    # Eliminar columnas redundantes
-    df_train.drop(columns=['reservation_status'], inplace=True)
 
     # Separar la variable objetivo y las predictoras
     X = df_train.drop('cancelled_last_30_days', axis=1)
