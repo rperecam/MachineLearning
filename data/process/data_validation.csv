@@ -1,0 +1,1408 @@
+board,country_x,market_segment,distribution_channel,room_type,required_car_parking_spaces,special_requests,stay_nights,rate,total_guests,hotel_id,arrival_date,booking_date,reservation_status_date,reservation_status,hotel_type,country_y,parking,total_rooms,restaurant,pool_and_spa,avg_review
+BB,SPA,Corporate,Corporate,A,,1.0,1.0,67.0,3.0,c4,2017-08-23,2017-08-20,2017-08-20,Booked,City Hotel,SPA,False,126,True,False,4.75
+BB,SPA,Corporate,Corporate,A,,2.0,1.0,67.0,3.0,c4,2017-08-22,2017-08-22,2017-08-22,Booked,City Hotel,SPA,False,126,True,False,4.75
+BB,SPA,Corporate,Corporate,A,0.0,1.0,1.0,65.0,3.0,c4,2017-07-16,2017-07-14,2017-07-14,Booked,City Hotel,SPA,False,126,True,False,4.75
+BB,SPA,Corporate,Corporate,A,0.0,1.0,3.0,195.0,3.0,c4,2017-07-04,2017-07-01,2017-07-01,Booked,City Hotel,SPA,False,126,True,False,4.75
+BB,SPA,Corporate,Corporate,A,,2.0,1.0,80.0,3.0,c4,2017-08-30,2017-08-26,2017-08-26,Booked,City Hotel,SPA,False,126,True,False,4.75
+BB,SPA,Direct,Direct,A,0.0,2.0,1.0,80.0,3.0,c4,2017-07-26,2017-07-23,2017-07-23,Booked,City Hotel,SPA,False,126,True,False,4.75
+BB,SPA,Corporate,Corporate,D,0.0,1.0,1.0,95.0,3.0,c4,2017-07-13,2017-07-11,2017-07-11,Booked,City Hotel,SPA,False,126,True,False,4.75
+BB,SPA,Groups,TA/TO,A,,,2.0,160.0,3.0,c4,2017-07-04,2017-07-01,2017-07-01,Booked,City Hotel,SPA,False,126,True,False,4.75
+BB,SPA,Aviation,Corporate,D,0.0,1.0,2.0,190.0,3.0,c4,2017-07-09,2017-07-06,2017-07-06,Booked,City Hotel,SPA,False,126,True,False,4.75
+BB,GBR,Direct,Direct,A,,,5.0,554.4,3.0,c4,2017-07-15,2017-07-11,2017-07-11,Booked,City Hotel,SPA,False,126,True,False,4.75
+SC,NLD,Direct,Direct,A,,0.0,2.0,280.0,3.0,c4,2017-08-18,2017-08-11,2017-08-11,Booked,City Hotel,SPA,False,126,True,False,4.75
+BB,SPA,Direct,Direct,D,0.0,,1.0,318.0,3.0,c4,2017-08-19,2017-08-19,2017-08-19,Booked,City Hotel,SPA,False,126,True,False,4.75
+SC,NLD,Direct,Direct,A,0.0,,2.0,280.0,3.0,c4,2017-08-18,2017-07-24,2017-07-24,Booked,City Hotel,SPA,False,126,True,False,4.75
+BB,SPA,Direct,Direct,E,,1.0,4.0,740.0,3.0,c4,2017-08-17,2017-07-07,2017-07-07,Booked,City Hotel,SPA,False,126,True,False,4.75
+BB,SPA,Direct,Direct,A,0.0,1.0,4.0,578.0,3.0,c4,2017-08-22,2017-08-02,2017-08-02,Booked,City Hotel,SPA,False,126,True,False,4.75
+BB,SPA,Direct,Direct,A,0.0,,4.0,578.0,3.0,c4,2017-08-22,2017-08-02,2017-08-02,Booked,City Hotel,SPA,False,126,True,False,4.75
+BB,SPA,Direct,Direct,A,,,1.0,,3.0,c4,2017-08-21,2017-08-21,2017-08-21,Booked,City Hotel,SPA,False,126,True,False,4.75
+BB,SPA,Direct,Direct,A,,0.0,2.0,280.0,3.0,c4,2017-07-25,2017-07-15,2017-07-15,Booked,City Hotel,SPA,False,126,True,False,4.75
+BB,SPA,Direct,Direct,A,,,1.0,12.0,3.0,c4,2017-08-16,2017-08-16,2017-08-16,Booked,City Hotel,SPA,False,126,True,False,4.75
+BB,SPA,Direct,Direct,A,0.0,,2.0,24.0,3.0,c4,2017-08-15,2017-08-09,2017-08-09,Booked,City Hotel,SPA,False,126,True,False,4.75
+BB,SPA,Direct,Direct,D,,2.0,1.0,75.0,3.0,c4,2017-08-04,2017-08-03,2017-08-03,Booked,City Hotel,SPA,False,126,True,False,4.75
+BB,FRA,Direct,Direct,A,,1.0,3.0,432.0,3.0,c4,2017-08-09,2017-08-06,2017-08-06,Booked,City Hotel,SPA,False,126,True,False,4.75
+BB,NLD,Direct,Direct,A,0.0,,4.0,700.0,3.0,c4,2017-08-07,2017-07-30,2017-07-30,Booked,City Hotel,SPA,False,126,True,False,4.75
+BB,SPA,Direct,Direct,A,0.0,1.0,1.0,,3.0,c4,2017-07-15,2017-07-02,2017-07-02,Booked,City Hotel,SPA,False,126,True,False,4.75
+BB,FRA,Direct,Direct,A,,1.0,4.0,580.0,3.0,c4,2017-07-13,2017-07-01,2017-07-01,Booked,City Hotel,SPA,False,126,True,False,4.75
+BB,CN,Direct,Direct,D,0.0,0.0,1.0,145.0,3.0,c4,2017-07-14,2017-07-13,2017-07-13,Booked,City Hotel,SPA,False,126,True,False,4.75
+BB,SWE,Direct,Direct,A,0.0,1.0,2.0,258.0,3.0,c4,2017-07-15,2017-07-12,2017-07-12,Booked,City Hotel,SPA,False,126,True,False,4.75
+BB,CN,Direct,Direct,A,,,1.0,115.0,3.0,c4,2017-07-16,2017-07-13,2017-07-13,Booked,City Hotel,SPA,False,126,True,False,4.75
+BB,FIN,Direct,Direct,A,0.0,2.0,2.0,246.4,3.0,c4,2017-07-15,2017-07-14,2017-07-14,Booked,City Hotel,SPA,False,126,True,False,4.75
+BB,FRA,Direct,Direct,A,,2.0,3.0,500.01,3.0,c4,2017-07-10,2017-07-09,2017-07-09,Booked,City Hotel,SPA,False,126,True,False,4.75
+BB,FRA,Direct,Direct,A,,,3.0,334.41,3.0,c4,2017-07-10,2017-07-04,2017-07-04,Booked,City Hotel,SPA,False,126,True,False,4.75
+BB,CHN,Direct,Direct,A,,0.0,2.0,258.0,3.0,c4,2017-07-20,2017-07-12,2017-07-12,Booked,City Hotel,SPA,False,126,True,False,4.75
+BB,EST,Direct,Direct,A,0.0,0.0,4.0,492.8,3.0,c4,2017-07-17,2017-07-07,2017-07-07,Booked,City Hotel,SPA,False,126,True,False,4.75
+SC,FRA,Direct,Direct,A,,0.0,1.0,123.0,3.0,c4,2017-07-02,2017-07-02,2017-07-02,Booked,City Hotel,SPA,False,126,True,False,4.75
+BB,SPA,Corporate,Corporate,A,0.0,,1.0,81.23,3.0,c4,2017-07-03,2017-07-01,2017-07-01,Booked,City Hotel,SPA,False,126,True,False,4.75
+SC,CN,Direct,Direct,A,0.0,,1.0,118.0,3.0,c4,2017-07-06,2017-07-02,2017-07-02,Booked,City Hotel,SPA,False,126,True,False,4.75
+BB,SPA,Direct,Direct,D,0.0,1.0,1.0,148.0,3.0,c4,2017-08-24,2017-08-24,2017-08-24,Booked,City Hotel,SPA,False,126,True,False,4.75
+BB,MEX,Groups,TA/TO,A,0.0,1.0,1.0,140.0,3.0,c4,2017-08-24,2017-08-23,2017-08-23,Booked,City Hotel,SPA,False,126,True,False,4.75
+BB,MEX,Groups,TA/TO,A,0.0,1.0,1.0,140.0,3.0,c4,2017-08-24,2017-08-23,2017-08-23,Booked,City Hotel,SPA,False,126,True,False,4.75
+BB,MEX,Groups,TA/TO,A,0.0,1.0,1.0,140.0,3.0,c4,2017-08-24,2017-08-23,2017-08-23,Booked,City Hotel,SPA,False,126,True,False,4.75
+BB,SPA,Direct,Direct,E,,,1.0,190.0,3.0,c4,2017-08-17,2017-08-17,2017-08-17,Booked,City Hotel,SPA,False,126,True,False,4.75
+BB,BEL,Direct,Direct,A,,1.0,3.0,351.0,3.0,c4,2017-08-15,2017-07-07,2017-07-07,Booked,City Hotel,SPA,False,126,True,False,4.75
+BB,SPA,Direct,Direct,B,0.0,,2.0,246.0,3.0,c4,2017-08-16,2017-07-24,2017-07-24,Booked,City Hotel,SPA,False,126,True,False,4.75
+BB,SPA,Corporate,Corporate,A,,3.0,3.0,252.0,3.0,c4,2017-08-15,2017-08-11,2017-08-11,Booked,City Hotel,SPA,False,126,True,False,4.75
+BB,SPA,Direct,Direct,A,,1.0,2.0,160.0,3.0,c4,2017-08-15,2017-07-31,2017-07-31,Booked,City Hotel,SPA,False,126,True,False,4.75
+SC,SPA,Direct,Direct,A,,,1.0,139.0,3.0,c4,2017-08-16,2017-08-16,2017-08-16,Booked,City Hotel,SPA,False,126,True,False,4.75
+BB,ISR,Direct,Direct,A,0.0,,1.0,170.0,3.0,c4,2017-08-19,2017-08-12,2017-08-12,Booked,City Hotel,SPA,False,126,True,False,4.75
+BB,SPA,Direct,Direct,D,,0.0,2.0,278.0,3.0,c4,2017-08-19,2017-08-17,2017-08-17,Booked,City Hotel,SPA,False,126,True,False,4.75
+BB,POR,Direct,Direct,A,,2.0,2.0,378.0,3.0,c4,2017-08-18,2017-08-16,2017-08-16,Booked,City Hotel,SPA,False,126,True,False,4.75
+BB,SPA,Direct,Direct,D,,1.0,1.0,173.5,3.0,c4,2017-08-19,2017-08-18,2017-08-18,Booked,City Hotel,SPA,False,126,True,False,4.75
+BB,DEU,Direct,Direct,D,,,4.0,585.6,3.0,c4,2017-08-30,2017-07-07,2017-07-07,Booked,City Hotel,SPA,False,126,True,False,4.75
+BB,GBR,Direct,Direct,D,,,4.0,640.0,3.0,c4,2017-08-28,2017-08-17,2017-08-17,Booked,City Hotel,SPA,False,126,True,False,4.75
+BB,,Direct,Direct,A,,,0.0,0.0,3.0,c4,2017-08-27,2017-08-26,2017-08-26,Booked,City Hotel,SPA,False,126,True,False,4.75
+BB,FRA,Direct,Direct,A,,2.0,1.0,99.0,3.0,c4,2017-08-27,2017-08-14,2017-08-14,Booked,City Hotel,SPA,False,126,True,False,4.75
+BB,GBR,Direct,Direct,D,,2.0,3.0,480.0,3.0,c4,2017-08-25,2017-08-17,2017-08-17,Booked,City Hotel,SPA,False,126,True,False,4.75
+BB,,Direct,Direct,D,,2.0,4.0,530.12,3.0,c4,2017-08-25,2017-08-17,2017-08-17,Booked,City Hotel,SPA,False,126,True,False,4.75
+SC,POL,Direct,Direct,A,0.0,,2.0,238.0,3.0,c4,2017-08-02,2017-07-28,2017-07-28,Booked,City Hotel,SPA,False,126,True,False,4.75
+BB,NOR,Direct,Direct,D,0.0,0.0,3.0,378.0,3.0,c4,2017-07-29,2017-07-29,2017-07-29,Booked,City Hotel,SPA,False,126,True,False,4.75
+BB,FRA,Direct,Direct,A,,,2.0,299.0,3.0,c4,2017-07-31,2017-07-28,2017-07-28,Booked,City Hotel,SPA,False,126,True,False,4.75
+BB,SPA,Direct,Direct,A,0.0,,1.0,159.75,3.0,c4,2017-08-03,2017-07-31,2017-07-31,Booked,City Hotel,SPA,False,126,True,False,4.75
+BB,POR,Direct,Direct,A,,1.0,4.0,522.0,3.0,c4,2017-07-26,2017-07-05,2017-07-05,Booked,City Hotel,SPA,False,126,True,False,4.75
+SC,SPA,Direct,Direct,A,,1.0,4.0,640.0,3.0,c4,2017-07-25,2017-07-21,2017-07-21,Booked,City Hotel,SPA,False,126,True,False,4.75
+BB,POR,Direct,Direct,A,,1.0,4.0,522.0,16.88534761940745,c4,2017-07-26,2017-07-05,2017-07-05,Booked,City Hotel,SPA,False,126,True,False,4.75
+,FRA,Direct,Direct,A,0.0,,2.0,378.0,3.0,c4,2017-07-29,2017-07-29,2017-07-29,Booked,City Hotel,SPA,False,126,True,False,4.75
+BB,CHE,Direct,Direct,A,,0.0,3.0,474.0,3.0,c4,2017-07-28,2017-07-22,2017-07-22,Booked,City Hotel,SPA,False,126,True,False,4.75
+BB,POR,Direct,Direct,A,0.0,1.0,3.0,459.0,3.0,c4,2017-07-27,2017-07-05,2017-07-05,Booked,City Hotel,SPA,False,126,True,False,4.75
+BB,SPA,Direct,Direct,D,,1.0,1.0,4035.342891330138,3.0,c4,2017-07-29,2017-07-28,2017-07-28,Booked,City Hotel,SPA,False,126,True,False,4.75
+BB,CN,Direct,Direct,B,,,4.0,396.0,3.0,c4,2017-08-12,2017-08-07,2017-08-07,Booked,City Hotel,SPA,False,126,True,False,4.75
+BB,CN,Direct,Direct,A,,2.0,3.0,422.4,3.0,c4,2017-08-10,2017-08-01,2017-08-01,Booked,City Hotel,SPA,False,126,True,False,4.75
+BB,POR,Direct,Direct,D,,,4.0,630.0,3.0,c4,2017-08-10,2017-07-14,2017-07-14,Booked,City Hotel,SPA,False,126,True,False,4.75
+BB,SPA,Direct,Direct,A,,2.0,1.0,75.0,3.0,c4,2017-08-11,2017-08-10,2017-08-10,Booked,City Hotel,SPA,False,126,True,False,4.75
+BB,ITA,Direct,Direct,A,0.0,1.0,2.0,310.0,3.0,c4,2017-08-12,2017-07-25,2017-07-25,Booked,City Hotel,SPA,False,126,True,False,4.75
+BB,IRL,Direct,Direct,A,0.0,,5.0,630.0,3.0,c4,2017-08-03,2017-07-10,2017-07-10,Booked,City Hotel,SPA,False,126,True,False,4.75
+BB,SPA,Corporate,Corporate,A,,2.0,1.0,67.0,3.0,c4,2017-08-07,2017-08-05,2017-08-05,Booked,City Hotel,SPA,False,126,True,False,4.75
+SC,SPA,Direct,Direct,A,,0.0,1.0,160.0,3.0,c4,2017-08-07,2017-08-06,2017-08-06,Booked,City Hotel,SPA,False,126,True,False,4.75
+BB,SPA,Direct,Direct,D,0.0,,1.0,180.0,3.0,c4,2017-08-10,2017-08-10,2017-08-10,Booked,City Hotel,SPA,False,126,True,False,4.75
+BB,SPA,Corporate,Corporate,A,,2.0,33.274385106774496,195.0,3.0,c4,2017-08-08,2017-08-01,2017-08-01,Booked,City Hotel,SPA,False,126,True,False,4.75
+BB,SPA,Direct,Direct,D,,1.0,2.0,150.0,3.0,c4,2017-07-25,2017-07-14,2017-07-14,Booked,City Hotel,SPA,False,126,True,False,4.75
+BB,SPA,Direct,Direct,A,,2.0,2.0,150.0,3.0,c4,2017-07-03,2017-07-03,2017-07-03,Booked,City Hotel,SPA,False,126,True,False,4.75
+BB,SPA,Corporate,Corporate,A,0.0,0.0,1.0,75.0,3.0,c4,2017-07-12,2017-07-09,2017-07-09,Booked,City Hotel,SPA,False,126,True,False,4.75
+BB,SPA,Corporate,Corporate,A,0.0,1.0,2.0,130.0,3.0,c4,2017-07-11,2017-07-08,2017-07-08,Booked,City Hotel,SPA,False,126,True,False,4.75
+BB,SPA,Corporate,Corporate,A,,3.0,2.0,134.0,3.0,c4,2017-08-29,2017-08-28,2017-08-28,Booked,City Hotel,SPA,False,126,True,False,4.75
+BB,SPA,Corporate,Corporate,A,0.0,1.0,1.0,67.0,3.0,c4,2017-08-24,2017-08-20,2017-08-20,Booked,City Hotel,SPA,False,126,True,False,4.75
+BB,SPA,Corporate,Corporate,A,,1.0,,130.0,3.0,c4,2017-07-18,2017-07-15,2017-07-15,Booked,City Hotel,SPA,False,126,True,False,4.75
+BB,SPA,Corporate,Corporate,D,,2.0,1.0,95.0,3.0,c4,2017-08-02,2017-08-01,2017-08-01,Booked,City Hotel,SPA,False,126,True,False,4.75
+,SPA,Corporate,,A,0.0,1.0,3.0,195.0,3.0,c4,2017-08-15,2017-08-02,2017-08-02,Booked,City Hotel,SPA,False,126,True,False,4.75
+BB,SPA,Corporate,Corporate,A,,1.0,3.0,195.0,3.0,c4,2017-07-04,2017-07-01,2017-07-01,Booked,City Hotel,SPA,False,126,True,False,4.75
+BB,SPA,Corporate,Corporate,A,1.0,1.0,2.0,134.0,3.0,c1,2017-08-22,2017-08-19,2017-08-19,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,SPA,Corporate,Corporate,A,,1.0,2.0,130.0,2.0,c1,2017-07-18,2017-07-17,2017-07-17,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,SPA,Corporate,Corporate,A,1.0,1.0,2.0,134.0,3.0,c1,2017-07-31,2017-07-28,2017-07-28,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,SPA,Corporate,Corporate,A,,1.0,3.0,195.0,2.0,c1,2017-07-04,2017-07-01,2017-07-01,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,SPA,Corporate,Corporate,A,,2.0,1.0,65.0,2.0,c1,2017-07-10,2017-07-08,2017-07-08,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,SPA,Corporate,Corporate,A,0.0,2.0,3.0,195.0,2.0,c1,2017-07-23,2017-07-21,2017-07-21,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,SPA,Corporate,Corporate,A,0.0,2.0,2.0,130.0,2.0,c1,2017-07-11,2017-07-08,2017-07-08,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,SPA,Corporate,Corporate,D,,1.0,1.0,95.0,2.0,c1,2017-07-13,2017-07-11,2017-07-11,Booked,City Hotel,SPA,True,98,True,True,4.04
+,SPA,Complementary,Corporate,A,0.0,2.0,1.0,0.0,3.0,c1,2017-08-28,2017-08-26,2017-08-26,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,SPA,Corporate,Corporate,A,1.0,2.0,2.0,134.0,3.0,c1,2017-07-05,2017-07-04,2017-07-04,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,SPA,Corporate,Corporate,A,,,1.0,95.0,2.0,c1,2017-07-06,2017-07-01,2017-07-01,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,SPA,Corporate,Corporate,A,,,1.0,118.0,2.0,c1,2017-07-04,2017-07-02,2017-07-02,Booked,City Hotel,SPA,True,98,True,True,4.04
+SC,SPA,Online TA,TA/TO,A,,0.0,3.0,320.01,2.0,c1,2017-07-09,2017-07-02,2017-07-02,Booked,City Hotel,SPA,True,98,True,True,4.04
+SC,FRA,Online TA,TA/TO,A,0.0,,2.0,280.0,2.0,c1,2017-07-17,2017-07-06,2017-07-06,Booked,City Hotel,SPA,True,98,True,True,4.04
+SC,SPA,Online TA,TA/TO,A,,,1.0,140.0,2.0,c1,2017-07-20,2017-07-06,2017-07-06,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,AUT,Direct,Direct,A,0.0,0.0,1.0,90.0,2.0,c1,2017-08-27,2017-08-06,2017-08-06,Booked,City Hotel,SPA,True,98,True,True,4.04
+SC,SPA,Online TA,TA/TO,D,,0.0,2.0,232.0,2.0,c1,2017-08-26,2017-07-18,2017-07-18,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,SPA,Direct,Direct,A,0.0,,1.0,12.0,2.0,c1,2017-08-24,2017-08-24,2017-08-24,Booked,City Hotel,SPA,True,98,True,True,4.04
+SC,CN,Online TA,TA/TO,A,,,1.0,140.0,2.0,c1,2017-08-31,2017-07-29,2017-07-29,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,IRL,Direct,Direct,A,0.0,2.0,2.0,289.0,,c1,2017-08-23,2017-08-06,2017-08-06,Booked,City Hotel,SPA,True,98,True,True,4.04
+SC,FRA,Online TA,TA/TO,A,,1.0,1.0,159.0,2.0,c1,2017-08-19,2017-08-18,2017-08-18,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,SPA,Direct,Direct,A,0.0,0.0,3.0,510.0,2.0,c1,2017-08-17,2017-08-16,2017-08-16,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,USA,Direct,Direct,D,,,3.0,432.0,2.0,c1,2017-08-21,2017-08-15,2017-08-15,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,,Direct,Direct,A,,,4.0,578.0,2.0,c1,2017-08-22,2017-08-02,2017-08-02,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,DEU,Direct,Direct,D,0.0,0.0,1.0,203.6,2.0,c1,2017-08-20,2017-08-20,2017-08-20,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,SPA,Corporate,Corporate,A,,0.0,1.0,65.0,2.0,c1,2017-07-29,2017-07-24,2017-07-24,Booked,City Hotel,SPA,True,98,True,True,4.04
+SC,FRA,Online TA,TA/TO,A,0.0,,2.0,280.0,2.0,c1,2017-07-28,2017-07-19,2017-07-19,Booked,City Hotel,SPA,True,98,True,True,4.04
+SC,SPA,Online TA,TA/TO,A,0.0,,4.0,316.0,2.0,c1,2017-07-27,2017-07-09,2017-07-09,Booked,City Hotel,SPA,True,98,True,True,4.04
+SC,CHN,Online TA,TA/TO,A,,,2.0,268.0,2.0,c1,2017-08-01,2017-07-20,2017-07-20,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,SPA,Direct,Direct,A,,,1.0,140.8,2.0,c1,2017-08-01,2017-07-22,2017-07-22,Booked,City Hotel,SPA,True,98,True,True,4.04
+SC,GBR,Online TA,TA/TO,A,,,1.0,140.0,2.0,c1,2017-07-23,2017-07-16,2017-07-16,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,SPA,Corporate,Corporate,A,,0.0,2.0,130.0,2.0,c1,2017-07-26,2017-07-24,2017-07-24,Booked,City Hotel,SPA,True,98,True,True,4.04
+SC,RUS,Online TA,TA/TO,A,,1.0,8.0,1128.0,3.0,c1,2017-07-24,2017-07-18,2017-07-18,Booked,City Hotel,SPA,True,98,True,True,4.04
+SC,USA,Online TA,TA/TO,A,,,2.0,320.0,2.0,c1,2017-07-26,2017-07-24,2017-07-24,Booked,City Hotel,SPA,True,98,True,True,4.04
+SC,CHN,Online TA,TA/TO,A,,,4.0,504.0,2.0,c1,2017-07-25,2017-07-10,2017-07-10,Booked,City Hotel,SPA,True,98,True,True,4.04
+SC,SWE,Direct,Direct,A,,1.0,2.0,260.0,4.0,c1,2017-07-25,2017-07-15,2017-07-15,Booked,City Hotel,SPA,True,98,True,True,4.04
+SC,GBR,Online TA,TA/TO,A,0.0,1.0,4.0,792.0,2.0,c1,2017-08-16,2017-07-20,2017-07-20,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,SPA,Direct,Direct,D,,0.0,1.0,219.0,2.0,c1,2017-08-12,2017-08-12,2017-08-12,Booked,City Hotel,SPA,True,98,True,True,4.04
+SC,GBR,Online TA,TA/TO,A,0.0,2.0,2.0,280.0,2.0,c1,2017-08-10,2017-07-18,2017-07-18,Booked,City Hotel,SPA,True,98,True,True,4.04
+SC,MAR,Online TA,TA/TO,A,,,4.0,640.0,,c1,2017-08-11,2017-07-27,2017-07-27,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,SPA,Direct,Direct,A,,,2.0,320.0,2.0,c1,2017-08-16,2017-08-09,2017-08-09,Booked,City Hotel,SPA,True,98,True,True,4.04
+SC,SPA,Online TA,TA/TO,A,0.0,,2.0,187.2,2.0,c1,2017-08-16,2017-07-23,2017-07-23,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,SPA,Direct,Direct,A,0.0,,2.0,320.0,2.0,c1,2017-08-16,2017-08-09,2017-08-09,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,SPA,Direct,Direct,A,,,2.0,24.0,2.0,c1,2017-08-15,2017-08-09,2017-08-09,Booked,City Hotel,SPA,True,98,True,True,4.04
+SC,FRA,Online TA,TA/TO,A,0.0,1.0,3.0,480.0,2.0,c1,2017-08-14,2017-07-29,2017-07-29,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,SPA,Direct,Direct,A,0.0,,1.0,12.0,2.0,c1,2017-08-10,2017-08-10,2017-08-10,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,POR,Direct,Direct,A,,0.0,3.0,405.0,2.0,c1,2017-08-05,2017-07-05,2017-07-05,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,SPA,Direct,Direct,A,,1.0,1.0,150.0,4.0,c1,2017-08-09,2017-08-09,2017-08-09,Booked,City Hotel,SPA,True,98,True,True,4.04
+SC,IND,Online TA,TA/TO,A,0.0,0.0,5.0,710.0,2.0,c1,2017-08-09,2017-07-19,2017-07-19,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,FRA,Direct,Direct,A,0.0,1.0,3.0,432.0,4.0,c1,2017-08-09,2017-08-06,2017-08-06,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,CHE,Direct,Direct,A,0.0,,5.0,850.0,2.0,c1,2017-08-07,2017-07-31,2017-07-31,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,SPA,Direct,Direct,D,0.0,0.0,3.0,450.0,2.0,c1,2017-08-07,2017-08-07,2017-08-07,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,FRA,Corporate,Corporate,A,,0.0,1.0,80.0,2.0,c1,2017-07-25,2017-07-22,2017-07-22,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,SPA,Corporate,Corporate,A,0.0,1.0,2.0,130.0,2.0,c1,2017-08-02,2017-07-29,2017-07-29,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,SPA,Corporate,Corporate,A,0.0,1.0,1.0,75.0,4.0,c1,2017-08-16,2017-08-05,2017-08-05,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,FRA,Direct,Direct,A,0.0,1.0,1.0,123.2,4.0,c1,2017-07-15,2017-07-13,2017-07-13,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,AUT,Complementary,Direct,A,,2.0,1.0,0.0,4.0,c1,2017-07-15,2017-07-12,2017-07-12,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,FRA,Direct,Direct,A,0.0,1.0,1.0,108.0,4.0,c1,2017-07-15,2017-07-02,2017-07-02,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,SPA,Direct,Direct,A,,3.0,1.0,106.24,4.0,c1,2017-07-15,2017-07-09,2017-07-09,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,GBR,Direct,Direct,A,0.0,3.0,8.0,1190.0,4.0,c1,2017-07-10,2017-07-05,2017-07-05,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,SPA,Complementary,Direct,A,0.0,1.0,2.0,0.0,4.0,c1,2017-07-16,2017-07-15,2017-07-15,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,SPA,Direct,Direct,A,,1.0,,198.0,4.0,c1,2017-07-15,2017-07-12,2017-07-12,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,,Direct,Direct,A,,,1.0,115.0,2.0,c1,2017-07-16,2017-07-13,2017-07-13,Booked,City Hotel,SPA,True,98,True,True,4.04
+SC,GBR,Online TA,TA/TO,A,,,1.0,98.0,2.0,c1,2017-07-16,2017-07-10,2017-07-10,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,FRA,Direct,Direct,A,,0.0,1.0,145.0,2.0,c1,2017-07-17,2017-07-15,2017-07-15,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,SPA,Direct,Direct,A,,0.0,1.0,95.0,2.0,c1,2017-07-12,2017-07-09,2017-07-09,Booked,City Hotel,SPA,True,98,True,True,4.04
+SC,ITA,Online TA,TA/TO,A,,2.0,2.0,240.0,2.0,c1,2017-07-11,2017-07-07,2017-07-07,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,DNK,Online TA,TA/TO,A,1.0,1.0,1.0,149.0,4.0,c1,2017-07-12,2017-07-11,2017-07-11,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,CHN,Direct,Direct,D,,,1.0,165.0,2.0,c1,2017-07-11,2017-07-11,2017-07-11,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,SPA,Direct,Direct,A,,,1.0,77.0,2.0,c1,2017-07-14,2017-07-14,2017-07-14,Booked,City Hotel,SPA,True,98,True,True,4.04
+SC,IRL,Online TA,TA/TO,D,0.0,,2.0,172.7,2.0,c1,2017-07-12,2017-07-10,2017-07-10,Booked,City Hotel,SPA,True,98,True,True,4.04
+SC,FRA,Direct,Direct,A,,2.0,5.0,660.0,4.0,c1,2017-07-09,2017-07-02,2017-07-02,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,NLD,Direct,Direct,A,,1.0,1.0,4035.342891330138,2.0,c1,2017-07-18,2017-07-10,2017-07-10,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,CZE,Direct,Direct,A,0.0,0.0,1.0,120.0,2.0,c1,2017-07-24,2017-07-24,2017-07-24,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,SPA,Corporate,Corporate,A,,0.0,1.0,65.0,2.0,c1,2017-07-25,2017-07-22,2017-07-22,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,BRA,Direct,Direct,A,,1.0,2.0,238.0,4.0,c1,2017-07-24,2017-07-17,2017-07-17,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,SPA,Direct,Direct,A,0.0,0.0,3.0,480.0,2.0,c1,2017-07-25,2017-07-25,2017-07-25,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,SPA,Corporate,Corporate,A,,,1.0,65.0,2.0,c1,2017-07-27,2017-07-23,2017-07-23,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,SPA,Corporate,Corporate,A,,,1.0,65.0,2.0,c1,2017-07-27,2017-07-23,2017-07-23,Booked,City Hotel,SPA,True,98,True,True,4.04
+SC,IRL,Online TA,TA/TO,D,0.0,1.0,3.0,,2.0,c1,2017-07-23,2017-07-21,2017-07-21,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,RUS,Direct,Direct,A,,0.0,1.0,140.0,2.0,c1,2017-07-25,2017-07-25,2017-07-25,Booked,City Hotel,SPA,True,98,True,True,4.04
+SC,DEU,Online TA,TA/TO,A,0.0,0.0,3.0,387.99,2.0,c1,2017-07-23,2017-07-10,2017-07-10,Booked,City Hotel,SPA,True,98,True,True,4.04
+SC,FRA,Online TA,TA/TO,A,1.0,1.0,2.0,338.0,16.88534761940745,c1,2017-07-25,2017-07-21,2017-07-21,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,CHN,Direct,Direct,A,0.0,1.0,2.0,300.0,4.0,c1,2017-07-25,2017-07-15,2017-07-15,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,CHN,Direct,Direct,A,0.0,1.0,2.0,300.0,4.0,c1,2017-07-25,2017-07-15,2017-07-15,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,FRA,Offline TA/TO,TA/TO,A,,2.0,3.0,255.0,4.0,c1,2017-07-18,2017-07-17,2017-07-17,Booked,City Hotel,SPA,True,98,True,True,4.04
+SC,GBR,Online TA,TA/TO,A,0.0,0.0,2.0,280.0,2.0,c1,2017-07-19,2017-07-14,2017-07-14,Booked,City Hotel,SPA,True,98,True,True,4.04
+SC,SPA,Online TA,TA/TO,A,,,2.0,252.0,2.0,c1,2017-07-18,2017-07-11,2017-07-11,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,NLD,Direct,Direct,A,,1.0,1.0,145.0,2.0,c1,2017-07-18,2017-07-10,2017-07-10,Booked,City Hotel,SPA,True,98,True,True,4.04
+SC,NLD,Online TA,TA/TO,A,0.0,0.0,1.0,140.0,2.0,c1,2017-07-19,2017-07-11,2017-07-11,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,GBR,Direct,Direct,A,1.0,,1.0,159.0,3.0,c1,2017-07-22,2017-07-18,2017-07-18,Booked,City Hotel,SPA,True,98,True,True,4.04
+SC,USA,Direct,Direct,A,,,1.0,98.0,2.0,c1,2017-07-21,2017-07-14,2017-07-14,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,ARG,Direct,Direct,A,,,1.0,108.0,2.0,c1,2017-07-02,2017-07-01,2017-07-01,Booked,City Hotel,SPA,True,98,True,True,4.04
+SC,POR,Direct,Direct,A,,,1.0,98.0,2.0,c1,2017-07-02,2017-07-02,2017-07-02,Booked,City Hotel,SPA,True,98,True,True,4.04
+SC,SPA,Direct,Direct,B,0.0,,1.0,98.0,2.0,c1,2017-07-02,2017-07-02,2017-07-02,Booked,City Hotel,SPA,True,98,True,True,4.04
+,FRA,Direct,Direct,A,0.0,,1.0,123.0,2.0,c1,2017-07-02,2017-07-02,2017-07-02,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,SPA,Direct,Direct,A,0.0,,1.0,4035.342891330138,2.0,c1,2017-07-10,2017-07-10,2017-07-10,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,POR,Direct,Direct,A,,0.0,2.0,162.0,2.0,c1,2017-07-06,2017-07-06,2017-07-06,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,SPA,Direct,Direct,A,0.0,0.0,1.0,126.0,2.0,c1,2017-07-09,2017-07-06,2017-07-06,Booked,City Hotel,SPA,True,98,True,True,4.04
+SC,POR,Online TA,TA/TO,A,0.0,1.0,2.0,258.0,2.0,c1,2017-07-03,2017-07-01,2017-07-01,Booked,City Hotel,SPA,True,98,True,True,4.04
+SC,SPA,Online TA,TA/TO,A,,1.0,1.0,118.0,2.0,c1,2017-07-04,2017-07-02,2017-07-02,Booked,City Hotel,SPA,True,98,True,True,4.04
+SC,AUS,Online TA,TA/TO,A,0.0,1.0,3.0,356.01,2.0,c1,2017-07-01,2017-07-01,2017-07-01,Booked,City Hotel,SPA,True,98,True,True,4.04
+SC,TUN,Online TA,TA/TO,A,,0.0,3.0,210.33,2.0,c1,2017-07-02,2017-07-01,2017-07-01,Booked,City Hotel,SPA,True,98,True,True,4.04
+SC,JPN,Online TA,TA/TO,A,,,1.0,82.08,2.0,c1,2017-07-04,2017-07-02,2017-07-02,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,SPA,Corporate,Corporate,A,,0.0,1.0,130.5,2.0,c1,2017-07-04,2017-07-04,2017-07-04,Booked,City Hotel,SPA,True,98,True,True,4.04
+SC,DEU,Online TA,TA/TO,A,,1.0,2.0,137.28,2.0,c1,2017-07-02,2017-07-02,2017-07-02,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,SPA,Complementary,Direct,A,,,1.0,0.0,3.0,c1,2017-07-03,2017-07-03,2017-07-03,Booked,City Hotel,SPA,True,98,True,True,4.04
+,POR,Online TA,TA/TO,A,,1.0,1.0,98.0,2.0,c1,2017-07-03,2017-07-01,2017-07-01,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,SPA,Corporate,Corporate,A,0.0,0.0,1.0,95.0,2.0,c1,2017-07-06,2017-07-01,2017-07-01,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,SPA,Corporate,Corporate,A,0.0,,1.0,95.0,2.0,c1,2017-07-06,2017-07-01,2017-07-01,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,SPA,Corporate,Corporate,A,0.0,,1.0,95.0,2.0,c1,2017-07-06,2017-07-01,2017-07-01,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,SPA,Corporate,Corporate,A,,,1.0,95.0,2.0,c1,2017-07-06,2017-07-01,2017-07-01,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,SPA,Direct,Direct,A,,0.0,1.0,170.0,2.0,c1,2017-07-27,2017-07-27,2017-07-27,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,USA,Offline TA/TO,TA/TO,A,0.0,3.0,6.0,690.0,4.0,c1,2017-08-18,2017-07-02,2017-07-02,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,GBR,Offline TA/TO,TA/TO,A,,1.0,3.0,240.3,4.0,c1,2017-08-21,2017-07-04,2017-07-04,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,DEU,Direct,Direct,D,0.0,1.0,5.0,870.8,4.0,c1,2017-08-18,2017-08-17,2017-08-17,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,POR,Online TA,TA/TO,A,1.0,1.0,2.0,338.0,5.0,c1,2017-08-22,2017-08-12,2017-08-12,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,DEU,Offline TA/TO,TA/TO,A,,1.0,4.0,320.4,4.0,c1,2017-08-20,2017-07-03,2017-07-03,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,DEU,Offline TA/TO,TA/TO,A,,1.0,4.0,320.4,4.0,c1,2017-08-20,2017-07-03,2017-07-03,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,SPA,Direct,Direct,A,,0.0,1.0,140.0,2.0,c1,2017-08-21,2017-08-20,2017-08-20,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,POR,Offline TA/TO,TA/TO,A,1.0,0.0,4.0,356.4,4.0,c1,2017-08-18,2017-07-02,2017-07-02,Booked,City Hotel,SPA,True,98,True,True,4.04
+SC,ITA,Online TA,TA/TO,A,,0.0,3.0,278.97,2.0,c1,2017-08-19,2017-08-18,2017-08-18,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,TUR,Direct,Direct,D,,,2.0,320.0,2.0,c1,2017-08-21,2017-08-10,2017-08-10,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,SPA,Corporate,Corporate,A,0.0,4.0,1.0,75.0,4.0,c1,2017-08-23,2017-08-15,2017-08-15,Booked,City Hotel,SPA,True,98,True,True,4.04
+SC,FRA,Online TA,TA/TO,A,0.0,1.0,4.0,398.4,2.0,c1,2017-08-21,2017-08-01,2017-08-01,Booked,City Hotel,SPA,True,98,True,True,4.04
+SC,AUS,Online TA,TA/TO,A,,,2.0,259.0,2.0,c1,2017-08-23,2017-08-19,2017-08-19,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,SPA,Direct,Direct,A,,1.0,2.0,200.0,2.0,c1,2017-08-23,2017-08-20,2017-08-20,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,BEL,Direct,Direct,A,,0.0,1.0,107.1,2.0,c1,2017-08-24,2017-08-23,2017-08-23,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,SPA,Groups,TA/TO,A,,1.0,1.0,140.0,4.0,c1,2017-08-24,2017-08-23,2017-08-23,Booked,City Hotel,SPA,True,98,True,True,4.04
+SC,FRA,Direct,Direct,A,1.0,1.0,1.0,128.0,5.0,c1,2017-08-24,2017-08-23,2017-08-23,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,DEU,Direct,Direct,A,,,2.0,225.0,2.0,c1,2017-08-23,2017-07-01,2017-07-01,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,CN,Direct,Direct,A,,,2.0,230.0,2.0,c1,2017-08-23,2017-07-25,2017-07-25,Booked,City Hotel,SPA,True,98,True,True,4.04
+SC,GBR,Online TA,TA/TO,A,0.0,0.0,,190.24,2.0,c1,2017-08-23,2017-07-24,2017-07-24,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,MEX,Groups,TA/TO,A,,1.0,1.0,140.0,4.0,c1,2017-08-24,2017-08-23,2017-08-23,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,MEX,Groups,TA/TO,A,,1.0,1.0,140.0,4.0,c1,2017-08-24,2017-08-23,2017-08-23,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,MEX,Groups,TA/TO,A,,1.0,1.0,140.0,4.0,c1,2017-08-24,2017-08-23,2017-08-23,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,MEX,Groups,TA/TO,A,0.0,1.0,1.0,140.0,4.0,c1,2017-08-24,2017-08-23,2017-08-23,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,MEX,Groups,TA/TO,A,,1.0,1.0,140.0,4.0,c1,2017-08-24,2017-08-23,2017-08-23,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,SPA,Direct,Direct,B,,,2.0,246.0,2.0,c1,2017-08-16,2017-07-25,2017-07-25,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,USA,Direct,Direct,A,,3.0,2.0,252.0,4.0,c1,2017-08-15,2017-07-15,2017-07-15,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,SPA,Direct,Direct,A,,,1.0,139.0,2.0,c1,2017-08-16,2017-08-16,2017-08-16,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,CN,Offline TA/TO,TA/TO,D,0.0,2.0,3.0,297.0,4.0,c1,2017-08-13,2017-08-08,2017-08-08,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,SPA,Direct,Direct,B,,1.0,1.0,154.0,4.0,c1,2017-08-16,2017-07-24,2017-07-24,Booked,City Hotel,SPA,True,98,True,True,4.04
+SC,SWE,Online TA,TA/TO,A,0.0,1.0,2.0,260.0,2.0,c1,2017-08-15,2017-07-08,2017-07-08,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,ETH,Direct,Direct,D,0.0,0.0,4.0,447.2,2.0,c1,2017-08-15,2017-07-07,2017-07-07,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,CN,Offline TA/TO,TA/TO,D,,2.0,1.0,99.0,4.0,c1,2017-08-20,2017-08-12,2017-08-12,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,SPA,Direct,Direct,A,0.0,1.0,1.0,144.0,4.0,c1,2017-08-18,2017-08-15,2017-08-15,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,POR,Direct,Direct,D,,,1.0,174.0,2.0,c1,2017-08-18,2017-07-29,2017-07-29,Booked,City Hotel,SPA,True,98,True,True,4.04
+SC,GBR,Online TA,TA/TO,A,1.0,1.0,4.0,676.0,4.0,c1,2017-08-15,2017-08-01,2017-08-01,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,AUT,Offline TA/TO,TA/TO,A,,1.0,3.0,240.3,4.0,c1,2017-08-17,2017-07-02,2017-07-02,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,SPA,Direct,Direct,D,1.0,1.0,1.0,173.5,5.0,c1,2017-08-19,2017-08-18,2017-08-18,Booked,City Hotel,SPA,True,98,True,True,4.04
+SC,LBN,Direct,Direct,A,,2.0,1.0,140.0,2.0,c1,2017-08-31,2017-08-30,2017-08-30,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,DEU,Direct,Direct,D,1.0,,4.0,676.0,4.0,c1,2017-08-28,2017-08-14,2017-08-14,Booked,City Hotel,SPA,True,98,True,True,4.04
+SC,GBR,Online TA,TA/TO,A,,2.0,1.0,140.0,2.0,c1,2017-08-29,2017-08-19,2017-08-19,Booked,City Hotel,SPA,True,98,True,True,4.04
+HB,SPA,Groups,TA/TO,A,,0.0,4.0,416.0,2.0,c1,2017-08-28,2017-07-10,2017-07-10,Booked,City Hotel,SPA,True,98,True,True,4.04
+HB,SPA,Groups,TA/TO,A,,0.0,4.0,416.0,2.0,c1,2017-08-28,2017-07-10,2017-07-10,Booked,City Hotel,SPA,True,98,True,True,4.04
+SC,LBN,Online TA,TA/TO,A,0.0,2.0,3.0,420.0,2.0,c1,2017-08-28,2017-08-26,2017-08-26,Booked,City Hotel,SPA,True,98,True,True,4.04
+SC,DEU,Online TA,TA/TO,A,0.0,0.0,2.0,280.0,2.0,c1,2017-08-29,2017-08-19,2017-08-19,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,SPA,Corporate,Corporate,A,0.0,4.0,3.0,225.0,4.0,c1,2017-08-29,2017-08-18,2017-08-18,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,DEU,Direct,Direct,A,1.0,,3.0,455.01,4.0,c1,2017-08-31,2017-08-16,2017-08-16,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,ITA,Direct,Direct,A,0.0,,3.0,358.20000000000005,2.0,c1,2017-08-31,2017-08-27,2017-08-27,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,JPN,Direct,Direct,D,0.0,2.0,6.0,810.0,2.0,c1,2017-08-29,2017-07-04,2017-07-04,Booked,City Hotel,SPA,True,98,True,True,4.04
+,POL,Direct,Direct,D,0.0,1.0,3.0,404.46,4.0,c1,2017-08-31,2017-07-26,2017-07-26,Booked,City Hotel,SPA,True,98,True,True,4.04
+SC,GBR,Online TA,TA/TO,A,0.0,2.0,1.0,140.0,2.0,c1,2017-08-29,2017-08-19,2017-08-19,Booked,City Hotel,SPA,True,98,True,True,4.04
+,USA,Direct,Direct,A,,,1.0,95.0,2.0,c1,2017-08-27,2017-07-27,2017-07-27,Booked,City Hotel,SPA,True,98,True,True,4.04
+SC,USA,Online TA,TA/TO,A,,0.0,1.0,72.16,2.0,c1,2017-08-27,2017-07-09,2017-07-09,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,GBR,Direct,Direct,D,0.0,2.0,3.0,480.0,4.0,c1,2017-08-25,2017-08-17,2017-08-17,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,CHE,Direct,Direct,A,,0.0,3.0,358.20000000000005,2.0,c1,2017-08-23,2017-07-22,2017-07-22,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,FRA,Direct,Direct,A,1.0,,2.0,297.0,3.0,c1,2017-08-24,2017-08-18,2017-08-18,Booked,City Hotel,SPA,True,98,True,True,4.04
+SC,CHN,Online TA,TA/TO,A,0.0,1.0,3.0,295.20000000000005,2.0,c1,2017-08-23,2017-07-31,2017-07-31,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,POR,Direct,Direct,A,1.0,,2.0,297.0,4.0,c1,2017-08-24,2017-08-18,2017-08-18,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,SPA,Online TA,Direct,D,,3.0,1.0,170.0,5.0,c1,2017-08-26,2017-08-05,2017-08-05,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,SPA,Direct,Direct,D,,3.0,1.0,170.0,5.0,c1,2017-08-25,2017-08-24,2017-08-24,Booked,City Hotel,SPA,True,98,True,True,4.04
+SC,POR,Online TA,TA/TO,A,,,1.0,80.1,2.0,c1,2017-08-27,2017-08-26,2017-08-26,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,SPA,Complementary,Corporate,A,0.0,2.0,1.0,0.0,2.0,c1,2017-08-29,2017-08-29,2017-08-29,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,SPA,Corporate,Corporate,D,0.0,0.0,1.0,95.0,2.0,c1,2017-08-29,2017-08-09,2017-08-09,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,SPA,Corporate,Corporate,D,,,1.0,95.0,2.0,c1,2017-08-29,2017-08-09,2017-08-09,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,DEU,Corporate,Corporate,D,,,2.0,190.0,2.0,c1,2017-08-28,2017-08-08,2017-08-08,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,FRA,Direct,Direct,D,1.0,0.0,5.0,751.6500000000001,3.0,c1,2017-08-24,2017-07-26,2017-07-26,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,ITA,Direct,Direct,D,1.0,0.0,3.0,416.7000000000001,4.0,c1,2017-08-25,2017-07-11,2017-07-11,Booked,City Hotel,SPA,True,98,True,True,4.04
+SC,FRA,Online TA,TA/TO,A,,2.0,1.0,4035.342891330138,2.0,c1,2017-08-27,2017-08-04,2017-08-04,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,SPA,Online TA,TA/TO,A,1.0,2.0,1.0,107.1,5.0,c1,2017-08-27,2017-08-20,2017-08-20,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,MEX,Direct,Direct,A,,,1.0,95.0,2.0,c1,2017-08-27,2017-08-06,2017-08-06,Booked,City Hotel,SPA,True,98,True,True,4.04
+SC,FRA,Online TA,TA/TO,A,,,1.0,98.0,2.0,c1,2017-08-27,2017-08-10,2017-08-10,Booked,City Hotel,SPA,True,98,True,True,4.04
+SC,USA,Online TA,TA/TO,A,0.0,2.0,1.0,140.0,2.0,c1,2017-08-27,2017-07-28,2017-07-28,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,SPA,Direct,Direct,B,,1.0,2.0,248.0,4.0,c1,2017-08-26,2017-08-24,2017-08-24,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,SPA,Direct,Direct,B,0.0,1.0,2.0,248.0,2.0,c1,2017-08-26,2017-08-23,2017-08-23,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,FRA,Online TA,TA/TO,A,1.0,1.0,3.0,567.0,5.0,c1,2017-07-31,2017-07-21,2017-07-21,Booked,City Hotel,SPA,True,98,True,True,4.04
+SC,BEL,Online TA,TA/TO,A,,0.0,1.0,71.1,2.0,c1,2017-08-01,2017-07-03,2017-07-03,Booked,City Hotel,SPA,True,98,True,True,4.04
+SC,SPA,Online TA,TA/TO,A,0.0,1.0,1.0,119.0,2.0,c1,2017-08-01,2017-07-26,2017-07-26,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,SPA,Corporate,Corporate,A,1.0,0.0,1.0,74.0,3.0,c1,2017-08-01,2017-07-31,2017-07-31,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,SPA,Corporate,Corporate,A,,1.0,2.0,130.0,2.0,c1,2017-07-31,2017-07-28,2017-07-28,Booked,City Hotel,SPA,True,98,True,True,4.04
+SC,SPA,Direct,Direct,A,,1.0,2.0,240.0,4.0,c1,2017-07-30,2017-07-18,2017-07-18,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,SPA,Corporate,Corporate,A,1.0,1.0,2.0,134.0,4.0,c1,2017-08-07,2017-08-04,2017-08-04,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,SPA,Corporate,Corporate,A,0.0,,2.0,130.0,2.0,c1,2017-07-31,2017-07-29,2017-07-29,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,SPA,Corporate,Corporate,A,,0.0,5.0,557.5,2.0,c1,2017-07-28,2017-07-27,2017-07-27,Booked,City Hotel,SPA,True,98,True,True,4.04
+SC,USA,Direct,Direct,A,0.0,,1.0,128.0,2.0,c1,2017-08-01,2017-07-19,2017-07-19,Booked,City Hotel,SPA,True,98,True,True,4.04
+SC,USA,Direct,Direct,A,,,1.0,128.0,2.0,c1,2017-08-01,2017-07-19,2017-07-19,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,SPA,Corporate,Corporate,A,,1.0,2.0,130.0,2.0,c1,2017-08-02,2017-08-02,2017-08-02,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,SPA,Corporate,Corporate,A,,1.0,2.0,130.0,2.0,c1,2017-07-31,2017-07-29,2017-07-29,Booked,City Hotel,SPA,True,98,True,True,4.04
+SC,USA,Direct,Direct,A,0.0,3.0,3.0,450.0,5.0,c1,2017-08-02,2017-07-13,2017-07-13,Booked,City Hotel,SPA,True,98,True,True,4.04
+SC,FRA,Online TA,TA/TO,A,,,2.0,280.0,2.0,c1,2017-08-04,2017-07-15,2017-07-15,Booked,City Hotel,SPA,True,98,True,True,4.04
+,,Direct,Direct,A,,0.0,3.0,468.99,2.0,c1,2017-08-03,2017-07-27,2017-07-27,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,SPA,Corporate,Corporate,A,1.0,,2.0,,2.0,c1,2017-08-02,2017-08-01,2017-08-01,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,FRA,Direct,Direct,A,1.0,2.0,4.0,627.04,,c1,2017-07-31,2017-07-28,2017-07-28,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,SPA,Corporate,Corporate,A,1.0,1.0,2.0,134.0,4.0,c1,2017-08-02,2017-07-29,2017-07-29,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,USA,Direct,Direct,A,0.0,3.0,3.0,459.0,4.0,c1,2017-08-02,2017-07-13,2017-07-13,Booked,City Hotel,SPA,True,98,True,True,4.04
+SC,USA,Online TA,TA/TO,A,0.0,0.0,1.0,69.01,2.0,c1,2017-08-03,2017-08-03,2017-08-03,Booked,City Hotel,SPA,True,98,True,True,4.04
+SC,FRA,Online TA,TA/TO,A,0.0,0.0,2.0,280.0,2.0,c1,2017-08-02,2017-07-04,2017-07-04,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,MEX,Direct,Direct,E,,1.0,2.0,250.0,4.0,c1,2017-07-27,2017-07-23,2017-07-23,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,POR,Corporate,Corporate,D,,,2.0,190.0,2.0,c1,2017-07-28,2017-07-14,2017-07-14,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,SPA,Complementary,Direct,D,,0.0,1.0,0.0,2.0,c1,2017-07-31,2017-07-31,2017-07-31,Booked,City Hotel,SPA,True,98,True,True,4.04
+SC,USA,Online TA,TA/TO,D,0.0,0.0,1.0,69.7,2.0,c1,2017-07-31,2017-07-31,2017-07-31,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,SPA,Direct,Direct,D,,1.0,2.0,308.0,4.0,c1,2017-07-28,2017-07-22,2017-07-22,Booked,City Hotel,SPA,True,98,True,True,4.04
+SC,FRA,Online TA,TA/TO,A,,,3.0,429.0,2.0,c1,2017-07-28,2017-07-23,2017-07-23,Booked,City Hotel,SPA,True,98,True,True,4.04
+SC,ROU,Online TA,TA/TO,A,,1.0,3.0,408.0,2.0,c1,2017-07-28,2017-07-18,2017-07-18,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,SPA,Online TA,GDS,A,,1.0,3.0,600.0,3.0,c1,2017-08-11,2017-08-10,2017-08-10,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,FRA,Direct,Direct,A,,,1.0,180.0,2.0,c1,2017-08-13,2017-08-13,2017-08-13,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,SPA,Direct,Direct,A,0.0,,0.0,0.0,2.0,c1,2017-08-14,2017-08-14,2017-08-14,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,SPA,Direct,Direct,A,0.0,3.0,1.0,75.0,4.0,c1,2017-08-11,2017-08-10,2017-08-10,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,SPA,Direct,Direct,D,,0.0,1.0,180.0,2.0,c1,2017-08-11,2017-08-11,2017-08-11,Booked,City Hotel,SPA,True,98,True,True,4.04
+SC,ITA,Online TA,TA/TO,A,,0.0,2.0,378.0,2.0,c1,2017-08-10,2017-08-10,2017-08-10,Booked,City Hotel,SPA,True,98,True,True,4.04
+SC,FRA,Online TA,TA/TO,A,,,3.0,500.01,2.0,c1,2017-08-12,2017-08-07,2017-08-07,Booked,City Hotel,SPA,True,98,True,True,4.04
+SC,FRA,Online TA,TA/TO,A,0.0,1.0,3.0,540.0,2.0,c1,2017-08-13,2017-08-11,2017-08-11,Booked,City Hotel,SPA,True,98,True,True,4.04
+SC,IRL,Online TA,TA/TO,A,0.0,,6.0,960.0,2.0,c1,2017-08-08,2017-07-27,2017-07-27,Booked,City Hotel,SPA,True,98,True,True,4.04
+SC,BRA,Online TA,TA/TO,A,,,1.0,180.0,2.0,c1,2017-08-14,2017-08-10,2017-08-10,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,SPA,Direct,Direct,D,,,1.0,180.0,2.0,c1,2017-08-14,2017-08-13,2017-08-13,Booked,City Hotel,SPA,True,98,True,True,4.04
+SC,DEU,Online TA,TA/TO,A,,,33.274385106774496,390.0,2.0,c1,2017-08-06,2017-07-02,2017-07-02,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,USA,Direct,Direct,D,0.0,,1.0,160.0,2.0,c1,2017-08-07,2017-08-07,2017-08-07,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,USA,Direct,Direct,D,0.0,0.0,1.0,160.0,2.0,c1,2017-08-07,2017-08-07,2017-08-07,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,POR,Direct,Direct,A,0.0,1.0,3.0,396.0,4.0,c1,2017-08-06,2017-07-10,2017-07-10,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,POR,Online TA,TA/TO,A,1.0,1.0,3.0,507.0,4.0,c1,2017-08-04,2017-07-11,2017-07-11,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,SPA,Direct,Direct,A,0.0,,1.0,135.0,2.0,c1,2017-08-07,2017-08-07,2017-08-07,Booked,City Hotel,SPA,True,98,True,True,4.04
+SC,IRL,Direct,Direct,A,0.0,1.0,3.0,422.4,2.0,c1,2017-08-04,2017-07-24,2017-07-24,Booked,City Hotel,SPA,True,98,True,True,4.04
+SC,USA,Online TA,TA/TO,D,0.0,,3.0,276.63,16.88534761940745,c1,2017-08-08,2017-08-07,2017-08-07,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,SPA,Direct,Direct,A,,0.0,1.0,150.0,2.0,c1,2017-08-10,2017-08-10,2017-08-10,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,SPA,Corporate,Corporate,A,,2.0,2.0,130.0,2.0,c1,2017-08-30,2017-08-26,2017-08-26,Booked,City Hotel,SPA,True,98,True,True,4.04
+SC,USA,Direct,,A,0.0,,1.0,190.0,2.0,c1,2017-08-10,2017-08-09,2017-08-09,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,SPA,Direct,Direct,A,0.0,0.0,4.0,640.0,2.0,c1,2017-08-06,2017-08-06,2017-08-06,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,SPA,Corporate,Corporate,A,,2.0,2.0,130.0,2.0,c1,2017-08-08,2017-08-01,2017-08-01,Booked,City Hotel,SPA,True,98,True,True,4.04
+SC,FRA,Direct,Direct,A,1.0,1.0,5.0,940.0,3.0,c1,2017-08-05,2017-08-03,2017-08-03,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,SPA,Online TA,TA/TO,A,1.0,1.0,1.0,189.0,4.0,c1,2017-08-09,2017-08-07,2017-08-07,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,,Corporate,Corporate,A,0.0,3.0,3.0,225.0,4.0,c1,2017-08-07,2017-08-07,2017-08-07,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,IRL,Direct,Direct,A,,2.0,3.0,225.0,2.0,c1,2017-07-17,2017-07-10,2017-07-10,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,SPA,Direct,Direct,D,0.0,2.0,3.0,252.0,2.0,c1,2017-07-10,2017-07-06,2017-07-06,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,SPA,Corporate,Corporate,A,1.0,,1.0,65.0,3.0,c1,2017-07-25,2017-07-21,2017-07-21,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,SPA,Corporate,Corporate,A,0.0,,3.0,195.0,2.0,c1,2017-07-11,2017-07-01,2017-07-01,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,SPA,Corporate,Corporate,A,,0.0,33.274385106774496,65.0,2.0,c1,2017-07-17,2017-07-14,2017-07-14,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,SPA,Corporate,Corporate,A,1.0,2.0,1.0,4035.342891330138,4.0,c1,2017-08-31,2017-08-24,2017-08-24,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,SPA,Corporate,Corporate,A,1.0,2.0,1.0,67.0,3.0,c1,2017-08-16,2017-08-13,2017-08-13,Booked,City Hotel,SPA,True,98,True,True,4.04
+,SPA,Corporate,Corporate,A,0.0,0.0,1.0,65.0,2.0,c1,2017-07-13,2017-07-10,2017-07-10,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,SPA,Corporate,Corporate,A,,0.0,1.0,75.0,2.0,c1,2017-07-23,2017-07-22,2017-07-22,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,,Complementary,Corporate,A,1.0,1.0,3.0,0.0,4.0,c1,2017-08-22,2017-08-19,2017-08-19,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,SPA,Corporate,Corporate,A,,1.0,3.0,195.0,2.0,c1,2017-07-18,2017-07-15,2017-07-15,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,SPA,Corporate,Corporate,A,0.0,1.0,3.0,195.0,2.0,c1,2017-07-11,2017-07-08,2017-07-08,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,SPA,Corporate,Corporate,A,1.0,2.0,2.0,134.0,4.0,c1,2017-08-16,2017-08-13,2017-08-13,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,SPA,Corporate,Corporate,A,0.0,2.0,1.0,65.0,2.0,c1,2017-07-03,2017-07-01,2017-07-01,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,SPA,Corporate,Corporate,A,0.0,2.0,2.0,130.0,2.0,c1,2017-07-17,2017-07-15,2017-07-15,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,SPA,,Corporate,A,0.0,2.0,1.0,65.0,2.0,c1,2017-07-24,2017-07-22,2017-07-22,Booked,City Hotel,SPA,True,98,True,True,4.04
+,SPA,Corporate,Corporate,A,,3.0,1.0,67.0,4.0,c1,2017-08-31,2017-08-29,2017-08-29,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,SPA,Complementary,Direct,A,,3.0,1.0,0.0,3.0,c1,2017-08-23,2017-08-23,2017-08-23,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,SPA,Complementary,Direct,A,,3.0,1.0,0.0,3.0,c1,2017-08-15,2017-08-15,2017-08-15,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,SPA,Complementary,Direct,A,,3.0,1.0,0.0,4.0,c1,2017-08-08,2017-08-07,2017-08-07,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,SPA,Complementary,Direct,A,,3.0,1.0,0.0,3.0,c1,2017-08-01,2017-08-01,2017-08-01,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,SPA,Complementary,Direct,A,,3.0,1.0,0.0,4.0,c1,2017-07-12,2017-07-11,2017-07-11,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,SPA,Complementary,Corporate,A,,3.0,1.0,0.0,4.0,c1,2017-07-05,2017-07-04,2017-07-04,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,SPA,Corporate,Corporate,A,,0.0,1.0,65.0,2.0,c1,2017-07-10,2017-07-08,2017-07-08,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,SPA,Corporate,Corporate,A,,1.0,1.0,65.0,2.0,c1,2017-07-11,2017-07-08,2017-07-08,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,SPA,Corporate,Corporate,A,0.0,1.0,1.0,77.0,2.0,c1,2017-08-16,2017-08-02,2017-08-02,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,SPA,Corporate,Corporate,A,1.0,4.0,2.0,178.0,5.0,c1,2017-08-29,2017-08-04,2017-08-04,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,SPA,Corporate,Corporate,A,1.0,2.0,1.0,89.0,4.0,c1,2017-08-23,2017-08-01,2017-08-01,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,SPA,Corporate,Corporate,D,,2.0,1.0,104.0,2.0,c1,2017-07-13,2017-07-11,2017-07-11,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,SPA,Corporate,Corporate,D,1.0,2.0,1.0,104.0,4.0,c1,2017-07-20,2017-07-16,2017-07-16,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,SPA,Corporate,Corporate,A,0.0,1.0,1.0,65.0,2.0,c1,2017-07-05,2017-07-04,2017-07-04,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,SPA,Direct,Direct,A,0.0,0.0,1.0,80.0,2.0,c1,2017-08-29,2017-08-29,2017-08-29,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,SPA,Corporate,Corporate,A,1.0,,2.0,134.0,2.0,c1,2017-08-08,2017-08-07,2017-08-07,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,SPA,Corporate,Direct,D,1.0,2.0,1.0,,3.0,c1,2017-08-14,2017-08-12,2017-08-12,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,SPA,Corporate,Corporate,A,,3.0,3.0,195.0,4.0,c1,2017-08-29,2017-08-26,2017-08-26,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,SPA,Direct,Direct,A,1.0,2.0,1.0,140.0,5.0,c1,2017-08-18,2017-08-05,2017-08-05,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,SPA,Direct,Direct,A,1.0,2.0,1.0,140.0,5.0,c1,2017-08-04,2017-07-29,2017-07-29,Booked,City Hotel,SPA,True,98,True,True,4.04
+BB,SPA,Corporate,Corporate,A,0.0,,1.0,65.0,1.0,c3,2017-07-13,2017-07-10,2017-07-10,Booked,City Hotel,SPA,False,123,True,True,3.56
+BB,SPA,Corporate,Corporate,A,0.0,,1.0,65.0,1.0,c3,2017-07-19,2017-07-15,2017-07-15,Booked,City Hotel,SPA,False,123,True,True,3.56
+BB,SPA,Corporate,Corporate,A,,,1.0,67.0,1.0,c3,2017-07-11,2017-07-01,2017-07-01,Booked,City Hotel,SPA,False,123,True,True,3.56
+BB,,Corporate,Corporate,D,0.0,,1.0,95.0,1.0,c3,2017-07-13,2017-07-11,2017-07-11,Booked,City Hotel,SPA,False,123,True,True,3.56
+BB,AUT,Aviation,Corporate,A,,0.0,2.0,160.0,1.0,c3,2017-07-10,2017-07-08,2017-07-08,Booked,City Hotel,SPA,False,123,True,True,3.56
+BB,SPA,Corporate,Corporate,A,,,1.0,104.0,1.0,c3,2017-07-06,2017-07-01,2017-07-01,Booked,City Hotel,SPA,False,123,True,True,3.56
+BB,SPA,Corporate,Corporate,A,0.0,,1.0,118.0,1.0,c3,2017-07-04,2017-07-02,2017-07-02,Booked,City Hotel,SPA,False,123,True,True,3.56
+BB,DNK,Online TA,TA/TO,A,,0.0,2.0,260.0,1.0,c3,2017-07-15,2017-07-03,2017-07-03,Booked,City Hotel,SPA,False,123,True,True,3.56
+BB,,Online TA,TA/TO,D,0.0,,2.0,237.6,1.0,c3,2017-08-26,2017-08-01,2017-08-01,Booked,City Hotel,SPA,False,123,True,True,3.56
+SC,USA,Online TA,GDS,A,0.0,0.0,1.0,130.0,1.0,c3,2017-08-27,2017-07-25,2017-07-25,Booked,City Hotel,SPA,False,123,True,True,3.56
+BB,SPA,Offline TA/TO,TA/TO,A,,,1.0,130.0,3.0,c3,2017-08-23,2017-08-17,2017-08-17,Booked,City Hotel,SPA,False,123,True,True,3.56
+BB,SPA,Offline TA/TO,TA/TO,A,0.0,0.0,3.0,345.0,1.0,c3,2017-08-19,2017-07-02,2017-07-02,Booked,City Hotel,SPA,False,123,True,True,3.56
+BB,SPA,Offline TA/TO,TA/TO,A,,0.0,3.0,345.0,1.0,c3,2017-08-19,2017-07-02,2017-07-02,Booked,City Hotel,SPA,False,123,True,True,3.56
+BB,SPA,Direct,Direct,D,0.0,,1.0,148.5,1.0,c3,2017-08-20,2017-07-14,2017-07-14,Booked,City Hotel,SPA,False,123,True,True,3.56
+SC,USA,Online TA,TA/TO,A,0.0,0.0,3.0,387.0,1.0,c3,2017-07-30,2017-07-07,2017-07-07,Booked,City Hotel,SPA,False,123,True,True,3.56
+SC,SPA,Online TA,TA/TO,A,,,3.0,378.0,1.0,c3,2017-07-30,2017-07-26,2017-07-26,Booked,City Hotel,SPA,False,123,True,True,3.56
+BB,AGO,Online TA,TA/TO,D,0.0,0.0,3.0,510.0,1.0,c3,2017-07-21,2017-07-05,2017-07-05,Booked,City Hotel,SPA,False,123,True,True,3.56
+BB,CN,Online TA,TA/TO,D,,,3.0,510.0,1.0,c3,2017-07-26,2017-07-11,2017-07-11,Booked,City Hotel,SPA,False,123,True,True,3.56
+BB,GBR,Online TA,TA/TO,A,,,1.0,170.0,1.0,c3,2017-08-13,2017-08-06,2017-08-06,Booked,City Hotel,SPA,False,123,True,True,3.56
+SC,SPA,Online TA,TA/TO,P,0.0,0.0,0.0,0.0,1.0,c3,2017-08-11,2017-08-11,2017-08-11,Booked,City Hotel,SPA,False,123,True,True,3.56
+SC,SPA,Online TA,TA/TO,P,,,0.0,0.0,0.0,c3,2017-08-11,2017-08-11,2017-08-11,Booked,City Hotel,SPA,False,123,True,True,3.56
+HB,SPA,Groups,TA/TO,A,,,1.0,17.6,1.0,c3,2017-08-03,2017-08-02,2017-08-02,Booked,City Hotel,SPA,False,123,True,True,3.56
+SC,USA,Online TA,TA/TO,A,,,1.0,126.0,1.0,c3,2017-08-03,2017-07-13,2017-07-13,Booked,City Hotel,SPA,False,123,True,True,3.56
+BB,SPA,Aviation,Corporate,A,0.0,0.0,2.0,160.0,16.88534761940745,c3,2017-08-08,2017-08-08,2017-08-08,Booked,City Hotel,SPA,False,123,True,True,3.56
+BB,SPA,Offline TA/TO,TA/TO,A,,,33.274385106774496,338.01,3.0,c3,2017-08-09,2017-07-22,2017-07-22,Booked,City Hotel,SPA,False,123,True,True,3.56
+BB,FRA,Corporate,Corporate,A,,0.0,3.0,255.0,1.0,c3,2017-08-30,2017-08-13,2017-08-13,Booked,City Hotel,SPA,False,123,True,True,3.56
+SC,NLD,Online TA,TA/TO,A,0.0,,1.0,140.0,1.0,c3,2017-08-22,2017-08-16,2017-08-16,Booked,City Hotel,SPA,False,123,True,True,3.56
+BB,SPA,Corporate,Corporate,A,0.0,,3.0,195.0,1.0,c3,2017-07-11,2017-07-01,2017-07-01,Booked,City Hotel,SPA,False,123,True,True,3.56
+BB,MOZ,Direct,Direct,A,0.0,0.0,2.0,220.0,16.88534761940745,c3,2017-07-15,2017-07-15,2017-07-15,Booked,City Hotel,SPA,False,123,True,True,3.56
+BB,FRA,Direct,Direct,A,,0.0,1.0,145.0,1.0,c3,2017-07-17,2017-07-15,2017-07-15,Booked,City Hotel,SPA,False,123,True,True,3.56
+BB,FRA,Direct,Direct,D,,,1.0,145.0,1.0,c3,2017-07-16,2017-07-16,2017-07-16,Booked,City Hotel,SPA,False,123,True,True,3.56
+BB,IRL,Direct,Direct,A,,0.0,1.0,130.0,1.0,c3,2017-07-16,2017-07-06,2017-07-06,Booked,City Hotel,SPA,False,123,True,True,3.56
+BB,SPA,Corporate,Corporate,A,0.0,,1.0,65.0,1.0,c3,2017-07-12,2017-07-06,2017-07-06,Booked,City Hotel,SPA,False,123,True,True,3.56
+BB,SPA,Corporate,Corporate,A,,,1.0,65.0,1.0,c3,2017-07-12,2017-07-11,2017-07-11,Booked,City Hotel,SPA,False,123,True,True,3.56
+BB,DNK,Direct,Direct,A,0.0,0.0,4.0,446.4,1.0,c3,2017-07-10,2017-07-08,2017-07-08,Booked,City Hotel,SPA,False,123,True,True,3.56
+SC,POR,Online TA,TA/TO,D,0.0,,1.0,116.0,1.0,c3,2017-07-13,2017-07-09,2017-07-09,Booked,City Hotel,SPA,False,123,True,True,3.56
+BB,SPA,Direct,Direct,A,,,1.0,95.0,1.0,c3,2017-07-12,2017-07-09,2017-07-09,Booked,City Hotel,SPA,False,123,True,True,3.56
+BB,SPA,Corporate,Corporate,A,0.0,,1.0,65.0,1.0,c3,2017-07-24,2017-07-24,2017-07-24,Booked,City Hotel,SPA,False,123,True,True,3.56
+BB,SPA,Corporate,Corporate,A,0.0,,2.0,130.0,1.0,c3,2017-07-23,2017-07-16,2017-07-16,Booked,City Hotel,SPA,False,123,True,True,3.56
+BB,SPA,Corporate,Corporate,A,,,2.0,130.0,1.0,c3,2017-07-23,2017-07-16,2017-07-16,Booked,City Hotel,SPA,False,123,True,True,3.56
+BB,FRA,Direct,Direct,A,0.0,0.0,3.0,369.6,1.0,c3,2017-07-25,2017-07-15,2017-07-15,Booked,City Hotel,SPA,False,123,True,True,3.56
+BB,SPA,Corporate,Corporate,A,,,1.0,65.0,1.0,c3,2017-07-27,2017-07-23,2017-07-23,Booked,City Hotel,SPA,False,123,True,True,3.56
+SC,CHE,Online TA,TA/TO,A,,,5.0,800.0,1.0,c3,2017-07-22,2017-07-20,2017-07-20,Booked,City Hotel,SPA,False,123,True,True,3.56
+BB,GBR,Online TA,TA/TO,E,0.0,,1.0,200.0,1.0,c3,2017-07-26,2017-07-18,2017-07-18,Booked,City Hotel,SPA,False,123,True,True,3.56
+BB,DEU,Online TA,TA/TO,A,,,2.0,268.0,1.0,c3,2017-07-20,2017-07-09,2017-07-09,Booked,City Hotel,SPA,False,123,True,True,3.56
+SC,FRA,Direct,Direct,A,0.0,0.0,1.0,98.0,1.0,c3,2017-07-03,2017-07-03,2017-07-03,Booked,City Hotel,SPA,False,123,True,True,3.56
+SC,SPA,Direct,Direct,A,,,1.0,140.0,1.0,c3,2017-07-07,2017-07-03,2017-07-03,Booked,City Hotel,SPA,False,123,True,True,3.56
+BB,SPA,Corporate,Corporate,A,,,1.0,130.5,1.0,c3,2017-07-04,2017-07-04,2017-07-04,Booked,City Hotel,SPA,False,123,True,True,3.56
+BB,SPA,Direct,Direct,A,,0.0,1.0,112.0,1.0,c3,2017-07-03,2017-07-02,2017-07-02,Booked,City Hotel,SPA,False,123,True,True,3.56
+BB,BEL,Direct,Direct,A,,,1.0,103.0,1.0,c3,2017-07-03,2017-07-03,2017-07-03,Booked,City Hotel,SPA,False,123,True,True,3.56
+BB,SPA,Corporate,Corporate,A,,0.0,1.0,104.0,1.0,c3,2017-07-06,2017-07-01,2017-07-01,Booked,City Hotel,SPA,False,123,True,True,3.56
+BB,SPA,Corporate,Corporate,A,0.0,,1.0,95.0,1.0,c3,2017-07-06,2017-07-01,2017-07-01,Booked,City Hotel,SPA,False,123,True,True,3.56
+BB,SPA,Corporate,Corporate,A,,0.0,,95.0,1.0,c3,2017-07-06,2017-07-01,2017-07-01,Booked,City Hotel,SPA,False,123,True,True,3.56
+BB,SPA,Corporate,Corporate,A,0.0,,1.0,95.0,1.0,c3,2017-07-06,2017-07-01,2017-07-01,Booked,City Hotel,SPA,False,123,True,True,3.56
+BB,SPA,Corporate,Corporate,A,0.0,,1.0,95.0,1.0,c3,2017-07-06,2017-07-01,2017-07-01,Booked,City Hotel,SPA,False,123,True,True,3.56
+BB,SPA,Corporate,Corporate,A,0.0,,1.0,95.0,1.0,c3,2017-07-06,2017-07-01,2017-07-01,Booked,City Hotel,SPA,False,123,True,True,3.56
+BB,ITA,Online TA,TA/TO,A,,,2.0,190.0,1.0,c3,2017-08-22,2017-08-01,2017-08-01,Booked,City Hotel,SPA,False,123,True,True,3.56
+BB,DEU,Offline TA/TO,TA/TO,A,0.0,1.0,1.0,125.0,3.0,c3,2017-08-23,2017-07-23,2017-07-23,Booked,City Hotel,SPA,False,123,True,True,3.56
+BB,USA,Offline TA/TO,TA/TO,D,,0.0,1.0,115.0,1.0,c3,2017-08-23,2017-08-23,2017-08-23,Booked,City Hotel,SPA,False,123,True,True,3.56
+BB,SPA,Online TA,TA/TO,A,0.0,0.0,3.0,444.0,1.0,c3,2017-08-21,2017-08-05,2017-08-05,Booked,City Hotel,SPA,False,123,True,True,3.56
+BB,BEL,Offline TA/TO,TA/TO,A,,,2.0,12.0,1.0,c3,2017-08-20,2017-07-21,2017-07-21,Booked,City Hotel,SPA,False,123,True,True,3.56
+BB,SPA,Offline TA/TO,TA/TO,A,0.0,,2.0,280.0,1.0,c3,2017-08-20,2017-07-31,2017-07-31,Booked,City Hotel,SPA,False,123,True,True,3.56
+BB,POL,Online TA,TA/TO,D,,0.0,1.0,170.0,1.0,c3,2017-08-22,2017-08-16,2017-08-16,Booked,City Hotel,SPA,False,123,True,True,3.56
+BB,POR,Offline TA/TO,TA/TO,A,0.0,,4.0,460.0,1.0,c3,2017-08-20,2017-07-03,2017-07-03,Booked,City Hotel,SPA,False,123,True,True,3.56
+BB,POR,Groups,TA/TO,A,,,1.0,130.0,1.0,c3,2017-08-24,2017-08-23,2017-08-23,Booked,City Hotel,SPA,False,123,True,True,3.56
+BB,NLD,Offline TA/TO,TA/TO,A,,1.0,4.0,320.4,3.0,c3,2017-08-21,2017-07-04,2017-07-04,Booked,City Hotel,SPA,False,123,True,True,3.56
+BB,GBR,Offline TA/TO,TA/TO,D,0.0,0.0,4.0,356.4,3.0,c3,2017-08-21,2017-07-04,2017-07-04,Booked,City Hotel,SPA,False,123,True,True,3.56
+BB,ITA,Online TA,TA/TO,A,,,3.0,350.97,1.0,c3,2017-08-22,2017-07-29,2017-07-29,Booked,City Hotel,SPA,False,123,True,True,3.56
+BB,ITA,Offline TA/TO,TA/TO,A,0.0,,4.0,460.0,1.0,c3,2017-08-21,2017-07-04,2017-07-04,Booked,City Hotel,SPA,False,123,True,True,3.56
+BB,BEL,Direct,Direct,A,,,1.0,107.1,1.0,c3,2017-08-24,2017-08-23,2017-08-23,Booked,City Hotel,SPA,False,123,True,True,3.56
+BB,BGR,Offline TA/TO,TA/TO,A,,,5.0,575.0,1.0,c3,2017-08-20,2017-07-03,2017-07-03,Booked,City Hotel,SPA,False,123,True,True,3.56
+BB,ARG,Offline TA/TO,TA/TO,A,,,5.0,575.0,1.0,c3,2017-08-19,2017-07-02,2017-07-02,Booked,City Hotel,SPA,False,123,True,True,3.56
+BB,ITA,Online TA,TA/TO,A,,0.0,4.0,432.0,1.0,c3,2017-08-21,2017-07-01,2017-07-01,Booked,City Hotel,SPA,False,123,True,True,3.56
+BB,DEU,Offline TA/TO,TA/TO,A,0.0,,2.0,230.0,1.0,c3,2017-08-23,2017-08-23,2017-08-23,Booked,City Hotel,SPA,False,123,True,True,3.56
+SC,GBR,Offline TA/TO,TA/TO,A,,0.0,2.0,206.0,1.0,c3,2017-08-16,2017-08-02,2017-08-02,Booked,City Hotel,SPA,False,123,True,True,3.56
+BB,SPA,Corporate,Corporate,A,0.0,,1.0,65.0,1.0,c3,2017-08-16,2017-08-02,2017-08-02,Booked,City Hotel,SPA,False,123,True,True,3.56
+SC,CN,Online TA,TA/TO,A,,0.0,1.0,119.0,1.0,c3,2017-08-20,2017-08-18,2017-08-18,Booked,City Hotel,SPA,False,123,True,True,3.56
+,USA,Direct,Direct,D,,0.0,4.0,590.72,1.0,c3,2017-08-28,2017-07-17,2017-07-17,Booked,City Hotel,SPA,False,123,True,True,3.56
+HB,SPA,Groups,TA/TO,A,0.0,0.0,4.0,416.0,1.0,c3,2017-08-28,2017-07-10,2017-07-10,Booked,City Hotel,SPA,False,123,True,True,3.56
+BB,BRA,Direct,Direct,A,,,1.0,140.0,16.88534761940745,c3,2017-08-30,2017-08-30,2017-08-30,Booked,City Hotel,SPA,False,123,True,True,3.56
+HB,SPA,Groups,TA/TO,A,0.0,,2.0,208.0,1.0,c3,2017-08-29,2017-08-26,2017-08-26,Booked,City Hotel,SPA,False,123,True,True,3.56
+BB,,Online TA,TA/TO,A,,,3.0,387.99,1.0,c3,2017-08-31,2017-07-10,2017-07-10,Booked,City Hotel,SPA,False,123,True,True,3.56
+BB,GBR,Offline TA/TO,TA/TO,E,,1.0,3.0,328.5,3.0,c3,2017-08-31,2017-08-30,2017-08-30,Booked,City Hotel,SPA,False,123,True,True,3.56
+BB,DEU,Offline TA/TO,TA/TO,D,0.0,0.0,4.0,383.4,3.0,c3,2017-08-31,2017-07-12,2017-07-12,Booked,City Hotel,SPA,False,123,True,True,3.56
+SC,SPA,Online TA,TA/TO,A,0.0,,4.0,364.08,1.0,c3,2017-08-31,2017-08-07,2017-08-07,Booked,City Hotel,SPA,False,123,True,True,3.56
+BB,CN,Direct,Direct,D,,,3.0,425.7000000000001,1.0,c3,2017-08-30,2017-07-28,2017-07-28,Booked,City Hotel,SPA,False,123,True,True,3.56
+BB,JPN,Direct,Direct,D,,0.0,3.0,422.1,1.0,c3,2017-08-30,2017-08-28,2017-08-28,Booked,City Hotel,SPA,False,123,True,True,3.56
+HB,DEU,Offline TA/TO,TA/TO,D,0.0,1.0,2.0,191.0,3.0,c3,2017-08-25,2017-08-25,2017-08-25,Booked,City Hotel,SPA,False,123,True,True,3.56
+BB,USA,Offline TA/TO,TA/TO,A,,,7.0,805.0,1.0,c3,2017-08-19,2017-07-02,2017-07-02,Booked,City Hotel,SPA,False,123,True,True,3.56
+BB,AUS,Direct,Direct,D,0.0,,6.0,900.0,1.0,c3,2017-08-20,2017-07-02,2017-07-02,Booked,City Hotel,SPA,False,123,True,True,3.56
+HB,DEU,Groups,TA/TO,A,0.0,0.0,2.0,191.0,1.0,c3,2017-08-25,2017-08-14,2017-08-14,Booked,City Hotel,SPA,False,123,True,True,3.56
+BB,SPA,Corporate,Corporate,D,,,1.0,95.0,1.0,c3,2017-08-29,2017-08-09,2017-08-09,Booked,City Hotel,SPA,False,123,True,True,3.56
+BB,DEU,Corporate,Corporate,D,,0.0,1.0,95.0,1.0,c3,2017-08-29,2017-08-28,2017-08-28,Booked,City Hotel,SPA,False,123,True,True,3.56
+BB,MEX,Direct,Direct,A,,,1.0,95.0,1.0,c3,2017-08-27,2017-08-06,2017-08-06,Booked,City Hotel,SPA,False,123,True,True,3.56
+BB,CHN,Direct,Direct,A,0.0,0.0,1.0,95.0,1.0,c3,2017-08-27,2017-08-27,2017-08-27,Booked,City Hotel,SPA,False,123,True,True,3.56
+SC,SPA,Direct,Direct,A,,,3.0,480.0,1.0,c3,2017-08-04,2017-07-31,2017-07-31,Booked,City Hotel,SPA,False,123,True,True,3.56
+SC,FRA,Online TA,TA/TO,A,,0.0,1.0,179.0,1.0,c3,2017-08-05,2017-08-05,2017-08-05,Booked,City Hotel,SPA,False,123,True,True,3.56
+SC,GBR,Offline TA/TO,TA/TO,A,,0.0,1.0,128.0,3.0,c3,2017-08-05,2017-08-01,2017-08-01,Booked,City Hotel,SPA,False,123,True,True,3.56
+BB,DNK,Offline TA/TO,TA/TO,A,,,1.0,120.0,3.0,c3,2017-08-03,2017-08-01,2017-08-01,Booked,City Hotel,SPA,False,123,True,True,3.56
+SC,NLD,Online TA,TA/TO,A,0.0,,1.0,119.0,1.0,c3,2017-08-03,2017-07-30,2017-07-30,Booked,City Hotel,SPA,False,123,True,True,3.56
+BB,SPA,Offline TA/TO,TA/TO,A,,0.0,1.0,80.1,3.0,c3,2017-07-28,2017-07-28,2017-07-28,Booked,City Hotel,SPA,False,123,True,True,3.56
+BB,SPA,Corporate,Corporate,D,,,1.0,,1.0,c3,2017-07-31,2017-07-31,2017-07-31,Booked,City Hotel,SPA,False,123,True,True,3.56
+BB,SPA,Corporate,Corporate,A,0.0,0.0,1.0,65.0,1.0,c3,2017-07-30,2017-07-30,2017-07-30,Booked,City Hotel,SPA,False,123,True,True,3.56
+BB,DEU,Direct,Direct,A,,0.0,1.0,199.0,1.0,c3,2017-08-12,2017-08-12,2017-08-12,Booked,City Hotel,SPA,False,123,True,True,3.56
+BB,BEL,Direct,Direct,A,,0.0,2.0,281.6,1.0,c3,2017-08-07,2017-07-28,2017-07-28,Booked,City Hotel,SPA,False,123,True,True,3.56
+SC,SPA,Offline TA/TO,TA/TO,A,,1.0,3.0,221.82,3.0,c3,2017-08-04,2017-07-05,2017-07-05,Booked,City Hotel,SPA,False,123,True,True,3.56
+BB,POR,Corporate,Corporate,A,0.0,0.0,1.0,80.0,1.0,c3,2017-08-09,2017-08-05,2017-08-05,Booked,City Hotel,SPA,False,123,True,True,3.56
+,POR,Corporate,Corporate,A,,,1.0,4035.342891330138,1.0,c3,2017-08-09,2017-08-05,2017-08-05,Booked,City Hotel,SPA,False,123,True,True,3.56
+BB,SPA,Direct,Direct,A,0.0,,1.0,140.0,1.0,c3,2017-08-09,2017-08-09,2017-08-09,Booked,City Hotel,SPA,False,123,True,True,3.56
+BB,SPA,Corporate,Corporate,A,0.0,,1.0,65.0,1.0,c3,2017-08-29,2017-08-22,2017-08-22,Booked,City Hotel,SPA,False,123,True,True,3.56
+BB,SPA,Corporate,Corporate,A,,0.0,2.0,160.0,1.0,c3,2017-08-01,2017-07-03,2017-07-03,Booked,City Hotel,SPA,False,123,True,True,3.56
+SC,SPA,Online TA,TA/TO,A,,1.0,1.0,,4.0,c2,2017-07-06,2017-07-01,2017-07-01,Booked,City Hotel,FRA,False,51,False,False,4.17
+SC,POR,Online TA,TA/TO,A,,2.0,1.0,118.0,4.0,c2,2017-07-06,2017-07-01,2017-07-01,Booked,City Hotel,FRA,False,51,False,False,4.17
+SC,SPA,Online TA,TA/TO,A,0.0,1.0,1.0,118.0,4.0,c2,2017-07-06,2017-07-01,2017-07-01,Booked,City Hotel,FRA,False,51,False,False,4.17
+BB,SPA,Online TA,TA/TO,A,0.0,1.0,1.0,138.0,4.0,c2,2017-07-06,2017-07-01,2017-07-01,Booked,City Hotel,FRA,False,51,False,False,4.17
+BB,FRA,Online TA,TA/TO,A,,3.0,1.0,190.0,4.0,c2,2017-07-16,2017-07-16,2017-07-16,Booked,City Hotel,FRA,False,51,False,False,4.17
+SC,AUS,Online TA,TA/TO,A,,1.0,2.0,260.0,4.0,c2,2017-07-16,2017-07-05,2017-07-05,Booked,City Hotel,FRA,False,51,False,False,4.17
+SC,SWE,Online TA,TA/TO,A,0.0,2.0,1.0,140.0,4.0,c2,2017-07-17,2017-07-17,2017-07-17,Booked,City Hotel,FRA,False,51,False,False,4.17
+BB,MOZ,Online TA,TA/TO,A,0.0,2.0,2.0,278.0,4.0,c2,2017-07-15,2017-07-09,2017-07-09,Booked,City Hotel,FRA,False,51,False,False,4.17
+SC,BRA,Online TA,TA/TO,A,0.0,1.0,2.0,248.0,4.0,c2,2017-07-20,2017-07-08,2017-07-08,Booked,City Hotel,FRA,False,51,False,False,4.17
+SC,ITA,Online TA,TA/TO,A,0.0,1.0,1.0,98.0,4.0,c2,2017-07-21,2017-07-15,2017-07-15,Booked,City Hotel,FRA,False,51,False,False,4.17
+SC,IRN,Online TA,TA/TO,A,0.0,1.0,4.0,520.0,4.0,c2,2017-07-09,2017-07-04,2017-07-04,Booked,City Hotel,FRA,False,51,False,False,4.17
+SC,IRN,Online TA,TA/TO,A,0.0,1.0,4.0,520.0,4.0,c2,2017-07-09,2017-07-02,2017-07-02,Booked,City Hotel,FRA,False,51,False,False,4.17
+SC,DEU,Online TA,TA/TO,A,0.0,1.0,5.0,640.0,4.0,c2,2017-07-09,2017-07-05,2017-07-05,Booked,City Hotel,FRA,False,51,False,False,4.17
+SC,FRA,Online TA,TA/TO,A,,1.0,3.0,378.0,4.0,c2,2017-07-13,2017-07-08,2017-07-08,Booked,City Hotel,FRA,False,51,False,False,4.17
+BB,FRA,Online TA,TA/TO,D,,1.0,3.0,489.99,4.0,c2,2017-07-13,2017-07-01,2017-07-01,Booked,City Hotel,FRA,False,51,False,False,4.17
+SC,SPA,Online TA,TA/TO,A,0.0,1.0,2.0,190.4,4.0,c2,2017-07-21,2017-07-16,2017-07-16,Booked,City Hotel,FRA,False,51,False,False,4.17
+SC,SPA,Online TA,TA/TO,A,0.0,1.0,1.0,89.0,4.0,c2,2017-08-27,2017-08-17,2017-08-17,Booked,City Hotel,FRA,False,51,False,False,4.17
+SC,GBR,Online TA,TA/TO,A,0.0,2.0,2.0,229.0,4.0,c2,2017-08-26,2017-08-12,2017-08-12,Booked,City Hotel,FRA,False,51,False,False,4.17
+BB,SPA,Online TA,TA/TO,A,,2.0,1.0,160.0,4.0,c2,2017-08-28,2017-08-24,2017-08-24,Booked,City Hotel,FRA,False,51,False,False,4.17
+BB,DEU,Online TA,TA/TO,D,,1.0,7.0,1145.97,4.0,c2,2017-08-27,2017-07-23,2017-07-23,Booked,City Hotel,FRA,False,51,False,False,4.17
+SC,SPA,Online TA,TA/TO,A,,1.0,1.0,89.0,4.0,c2,2017-08-27,2017-08-10,2017-08-10,Booked,City Hotel,FRA,False,51,False,False,4.17
+SC,SPA,Online TA,TA/TO,A,0.0,1.0,4.0,407.2,4.0,c2,2017-08-25,2017-08-17,2017-08-17,Booked,City Hotel,FRA,False,51,False,False,4.17
+BB,DEU,Online TA,TA/TO,A,,1.0,2.0,299.0,4.0,c2,2017-08-24,2017-08-07,2017-08-07,Booked,City Hotel,FRA,False,51,False,False,4.17
+SC,ITA,Online TA,TA/TO,A,,1.0,2.0,258.0,4.0,c2,2017-08-24,2017-07-25,2017-07-25,Booked,City Hotel,FRA,False,51,False,False,4.17
+BB,ITA,Online TA,TA/TO,A,,1.0,3.0,458.01,4.0,c2,2017-08-23,2017-07-26,2017-07-26,Booked,City Hotel,FRA,False,51,False,False,4.17
+BB,POR,Online TA,TA/TO,D,0.0,3.0,2.0,340.0,5.0,c2,2017-08-25,2017-08-05,2017-08-05,Booked,City Hotel,FRA,False,51,False,False,4.17
+BB,GRC,Online TA,TA/TO,E,,1.0,6.0,1110.0,4.0,c2,2017-08-31,2017-07-02,2017-07-02,Booked,City Hotel,FRA,False,51,False,False,4.17
+SC,GBR,Online TA,TA/TO,A,0.0,1.0,4.0,549.0,4.0,c2,2017-08-29,2017-08-07,2017-08-07,Booked,City Hotel,FRA,False,51,False,False,4.17
+BB,CHN,Online TA,TA/TO,D,0.0,1.0,3.0,498.99,4.0,c2,2017-08-30,2017-08-15,2017-08-15,Booked,City Hotel,FRA,False,51,False,False,4.17
+BB,BRA,Online TA,TA/TO,A,0.0,1.0,3.0,480.0,4.0,c2,2017-08-18,2017-07-30,2017-07-30,Booked,City Hotel,FRA,False,51,False,False,4.17
+BB,IRL,Online TA,TA/TO,D,0.0,1.0,3.0,549.99,4.0,c2,2017-08-18,2017-08-09,2017-08-09,Booked,City Hotel,FRA,False,51,False,False,4.17
+SC,SPA,Online TA,TA/TO,A,0.0,1.0,1.0,160.0,4.0,c2,2017-08-17,2017-08-10,2017-08-10,Booked,City Hotel,FRA,False,51,False,False,4.17
+SC,CHN,Online TA,TA/TO,A,0.0,2.0,3.0,480.0,4.0,c2,2017-08-17,2017-08-02,2017-08-02,Booked,City Hotel,FRA,False,51,False,False,4.17
+BB,POR,Online TA,TA/TO,A,,1.0,3.0,468.0,4.0,c2,2017-07-28,2017-07-13,2017-07-13,Booked,City Hotel,FRA,False,51,False,False,4.17
+SC,SPA,Online TA,TA/TO,A,0.0,1.0,1.0,140.0,4.0,c2,2017-07-29,2017-07-19,2017-07-19,Booked,City Hotel,FRA,False,51,False,False,4.17
+BB,FRA,Online TA,TA/TO,D,,2.0,3.0,510.0,4.0,c2,2017-07-29,2017-07-12,2017-07-12,Booked,City Hotel,FRA,False,51,False,False,4.17
+SC,CN,Online TA,TA/TO,A,,1.0,2.0,280.0,4.0,c2,2017-07-29,2017-07-08,2017-07-08,Booked,City Hotel,FRA,False,51,False,False,4.17
+SC,CN,Online TA,TA/TO,A,0.0,1.0,2.0,280.0,,c2,2017-07-29,2017-07-08,2017-07-08,Booked,City Hotel,FRA,False,51,False,False,4.17
+SC,GBR,Online TA,TA/TO,A,,1.0,2.0,280.0,4.0,c2,2017-07-29,2017-07-11,2017-07-11,Booked,City Hotel,FRA,False,51,False,False,4.17
+SC,SPA,Online TA,TA/TO,A,,1.0,2.0,320.0,4.0,c2,2017-07-28,2017-07-22,2017-07-22,Booked,City Hotel,FRA,False,51,False,False,4.17
+BB,CHE,Online TA,TA/TO,D,0.0,2.0,5.0,858.0,4.0,c2,2017-07-27,2017-07-22,2017-07-22,Booked,City Hotel,FRA,False,51,False,False,4.17
+BB,NLD,Online TA,TA/TO,A,0.0,2.0,1.0,129.0,4.0,c2,2017-07-30,2017-07-24,2017-07-24,Booked,City Hotel,FRA,False,51,False,False,4.17
+SC,SPA,Online TA,TA/TO,A,,2.0,2.0,279.0,4.0,c2,2017-07-31,2017-07-28,2017-07-28,Booked,City Hotel,FRA,False,51,False,False,4.17
+SC,GBR,Online TA,TA/TO,A,,1.0,2.0,248.0,4.0,c2,2017-07-31,2017-07-20,2017-07-20,Booked,City Hotel,FRA,False,51,False,False,4.17
+SC,POR,Online TA,TA/TO,A,,1.0,1.0,98.0,4.0,c2,2017-07-24,2017-07-15,2017-07-15,Booked,City Hotel,FRA,False,51,False,False,4.17
+SC,COL,Online TA,TA/TO,A,0.0,1.0,,476.0,4.0,c2,2017-07-21,2017-07-13,2017-07-13,Booked,City Hotel,FRA,False,51,False,False,4.17
+BB,CHE,Online TA,TA/TO,D,0.0,1.0,4.0,,4.0,c2,2017-07-21,2017-07-06,2017-07-06,Booked,City Hotel,FRA,False,51,False,False,4.17
+BB,IRL,Online TA,TA/TO,A,0.0,1.0,3.0,438.0,4.0,c2,2017-07-22,2017-07-16,2017-07-16,Booked,City Hotel,FRA,False,51,False,False,4.17
+SC,NOR,Online TA,TA/TO,A,,1.0,2.0,238.0,4.0,c2,2017-07-24,2017-07-16,2017-07-16,Booked,City Hotel,FRA,False,51,False,False,4.17
+SC,POR,Online TA,TA/TO,A,0.0,1.0,,387.99,4.0,c2,2017-07-24,2017-07-10,2017-07-10,Booked,City Hotel,FRA,False,51,False,False,4.17
+SC,POR,Online TA,TA/TO,A,,1.0,2.0,280.0,4.0,c2,2017-07-25,2017-07-15,2017-07-15,Booked,City Hotel,FRA,False,51,False,False,4.17
+SC,GBR,Online TA,TA/TO,A,,1.0,1.0,160.0,4.0,c2,2017-08-13,2017-08-06,2017-08-06,Booked,City Hotel,FRA,False,51,False,False,4.17
+SC,GBR,Online TA,TA/TO,A,,3.0,6.0,840.0,5.0,c2,2017-08-12,2017-07-17,2017-07-17,Booked,City Hotel,FRA,False,51,False,False,4.17
+,GBR,Online TA,TA/TO,A,0.0,2.0,4.0,560.0,4.0,c2,2017-08-12,2017-07-18,2017-07-18,Booked,City Hotel,FRA,False,51,False,False,4.17
+BB,POR,Online TA,TA/TO,A,,1.0,4.0,720.0,4.0,c2,2017-08-12,2017-07-28,2017-07-28,Booked,City Hotel,FRA,False,51,False,False,4.17
+BB,FRA,Online TA,TA/TO,D,0.0,2.0,2.0,380.0,4.0,c2,2017-08-13,2017-07-29,2017-07-29,Booked,City Hotel,FRA,False,51,False,False,4.17
+BB,CHE,Online TA,TA/TO,D,,1.0,3.0,510.0,4.0,c2,2017-08-10,2017-07-18,2017-07-18,Booked,City Hotel,FRA,False,51,False,False,4.17
+SC,IRL,Online TA,TA/TO,A,,1.0,4.0,640.0,4.0,c2,2017-08-10,2017-07-30,2017-07-30,Booked,City Hotel,FRA,False,51,False,False,4.17
+BB,FRA,Online TA,TA/TO,A,0.0,1.0,2.0,360.0,4.0,c2,2017-08-11,2017-07-30,2017-07-30,Booked,City Hotel,FRA,False,51,False,False,4.17
+SC,USA,Online TA,TA/TO,A,,1.0,1.0,160.0,4.0,c2,2017-08-11,2017-07-28,2017-07-28,Booked,City Hotel,FRA,False,51,False,False,4.17
+SC,GBR,Online TA,TA/TO,A,0.0,1.0,3.0,420.0,4.0,c2,2017-08-13,2017-07-12,2017-07-12,Booked,City Hotel,FRA,False,51,False,False,4.17
+SC,GBR,Online TA,TA/TO,A,0.0,1.0,2.0,280.0,4.0,c2,2017-08-13,2017-07-27,2017-07-27,Booked,City Hotel,FRA,False,51,False,False,4.17
+BB,ITA,Online TA,TA/TO,A,0.0,1.0,4.0,640.0,4.0,c2,2017-08-15,2017-07-17,2017-07-17,Booked,City Hotel,FRA,False,51,False,False,4.17
+BB,DEU,Online TA,TA/TO,A,,1.0,3.0,540.0,4.0,c2,2017-08-15,2017-07-30,2017-07-30,Booked,City Hotel,FRA,False,51,False,False,4.17
+SC,IRL,Online TA,TA/TO,A,,1.0,3.0,480.0,4.0,c2,2017-08-16,2017-08-03,2017-08-03,Booked,City Hotel,FRA,False,51,False,False,4.17
+SC,GBR,Online TA,TA/TO,A,,1.0,3.0,420.0,4.0,c2,2017-08-13,2017-07-27,2017-07-27,Booked,City Hotel,FRA,False,51,False,False,4.17
+BB,CHE,Online TA,TA/TO,A,,1.0,1.0,160.0,4.0,c2,2017-08-15,2017-07-26,2017-07-26,Booked,City Hotel,FRA,False,51,False,False,4.17
+BB,BRA,Online TA,TA/TO,A,,1.0,4.0,640.0,4.0,c2,2017-08-04,2017-07-10,2017-07-10,Booked,City Hotel,FRA,False,51,False,False,4.17
+BB,DNK,Online TA,TA/TO,A,,1.0,5.0,800.0,4.0,c2,2017-08-05,2017-07-04,2017-07-04,Booked,City Hotel,FRA,False,51,False,False,4.17
+BB,CIV,Online TA,TA/TO,D,,1.0,4.0,848.0,4.0,c2,2017-08-02,2017-07-21,2017-07-21,Booked,City Hotel,FRA,False,51,False,False,4.17
+BB,POR,Online TA,TA/TO,D,0.0,1.0,3.0,498.0,4.0,c2,2017-08-02,2017-07-22,2017-07-22,Booked,City Hotel,FRA,False,51,False,False,4.17
+BB,FRA,Online TA,TA/TO,A,,2.0,2.0,360.0,4.0,c2,2017-08-08,2017-07-24,2017-07-24,Booked,City Hotel,FRA,False,51,False,False,4.17
+SC,NLD,Online TA,TA/TO,A,,1.0,5.0,700.0,4.0,c2,2017-08-09,2017-07-18,2017-07-18,Booked,City Hotel,FRA,False,51,False,False,4.17
+BB,POR,Online TA,TA/TO,D,,2.0,5.0,950.0,4.0,c2,2017-08-06,2017-07-26,2017-07-26,Booked,City Hotel,FRA,False,51,False,False,4.17
+SC,FRA,Online TA,TA/TO,A,0.0,1.0,2.0,280.0,4.0,c2,2017-07-14,2017-07-01,2017-07-01,Booked,City Hotel,FRA,False,51,False,False,4.17
+BB,NLD,Online TA,TA/TO,D,0.0,1.0,2.0,298.0,4.0,c2,2017-07-14,2017-07-09,2017-07-09,Booked,City Hotel,FRA,False,51,False,False,4.17
+SC,NOR,Online TA,TA/TO,A,0.0,1.0,3.0,320.01,4.0,c2,2017-07-14,2017-07-13,2017-07-13,Booked,City Hotel,FRA,False,51,False,False,4.17
+BB,MAR,Online TA,TA/TO,A,,1.0,2.0,283.0,4.0,c2,2017-07-15,2017-07-13,2017-07-13,Booked,City Hotel,FRA,False,51,False,False,4.17
+,MOZ,Online TA,TA/TO,A,0.0,1.0,2.0,236.0,4.0,c2,2017-07-15,2017-07-10,2017-07-10,Booked,City Hotel,FRA,False,51,False,False,4.17
+SC,FRA,Online TA,TA/TO,A,0.0,1.0,1.0,98.0,4.0,c2,2017-07-16,2017-07-09,2017-07-09,Booked,City Hotel,FRA,False,51,False,False,4.17
+BB,MOZ,Online TA,TA/TO,A,0.0,3.0,2.0,250.0,4.0,c2,2017-07-15,2017-07-11,2017-07-11,Booked,City Hotel,FRA,False,51,False,False,4.17
+BB,POR,Online TA,TA/TO,A,,1.0,1.0,125.0,4.0,c2,2017-07-16,2017-07-11,2017-07-11,Booked,City Hotel,FRA,False,51,False,False,4.17
+SC,FRA,Online TA,TA/TO,A,,1.0,1.0,105.0,4.0,c2,2017-07-16,2017-07-12,2017-07-12,Booked,City Hotel,FRA,False,51,False,False,4.17
+SC,CN,Online TA,TA/TO,A,,1.0,1.0,112.0,4.0,c2,2017-07-15,2017-07-14,2017-07-14,Booked,City Hotel,FRA,False,51,False,False,4.17
+SC,GBR,Online TA,TA/TO,A,,1.0,1.0,105.0,4.0,c2,2017-07-15,2017-07-11,2017-07-11,Booked,City Hotel,FRA,False,51,False,False,4.17
+SC,DEU,Online TA,TA/TO,A,,2.0,1.0,120.0,4.0,c2,2017-07-14,2017-07-14,2017-07-14,Booked,City Hotel,FRA,False,51,False,False,4.17
+BB,AUT,Online TA,TA/TO,D,,1.0,4.0,489.2,4.0,c2,2017-07-11,2017-07-10,2017-07-10,Booked,City Hotel,FRA,False,51,False,False,4.17
+SC,AUT,Online TA,TA/TO,A,0.0,2.0,1.0,120.0,4.0,c2,2017-07-15,2017-07-06,2017-07-06,Booked,City Hotel,FRA,False,51,False,False,4.17
+,GBR,Online TA,TA/TO,A,,1.0,2.0,260.0,,c2,2017-07-14,2017-07-01,2017-07-01,Booked,City Hotel,FRA,False,51,False,False,4.17
+BB,FRA,Online TA,TA/TO,D,,2.0,1.0,135.0,4.0,c2,2017-07-16,2017-07-11,2017-07-11,Booked,City Hotel,FRA,False,51,False,False,4.17
+SC,BEL,Online TA,TA/TO,A,,1.0,6.0,756.0,4.0,c2,2017-07-12,2017-07-08,2017-07-08,Booked,City Hotel,FRA,False,51,False,False,4.17
+SC,POR,Online TA,TA/TO,A,,1.0,4.0,490.0,4.0,c2,2017-07-15,2017-07-11,2017-07-11,Booked,City Hotel,FRA,False,51,False,False,4.17
+BB,SAU,Online TA,TA/TO,D,0.0,1.0,1.0,170.0,4.0,c2,2017-07-17,2017-07-07,2017-07-07,Booked,City Hotel,FRA,False,51,False,False,4.17
+BB,POR,Online TA,TA/TO,D,,1.0,4.0,632.0,4.0,c2,2017-07-13,2017-07-09,2017-07-09,Booked,City Hotel,FRA,False,51,False,False,4.17
+BB,BEL,Online TA,TA/TO,A,,1.0,1.0,118.0,4.0,c2,2017-07-16,2017-07-08,2017-07-08,Booked,City Hotel,FRA,False,51,False,False,4.17
+BB,DEU,Online TA,TA/TO,D,,1.0,1.0,150.0,4.0,c2,2017-07-14,2017-07-11,2017-07-11,Booked,City Hotel,FRA,False,51,False,False,4.17
+SC,FIN,Online TA,TA/TO,A,0.0,1.0,1.0,106.4,16.88534761940745,c2,2017-07-17,2017-07-16,2017-07-16,Booked,City Hotel,FRA,False,51,False,False,4.17
+SC,SPA,Online TA,TA/TO,A,0.0,1.0,3.0,315.0,4.0,c2,2017-07-15,2017-07-11,2017-07-11,Booked,City Hotel,FRA,False,51,False,False,4.17
+SC,FRA,Online TA,TA/TO,A,,1.0,33.274385106774496,120.0,4.0,c2,2017-07-12,2017-07-01,2017-07-01,Booked,City Hotel,FRA,False,51,False,False,4.17
+BB,SPA,Online TA,TA/TO,A,,1.0,1.0,140.0,4.0,c2,2017-07-11,2017-07-04,2017-07-04,Booked,City Hotel,FRA,False,51,False,False,4.17
+BB,IRL,Online TA,TA/TO,E,,3.0,,180.0,5.0,c2,2017-07-13,2017-07-08,2017-07-08,Booked,City Hotel,FRA,False,51,False,False,4.17
+BB,FRA,Online TA,TA/TO,E,0.0,1.0,1.0,180.0,4.0,c2,2017-07-13,2017-07-12,2017-07-12,Booked,City Hotel,FRA,False,51,False,False,4.17
+SC,USA,Online TA,TA/TO,A,,1.0,2.0,278.0,4.0,c2,2017-07-12,2017-07-01,2017-07-01,Booked,City Hotel,FRA,False,51,False,False,4.17
+SC,GBR,Online TA,TA/TO,A,,2.0,3.0,380.01,4.0,c2,2017-07-11,2017-07-01,2017-07-01,Booked,City Hotel,FRA,False,51,False,False,4.17
+SC,SPA,Online TA,TA/TO,A,,1.0,4.0,476.0,4.0,c2,2017-07-21,2017-07-15,2017-07-15,Booked,City Hotel,FRA,False,51,False,False,4.17
+BB,GBR,Online TA,TA/TO,E,,2.0,3.0,600.0,4.0,c2,2017-07-23,2017-07-05,2017-07-05,Booked,City Hotel,FRA,False,51,False,False,4.17
+BB,GBR,Online TA,,A,,2.0,3.0,480.0,4.0,c2,2017-07-23,2017-07-05,2017-07-05,Booked,City Hotel,FRA,False,51,False,False,4.17
+BB,POL,Online TA,TA/TO,A,,1.0,3.0,480.0,4.0,c2,2017-07-23,2017-07-19,2017-07-19,Booked,City Hotel,FRA,False,51,False,False,4.17
+SC,FRA,Online TA,TA/TO,A,0.0,2.0,1.0,140.0,4.0,c2,2017-07-24,2017-07-23,2017-07-23,Booked,City Hotel,FRA,False,51,False,False,4.17
+SC,DEU,Online TA,TA/TO,A,,1.0,1.0,108.0,4.0,c2,2017-07-24,2017-07-13,2017-07-13,Booked,City Hotel,FRA,False,51,False,False,4.17
+SC,AUT,Online TA,TA/TO,A,0.0,2.0,1.0,160.0,4.0,c2,2017-07-25,2017-07-21,2017-07-21,Booked,City Hotel,FRA,False,51,False,False,4.17
+SC,DEU,Online TA,TA/TO,A,0.0,1.0,5.0,616.0,4.0,c2,2017-07-21,2017-07-15,2017-07-15,Booked,City Hotel,FRA,False,51,False,False,4.17
+BB,CHE,Online TA,TA/TO,D,,1.0,4.0,680.0,4.0,c2,2017-07-17,2017-07-13,2017-07-13,Booked,City Hotel,FRA,False,51,False,False,4.17
+BB,BEL,Online TA,TA/TO,A,,1.0,,160.0,4.0,c2,2017-07-20,2017-07-07,2017-07-07,Booked,City Hotel,FRA,False,51,False,False,4.17
+BB,DNK,Online TA,TA/TO,A,,1.0,1.0,128.0,4.0,c2,2017-07-22,2017-07-13,2017-07-13,Booked,City Hotel,FRA,False,51,False,False,4.17
+SC,GBR,Online TA,TA/TO,A,0.0,1.0,3.0,309.96,4.0,c2,2017-07-21,2017-07-13,2017-07-13,Booked,City Hotel,FRA,False,51,False,False,4.17
+BB,FRA,Online TA,TA/TO,D,,1.0,1.0,138.0,4.0,c2,2017-07-21,2017-07-10,2017-07-10,Booked,City Hotel,FRA,False,51,False,False,4.17
+SC,SPA,Online TA,TA/TO,A,0.0,3.0,1.0,98.0,5.0,c2,2017-07-21,2017-07-13,2017-07-13,Booked,City Hotel,FRA,False,51,False,False,4.17
+BB,DEU,Online TA,TA/TO,A,,3.0,4.0,598.0,5.0,c2,2017-07-19,2017-07-14,2017-07-14,Booked,City Hotel,FRA,False,51,False,False,4.17
+BB,GBR,Online TA,TA/TO,D,0.0,1.0,3.0,477.99,4.0,c2,2017-07-20,2017-07-09,2017-07-09,Booked,City Hotel,FRA,False,51,False,False,4.17
+BB,SPA,Online TA,TA/TO,D,,1.0,4.0,638.0,4.0,c2,2017-07-18,2017-07-15,2017-07-15,Booked,City Hotel,FRA,False,51,False,False,4.17
+BB,FRA,Online TA,TA/TO,A,,1.0,1.0,118.0,4.0,c2,2017-07-21,2017-07-13,2017-07-13,Booked,City Hotel,FRA,False,51,False,False,4.17
+BB,SPA,,TA/TO,A,0.0,1.0,1.0,118.0,4.0,c2,2017-07-02,2017-07-01,2017-07-01,Booked,City Hotel,FRA,False,51,False,False,4.17
+BB,FRA,Online TA,TA/TO,E,,2.0,2.0,378.0,4.0,c2,2017-07-06,2017-07-01,2017-07-01,Booked,City Hotel,FRA,False,51,False,False,4.17
+BB,SVK,Online TA,TA/TO,A,0.0,1.0,2.0,320.0,4.0,c2,2017-07-09,2017-07-03,2017-07-03,Booked,City Hotel,FRA,False,51,False,False,4.17
+,SPA,Online TA,TA/TO,A,,1.0,1.0,138.0,4.0,c2,2017-07-04,2017-07-02,2017-07-02,Booked,City Hotel,FRA,False,51,False,False,4.17
+BB,IRL,Online TA,TA/TO,A,,1.0,1.0,118.0,4.0,c2,2017-07-03,2017-07-01,2017-07-01,Booked,City Hotel,FRA,False,51,False,False,4.17
+BB,SPA,Online TA,TA/TO,A,0.0,1.0,1.0,118.0,4.0,c2,2017-07-03,2017-07-03,2017-07-03,Booked,City Hotel,FRA,False,51,False,False,4.17
+BB,ISR,Online TA,TA/TO,A,,3.0,2.0,318.0,5.0,c2,2017-07-05,2017-07-01,2017-07-01,Booked,City Hotel,FRA,False,51,False,False,4.17
+BB,SPA,Online TA,TA/TO,E,,1.0,1.0,199.0,,c2,2017-08-22,2017-08-21,2017-08-21,Booked,City Hotel,FRA,False,51,False,False,4.17
+SC,AUS,Online TA,TA/TO,A,,2.0,2.0,280.0,16.88534761940745,c2,2017-08-21,2017-08-21,2017-08-21,Booked,City Hotel,FRA,False,51,False,False,4.17
+SC,ITA,Online TA,TA/TO,A,0.0,1.0,4.0,572.4,4.0,c2,2017-08-17,2017-08-17,2017-08-17,Booked,City Hotel,FRA,False,51,False,False,4.17
+SC,FRA,Online TA,TA/TO,A,,1.0,1.0,119.0,4.0,c2,2017-08-24,2017-08-05,2017-08-05,Booked,City Hotel,FRA,False,51,False,False,4.17
+BB,BRA,Online TA,TA/TO,A,,1.0,,111.2,4.0,c2,2017-08-24,2017-08-09,2017-08-09,Booked,City Hotel,FRA,False,51,False,False,4.17
+SC,FRA,Online TA,TA/TO,A,,1.0,2.0,259.0,4.0,c2,2017-08-23,2017-08-08,2017-08-08,Booked,City Hotel,FRA,False,51,False,False,4.17
+BB,USA,Online TA,TA/TO,A,0.0,1.0,2.0,278.0,4.0,c2,2017-08-23,2017-07-22,2017-07-22,Booked,City Hotel,FRA,False,51,False,False,4.17
+BB,CN,Online TA,TA/TO,A,,1.0,3.0,459.0,4.0,c2,2017-08-23,2017-08-06,2017-08-06,Booked,City Hotel,FRA,False,51,False,False,4.17
+SC,ROU,Online TA,TA/TO,A,,1.0,1.0,107.1,4.0,c2,2017-08-24,2017-08-19,2017-08-19,Booked,City Hotel,FRA,False,51,False,False,4.17
+BB,SPA,Online TA,TA/TO,A,,3.0,1.0,150.0,5.0,c2,2017-08-20,2017-08-16,2017-08-16,Booked,City Hotel,FRA,False,51,False,False,4.17
+BB,SPA,Online TA,TA/TO,A,,2.0,1.0,189.0,4.0,c2,2017-08-17,2017-08-16,2017-08-16,Booked,City Hotel,FRA,False,51,False,False,4.17
+BB,FRA,Online TA,TA/TO,A,0.0,1.0,4.0,600.0,4.0,c2,2017-08-14,2017-07-06,2017-07-06,Booked,City Hotel,FRA,False,51,False,False,4.17
+BB,USA,Online TA,TA/TO,D,0.0,2.0,2.0,380.0,4.0,c2,2017-08-17,2017-07-30,2017-07-30,Booked,City Hotel,FRA,False,51,False,False,4.17
+SC,ITA,Online TA,TA/TO,A,0.0,3.0,4.0,610.0,5.0,c2,2017-08-15,2017-07-19,2017-07-19,Booked,City Hotel,FRA,False,51,False,False,4.17
+BB,GBR,Online TA,TA/TO,D,,1.0,4.0,486.4,4.0,c2,2017-08-15,2017-07-04,2017-07-04,Booked,City Hotel,FRA,False,51,False,False,4.17
+BB,FRA,Online TA,TA/TO,A,,1.0,4.0,640.0,4.0,c2,2017-08-13,2017-07-11,2017-07-11,Booked,City Hotel,FRA,False,51,False,False,4.17
+BB,POL,Online TA,TA/TO,D,0.0,1.0,3.0,480.0,4.0,c2,2017-08-13,2017-07-08,2017-07-08,Booked,City Hotel,FRA,False,51,False,False,4.17
+SC,IRL,Online TA,TA/TO,A,,3.0,3.0,480.0,5.0,c2,2017-08-14,2017-07-31,2017-07-31,Booked,City Hotel,FRA,False,51,False,False,4.17
+SC,,Online TA,TA/TO,A,,1.0,4.0,560.0,4.0,c2,2017-08-13,2017-07-08,2017-07-08,Booked,City Hotel,FRA,False,51,False,False,4.17
+BB,GBR,Online TA,TA/TO,D,,1.0,2.0,178.2,4.0,c2,2017-08-18,2017-07-14,2017-07-14,Booked,City Hotel,FRA,False,51,False,False,4.17
+BB,GBR,Online TA,TA/TO,D,,1.0,33.274385106774496,178.2,4.0,c2,2017-08-18,2017-07-14,2017-07-14,Booked,City Hotel,FRA,False,51,False,False,4.17
+BB,BRA,Online TA,TA/TO,D,,1.0,3.0,549.99,4.0,c2,2017-08-18,2017-08-11,2017-08-11,Booked,City Hotel,FRA,False,51,False,False,4.17
+BB,GBR,Online TA,TA/TO,D,,1.0,3.0,549.99,4.0,c2,2017-08-18,2017-08-13,2017-08-13,Booked,City Hotel,FRA,False,51,False,False,4.17
+BB,SPA,Online TA,TA/TO,D,0.0,4.0,2.0,360.0,4.0,c2,2017-08-19,2017-08-13,2017-08-13,Booked,City Hotel,FRA,False,51,False,False,4.17
+BB,ITA,Online TA,TA/TO,A,0.0,1.0,1.0,160.0,4.0,c2,2017-08-19,2017-07-31,2017-07-31,Booked,City Hotel,FRA,False,51,False,False,4.17
+BB,SPA,Online TA,TA/TO,A,,1.0,2.0,255.2,4.0,c2,2017-08-18,2017-08-17,2017-08-17,Booked,City Hotel,FRA,False,51,False,False,4.17
+SC,CHE,Online TA,TA/TO,A,,3.0,2.0,338.0,5.0,c2,2017-08-17,2017-08-01,2017-08-01,Booked,City Hotel,FRA,False,51,False,False,4.17
+BB,SWE,Online TA,TA/TO,A,,2.0,2.0,273.6,4.0,c2,2017-08-18,2017-08-15,2017-08-15,Booked,City Hotel,FRA,False,51,False,False,4.17
+BB,FRA,Online TA,TA/TO,D,,1.0,1.0,190.0,4.0,c2,2017-08-19,2017-08-09,2017-08-09,Booked,City Hotel,FRA,False,51,False,False,4.17
+BB,POL,Online TA,TA/TO,A,0.0,1.0,2.0,299.0,4.0,c2,2017-08-24,2017-08-13,2017-08-13,Booked,City Hotel,FRA,False,51,False,False,4.17
+SC,SPA,Online TA,TA/TO,A,0.0,1.0,1.0,140.0,4.0,c2,2017-08-31,2017-08-29,2017-08-29,Booked,City Hotel,FRA,False,51,False,False,4.17
+BB,DEU,Online TA,TA/TO,D,,1.0,4.0,356.4,4.0,c2,2017-08-27,2017-07-08,2017-07-08,Booked,City Hotel,FRA,False,51,False,False,4.17
+BB,GBR,Online TA,TA/TO,D,,1.0,3.0,510.0,4.0,c2,2017-08-28,2017-08-12,2017-08-12,Booked,City Hotel,FRA,False,51,False,False,4.17
+SC,FRA,Online TA,TA/TO,A,,1.0,1.0,140.0,4.0,c2,2017-08-29,2017-08-07,2017-08-07,Booked,City Hotel,FRA,False,51,False,False,4.17
+BB,GBR,Online TA,TA/TO,D,0.0,1.0,4.0,629.0,4.0,c2,2017-08-26,2017-08-19,2017-08-19,Booked,City Hotel,FRA,False,51,False,False,4.17
+BB,DEU,Online TA,TA/TO,A,,1.0,3.0,458.01,,c2,2017-08-31,2017-08-17,2017-08-17,Booked,City Hotel,FRA,False,51,False,False,4.17
+BB,LUX,Online TA,TA/TO,A,0.0,1.0,3.0,458.01,4.0,c2,2017-08-31,2017-08-15,2017-08-15,Booked,City Hotel,FRA,False,51,False,False,4.17
+SC,SPA,Online TA,TA/TO,A,0.0,1.0,1.0,99.0,4.0,c2,2017-08-27,2017-08-27,2017-08-27,Booked,City Hotel,FRA,False,51,False,False,4.17
+SC,SPA,Online TA,TA/TO,A,,2.0,1.0,89.0,4.0,c2,2017-08-27,2017-08-27,2017-08-27,Booked,City Hotel,FRA,False,51,False,False,4.17
+BB,BRA,Online TA,TA/TO,D,0.0,1.0,2.0,244.8,4.0,c2,2017-08-26,2017-07-27,2017-07-27,Booked,City Hotel,FRA,False,51,False,False,4.17
+SC,POR,Online TA,TA/TO,A,,1.0,2.0,280.0,4.0,c2,2017-08-25,2017-08-20,2017-08-20,Booked,City Hotel,FRA,False,51,False,False,4.17
+BB,BRA,Online TA,TA/TO,D,,1.0,2.0,230.4,4.0,c2,2017-08-26,2017-07-12,2017-07-12,Booked,City Hotel,FRA,False,51,False,False,4.17
+SC,BEL,Online TA,TA/TO,A,,1.0,3.0,365.01,4.0,c2,2017-08-25,2017-08-01,2017-08-01,Booked,City Hotel,FRA,False,51,False,False,4.17
+SC,ITA,Online TA,TA/TO,A,,1.0,1.0,80.1,4.0,c2,2017-08-27,2017-08-26,2017-08-26,Booked,City Hotel,FRA,False,51,False,False,4.17
+BB,BRA,Online TA,TA/TO,D,0.0,1.0,2.0,236.16,4.0,c2,2017-08-26,2017-07-12,2017-07-12,Booked,City Hotel,FRA,False,51,False,False,4.17
+SC,FRA,Online TA,TA/TO,A,0.0,1.0,2.0,,4.0,c2,2017-08-24,2017-08-08,2017-08-08,Booked,City Hotel,FRA,False,51,False,False,4.17
+SC,GBR,Online TA,TA/TO,A,,3.0,1.0,140.0,5.0,c2,2017-08-25,2017-08-03,2017-08-03,Booked,City Hotel,FRA,False,51,False,False,4.17
+BB,POR,Online TA,TA/TO,D,,1.0,2.0,290.0,4.0,c2,2017-08-25,2017-08-10,2017-08-10,Booked,City Hotel,FRA,False,51,False,False,4.17
+BB,GBR,Online TA,TA/TO,D,,1.0,2.0,340.0,4.0,c2,2017-08-25,2017-08-09,2017-08-09,Booked,City Hotel,FRA,False,51,False,False,4.17
+BB,IRL,Online TA,TA/TO,D,0.0,2.0,3.0,489.0,4.0,c2,2017-08-24,2017-08-10,2017-08-10,Booked,City Hotel,FRA,False,51,False,False,4.17
+BB,FRA,Online TA,TA/TO,D,,2.0,1.0,140.0,4.0,c2,2017-08-28,2017-08-28,2017-08-28,Booked,City Hotel,FRA,False,51,False,False,4.17
+SC,DEU,Online TA,TA/TO,A,,2.0,2.0,239.0,4.0,c2,2017-08-27,2017-08-22,2017-08-22,Booked,City Hotel,FRA,False,51,False,False,4.17
+BB,NLD,Online TA,TA/TO,A,0.0,1.0,1.0,111.2,4.0,c2,2017-08-27,2017-08-26,2017-08-26,Booked,City Hotel,FRA,False,51,False,False,4.17
+BB,GBR,Online TA,TA/TO,A,,1.0,,109.0,4.0,c2,2017-08-27,2017-08-20,2017-08-20,Booked,City Hotel,FRA,False,51,False,False,4.17
+BB,POR,Online TA,TA/TO,A,,2.0,1.0,109.0,4.0,c2,2017-08-27,2017-08-26,2017-08-26,Booked,City Hotel,FRA,False,51,False,False,4.17
+SC,FRA,Online TA,TA/TO,A,0.0,1.0,1.0,80.1,4.0,c2,2017-08-27,2017-08-26,2017-08-26,Booked,City Hotel,FRA,False,51,False,False,4.17
+BB,DEU,Online TA,TA/TO,A,,1.0,4.0,508.0,4.0,c2,2017-08-24,2017-08-17,2017-08-17,Booked,City Hotel,FRA,False,51,False,False,4.17
+BB,POL,Online TA,TA/TO,A,,1.0,1.0,109.0,4.0,c2,2017-08-27,2017-08-18,2017-08-18,Booked,City Hotel,FRA,False,51,False,False,4.17
+SC,CN,Online TA,TA/TO,A,,1.0,,229.0,4.0,c2,2017-08-27,2017-08-18,2017-08-18,Booked,City Hotel,FRA,False,51,False,False,4.17
+BB,BEL,Online TA,TA/TO,A,0.0,1.0,3.0,540.0,4.0,c2,2017-07-31,2017-07-24,2017-07-24,Booked,City Hotel,FRA,False,51,False,False,4.17
+SC,IRL,Online TA,TA/TO,A,,1.0,3.0,429.0,4.0,c2,2017-07-31,2017-07-25,2017-07-25,Booked,City Hotel,FRA,False,51,False,False,4.17
+BB,DEU,Online TA,TA/TO,A,,1.0,4.0,676.0,4.0,c2,2017-07-30,2017-07-08,2017-07-08,Booked,City Hotel,FRA,False,51,False,False,4.17
+BB,FRA,Online TA,TA/TO,E,,1.0,2.0,407.0,4.0,c2,2017-08-01,2017-07-26,2017-07-26,Booked,City Hotel,FRA,False,51,False,False,4.17
+SC,SPA,Online TA,TA/TO,A,0.0,2.0,1.0,140.0,4.0,c2,2017-08-02,2017-07-14,2017-07-14,Booked,City Hotel,FRA,False,51,False,False,4.17
+SC,ITA,Online TA,TA/TO,A,,1.0,2.0,290.0,4.0,c2,2017-07-31,2017-07-30,2017-07-30,Booked,City Hotel,FRA,False,51,False,False,4.17
+SC,SPA,Online TA,,A,,1.0,1.0,109.0,4.0,c2,2017-08-01,2017-07-26,2017-07-26,Booked,City Hotel,FRA,False,51,False,False,4.17
+SC,FRA,Online TA,TA/TO,A,0.0,1.0,1.0,160.0,4.0,c2,2017-08-04,2017-07-29,2017-07-29,Booked,City Hotel,FRA,False,51,False,False,4.17
+SC,,Online TA,TA/TO,A,,1.0,2.0,268.0,4.0,c2,2017-08-03,2017-07-22,2017-07-22,Booked,City Hotel,FRA,False,51,False,False,4.17
+BB,IRL,Online TA,TA/TO,D,,1.0,2.0,280.0,4.0,c2,2017-08-03,2017-08-02,2017-08-02,Booked,City Hotel,FRA,False,51,False,False,4.17
+BB,IRL,Online TA,TA/TO,D,0.0,1.0,2.0,280.0,4.0,c2,2017-08-03,2017-08-02,2017-08-02,Booked,City Hotel,FRA,False,51,False,False,4.17
+SC,SLV,Online TA,TA/TO,A,0.0,1.0,2.0,320.0,4.0,c2,2017-08-04,2017-07-29,2017-07-29,Booked,City Hotel,FRA,False,51,False,False,4.17
+SC,FRA,Online TA,TA/TO,A,,1.0,5.0,700.0,4.0,c2,2017-07-30,2017-07-12,2017-07-12,Booked,City Hotel,FRA,False,51,False,False,4.17
+BB,CHN,Online TA,TA/TO,D,0.0,2.0,1.0,190.0,4.0,c2,2017-08-03,2017-07-24,2017-07-24,Booked,City Hotel,FRA,False,51,False,False,4.17
+SC,POR,Online TA,TA/TO,A,0.0,1.0,3.0,420.0,4.0,c2,2017-08-01,2017-07-05,2017-07-05,Booked,City Hotel,FRA,False,51,False,False,4.17
+BB,FRA,Online TA,TA/TO,A,0.0,3.0,4.0,640.0,5.0,c2,2017-08-01,2017-07-06,2017-07-06,Booked,City Hotel,FRA,False,51,False,False,4.17
+SC,GBR,Online TA,TA/TO,A,,1.0,4.0,560.0,4.0,c2,2017-08-01,2017-07-05,2017-07-05,Booked,City Hotel,FRA,False,51,False,False,4.17
+BB,CN,Online TA,TA/TO,D,,1.0,4.0,636.0,4.0,c2,2017-08-01,2017-07-21,2017-07-21,Booked,City Hotel,FRA,False,51,False,False,4.17
+SC,IRL,Online TA,TA/TO,A,,1.0,2.0,260.0,4.0,c2,2017-08-02,2017-07-01,2017-07-01,Booked,City Hotel,FRA,False,51,False,False,4.17
+BB,CHE,Online TA,TA/TO,A,,1.0,4.0,576.0,4.0,c2,2017-07-25,2017-07-22,2017-07-22,Booked,City Hotel,FRA,False,51,False,False,4.17
+BB,SWE,Online TA,TA/TO,D,,1.0,3.0,510.0,4.0,c2,2017-07-27,2017-07-08,2017-07-08,Booked,City Hotel,FRA,False,51,False,False,4.17
+BB,DEU,Online TA,TA/TO,A,0.0,2.0,2.0,320.0,4.0,c2,2017-07-28,2017-07-10,2017-07-10,Booked,City Hotel,FRA,False,51,False,False,4.17
+SC,SPA,Online TA,TA/TO,A,,1.0,2.0,280.0,4.0,c2,2017-07-28,2017-07-02,2017-07-02,Booked,City Hotel,FRA,False,51,False,False,4.17
+SC,GBR,Online TA,TA/TO,A,0.0,1.0,2.0,280.0,4.0,c2,2017-07-28,2017-07-02,2017-07-02,Booked,City Hotel,FRA,False,51,False,False,4.17
+SC,FRA,Online TA,TA/TO,A,,1.0,2.0,280.0,4.0,c2,2017-07-28,2017-07-12,2017-07-12,Booked,City Hotel,FRA,False,51,False,False,4.17
+SC,CHE,Online TA,TA/TO,A,0.0,1.0,1.0,140.0,4.0,c2,2017-07-31,2017-07-11,2017-07-11,Booked,City Hotel,FRA,False,51,False,False,4.17
+SC,IRL,Online TA,TA/TO,A,,2.0,1.0,109.0,4.0,c2,2017-07-30,2017-07-24,2017-07-24,Booked,City Hotel,FRA,False,51,False,False,4.17
+BB,FRA,Online TA,TA/TO,A,,1.0,4.0,628.0,4.0,c2,2017-07-27,2017-07-19,2017-07-19,Booked,City Hotel,FRA,False,51,False,False,4.17
+,SPA,Online TA,TA/TO,A,,2.0,1.0,140.0,4.0,c2,2017-07-29,2017-07-17,2017-07-17,Booked,City Hotel,FRA,False,51,False,False,4.17
+BB,POR,Online TA,TA/TO,A,0.0,1.0,3.0,507.0,4.0,c2,2017-07-27,2017-07-18,2017-07-18,Booked,City Hotel,FRA,False,51,False,False,4.17
+BB,GBR,Online TA,TA/TO,A,,1.0,2.0,320.0,4.0,c2,2017-07-28,2017-07-11,2017-07-11,Booked,City Hotel,FRA,False,51,False,False,4.17
+BB,CHN,Online TA,TA/TO,D,0.0,2.0,1.0,138.0,4.0,c2,2017-07-30,2017-07-22,2017-07-22,Booked,City Hotel,FRA,False,51,False,False,4.17
+SC,GBR,Online TA,TA/TO,A,0.0,1.0,2.0,300.0,4.0,c2,2017-07-28,2017-07-21,2017-07-21,Booked,City Hotel,FRA,False,51,False,False,4.17
+SC,FRA,Online TA,TA/TO,A,,2.0,,160.0,4.0,c2,2017-08-06,2017-08-06,2017-08-06,Booked,City Hotel,FRA,False,51,False,False,4.17
+BB,CHN,Online TA,TA/TO,D,,1.0,2.0,480.0,4.0,c2,2017-08-11,2017-08-11,2017-08-11,Booked,City Hotel,FRA,False,51,False,False,4.17
+BB,MAR,Online TA,TA/TO,A,0.0,2.0,3.0,587.01,4.0,c2,2017-08-10,2017-08-06,2017-08-06,Booked,City Hotel,FRA,False,51,False,False,4.17
+BB,FRA,Online TA,TA/TO,A,,2.0,4.0,720.0,4.0,c2,2017-08-10,2017-07-30,2017-07-30,Booked,City Hotel,FRA,False,51,False,False,4.17
+SC,SPA,Online TA,TA/TO,A,,2.0,3.0,480.0,4.0,c2,2017-08-09,2017-08-02,2017-08-02,Booked,City Hotel,FRA,False,51,False,False,4.17
+BB,NLD,Online TA,TA/TO,D,,1.0,4.0,760.0,4.0,c2,2017-08-08,2017-07-28,2017-07-28,Booked,City Hotel,FRA,False,51,False,False,4.17
+BB,CN,Online TA,TA/TO,A,,1.0,33.274385106774496,540.0,4.0,c2,2017-08-09,2017-08-01,2017-08-01,Booked,City Hotel,FRA,False,51,False,False,4.17
+BB,NOR,Online TA,TA/TO,D,,1.0,3.0,456.0,4.0,c2,2017-08-09,2017-08-07,2017-08-07,Booked,City Hotel,FRA,False,51,False,False,4.17
+BB,SPA,Online TA,TA/TO,D,0.0,1.0,2.0,398.0,4.0,c2,2017-08-10,2017-08-08,2017-08-08,Booked,City Hotel,FRA,False,51,False,False,4.17
+BB,LAO,Online TA,TA/TO,D,0.0,1.0,2.0,360.0,4.0,c2,2017-08-10,2017-08-08,2017-08-08,Booked,City Hotel,FRA,False,51,False,False,4.17
+BB,LAO,Online TA,TA/TO,D,,1.0,3.0,549.99,4.0,c2,2017-08-09,2017-08-08,2017-08-08,Booked,City Hotel,FRA,False,51,False,False,4.17
+BB,CHE,Online TA,TA/TO,A,0.0,1.0,2.0,320.0,4.0,c2,2017-08-14,2017-07-20,2017-07-20,Booked,City Hotel,FRA,False,51,False,False,4.17
+BB,POR,Online TA,TA/TO,A,,1.0,3.0,600.0,4.0,c2,2017-08-13,2017-08-11,2017-08-11,Booked,City Hotel,FRA,False,51,False,False,4.17
+BB,DEU,Online TA,TA/TO,D,0.0,2.0,2.0,420.0,4.0,c2,2017-08-13,2017-08-12,2017-08-12,Booked,City Hotel,FRA,False,51,False,False,4.17
+,GBR,Online TA,TA/TO,D,0.0,1.0,2.0,272.0,4.0,c2,2017-08-13,2017-07-25,2017-07-25,Booked,City Hotel,FRA,False,51,False,False,4.17
+SC,FRA,Online TA,TA/TO,A,0.0,2.0,4.0,560.0,4.0,c2,2017-08-04,2017-07-04,2017-07-04,Booked,City Hotel,FRA,False,51,False,False,4.17
+BB,GBR,Online TA,TA/TO,A,,3.0,3.0,450.0,16.88534761940745,c2,2017-08-06,2017-07-01,2017-07-01,Booked,City Hotel,FRA,False,51,False,False,4.17
+BB,CHE,Online TA,TA/TO,A,0.0,1.0,2.0,320.0,4.0,c2,2017-08-07,2017-07-16,2017-07-16,Booked,City Hotel,FRA,False,51,False,False,4.17
+SC,DEU,Online TA,TA/TO,A,,1.0,1.0,160.0,16.88534761940745,c2,2017-08-06,2017-07-30,2017-07-30,Booked,City Hotel,FRA,False,51,False,False,4.17
+SC,AUT,Online TA,TA/TO,A,,1.0,4.0,512.0,4.0,c2,2017-08-05,2017-08-04,2017-08-04,Booked,City Hotel,FRA,False,51,False,False,4.17
+BB,DNK,Online TA,TA/TO,A,0.0,2.0,4.0,720.0,4.0,c2,2017-08-07,2017-07-29,2017-07-29,Booked,City Hotel,FRA,False,51,False,False,4.17
+SC,FRA,Online TA,TA/TO,A,0.0,1.0,2.0,280.0,4.0,c2,2017-08-09,2017-07-18,2017-07-18,Booked,City Hotel,FRA,False,51,False,False,4.17
+BB,FRA,Online TA,TA/TO,D,,2.0,3.0,510.0,4.0,c2,2017-08-09,2017-07-16,2017-07-16,Booked,City Hotel,FRA,False,51,False,False,4.17
+BB,SPA,Online TA,TA/TO,A,,1.0,1.0,180.0,4.0,c2,2017-08-09,2017-08-08,2017-08-08,Booked,City Hotel,FRA,False,51,False,False,4.17
+BB,GBR,Online TA,TA/TO,A,,3.0,3.0,450.0,4.0,c2,2017-08-06,2017-07-01,2017-07-01,Booked,City Hotel,FRA,False,51,False,False,4.17
+SC,DEU,Online TA,TA/TO,A,,2.0,3.0,420.0,4.0,c2,2017-08-06,2017-07-17,2017-07-17,Booked,City Hotel,FRA,False,51,False,False,4.17
+SC,POR,Online TA,TA/TO,A,,2.0,,169.0,4.0,c2,2017-08-08,2017-08-08,2017-08-08,Booked,City Hotel,FRA,False,51,False,False,4.17
+SC,POR,Online TA,TA/TO,A,0.0,1.0,3.0,447.0,4.0,c2,2017-08-06,2017-07-05,2017-07-05,Booked,City Hotel,FRA,False,51,False,False,4.17
+SC,SPA,Online TA,TA/TO,A,,2.0,3.0,480.0,4.0,c2,2017-08-07,2017-08-04,2017-08-04,Booked,City Hotel,FRA,False,51,False,False,4.17
+BB,SPA,Online TA,TA/TO,D,0.0,1.0,1.0,150.0,4.0,c2,2017-07-14,2017-07-12,2017-07-12,Booked,City Hotel,FRA,False,51,False,False,4.17
+SC,DEU,Online TA,TA/TO,A,0.0,1.0,4.0,563.0,4.0,c2,2017-08-31,2017-08-09,2017-08-09,Booked,City Hotel,FRA,False,51,False,False,4.17
+BB,SPA,Direct,Direct,C,1.0,1.0,1.0,275.25,5.0,r1,2017-08-12,2017-07-24,2017-07-24,Booked,Resort Hotel,POR,True,64,True,True,4.66
+BB,SPA,Offline TA/TO,TA/TO,E,,,11.0,1540.0,3.0,r1,2017-08-28,2017-08-19,2017-08-19,Booked,Resort Hotel,POR,True,64,True,True,4.66
+BB,SPA,Corporate,Corporate,A,1.0,,1.0,142.0,2.0,r1,2017-07-11,2017-07-09,2017-07-09,Booked,Resort Hotel,POR,True,64,True,True,4.66
+BB,SPA,Online TA,Direct,D,,1.0,1.0,194.0,3.0,r1,2017-08-20,2017-08-17,2017-08-17,Booked,Resort Hotel,POR,True,64,True,True,4.66
+,SPA,Offline TA/TO,TA/TO,D,0.0,0.0,7.0,1281.91,1.0,r1,2017-08-26,2017-08-24,2017-08-24,Booked,Resort Hotel,POR,True,64,True,True,4.66
+SC,POR,Direct,Direct,F,1.0,3.0,8.0,0.0,4.0,r1,2017-07-24,2017-07-21,2017-07-21,Booked,Resort Hotel,POR,True,64,True,True,4.66
+BB,SPA,Direct,Direct,A,1.0,3.0,4.0,800.0,5.0,r1,2017-08-25,2017-08-14,2017-08-14,Booked,Resort Hotel,POR,True,64,True,True,4.66
+BB,SPA,Corporate,Corporate,D,1.0,2.0,2.0,0.0,5.0,r1,2017-08-03,2017-08-02,2017-08-02,Booked,Resort Hotel,POR,True,64,True,True,4.66
+,SPA,Corporate,Corporate,E,0.0,2.0,8.0,1216.8,4.0,r1,2017-07-30,2017-07-21,2017-07-21,Booked,Resort Hotel,POR,True,64,True,True,4.66
+BB,SPA,Online TA,TA/TO,A,,0.0,8.0,1640.0,1.0,r1,2017-07-22,2017-07-09,2017-07-09,Booked,Resort Hotel,POR,True,64,True,True,4.66
+BB,POR,Online TA,TA/TO,A,,3.0,,647.01,5.0,r1,2017-08-03,2017-07-25,2017-07-25,Booked,Resort Hotel,POR,True,64,True,True,4.66
+BB,SPA,Corporate,Corporate,A,1.0,0.0,1.0,142.0,3.0,r1,2017-08-01,2017-07-30,2017-07-30,Booked,Resort Hotel,POR,True,64,True,True,4.66
+BB,SPA,Direct,TA/TO,A,1.0,2.0,1.0,127.0,4.0,r1,2017-07-02,2017-07-02,2017-07-02,Booked,Resort Hotel,POR,True,64,True,True,4.66
+BB,SPA,Corporate,TA/TO,A,1.0,1.0,1.0,142.0,3.0,r1,2017-07-19,2017-07-18,2017-07-18,Booked,Resort Hotel,POR,True,64,True,True,4.66
+BB,SPA,Corporate,Direct,A,1.0,1.0,3.0,441.99,4.0,r1,2017-08-08,2017-07-14,2017-07-14,Booked,Resort Hotel,POR,True,64,True,True,4.66
+BB,CN,Direct,Direct,A,1.0,,2.0,338.0,4.0,r1,2017-07-05,2017-07-02,2017-07-02,Booked,Resort Hotel,POR,True,64,True,True,4.66
+,SWE,Direct,TA/TO,A,1.0,1.0,2.0,348.0,5.0,r1,2017-07-04,2017-07-03,2017-07-03,Booked,Resort Hotel,POR,True,64,True,True,4.66
+HB,POR,Online TA,TA/TO,A,1.0,1.0,2.0,398.0,5.0,r1,2017-07-07,2017-07-03,2017-07-03,Booked,Resort Hotel,POR,True,64,True,True,4.66
+BB,POR,Direct,Direct,D,1.0,2.0,1.0,170.0,4.0,r1,2017-07-08,2017-07-06,2017-07-06,Booked,Resort Hotel,POR,True,64,True,True,4.66
+HB,SPA,Online TA,TA/TO,A,1.0,1.0,1.0,123.6,4.0,r1,2017-07-07,2017-07-06,2017-07-06,Booked,Resort Hotel,POR,True,64,True,True,4.66
+BB,SPA,Online TA,TA/TO,D,1.0,1.0,1.0,194.0,4.0,r1,2017-07-08,2017-07-02,2017-07-02,Booked,Resort Hotel,POR,True,64,True,True,4.66
+BB,USA,Online TA,TA/TO,A,1.0,1.0,1.0,142.0,4.0,r1,2017-07-14,2017-07-14,2017-07-14,Booked,Resort Hotel,POR,True,64,True,True,4.66
+BB,POR,Online TA,TA/TO,D,1.0,2.0,7.0,1344.0,5.0,r1,2017-07-08,2017-07-03,2017-07-03,Booked,Resort Hotel,POR,True,64,True,True,4.66
+BB,FRA,Online TA,TA/TO,D,0.0,3.0,1.0,120.0,5.0,r1,2017-07-13,2017-07-12,2017-07-12,Booked,Resort Hotel,POR,True,64,True,True,4.66
+BB,SPA,Online TA,TA/TO,A,1.0,1.0,33.274385106774496,582.0,5.0,r1,2017-07-15,2017-07-14,2017-07-14,Booked,Resort Hotel,POR,True,64,True,True,4.66
+BB,POR,Online TA,TA/TO,A,1.0,2.0,3.0,552.0,4.0,r1,2017-07-13,2017-07-01,2017-07-01,Booked,Resort Hotel,POR,True,64,True,True,4.66
+BB,POR,Direct,Direct,D,1.0,0.0,3.0,560.01,3.0,r1,2017-07-14,2017-07-14,2017-07-14,Booked,Resort Hotel,POR,True,64,True,True,4.66
+HB,SPA,Direct,TA/TO,D,0.0,0.0,2.0,414.0,2.0,r1,2017-07-17,2017-07-15,2017-07-15,Booked,Resort Hotel,POR,True,64,True,True,4.66
+HB,SPA,Online TA,TA/TO,A,1.0,1.0,4.0,824.0,4.0,r1,2017-07-07,2017-07-04,2017-07-04,Booked,Resort Hotel,POR,True,64,True,True,4.66
+BB,AGO,Online TA,TA/TO,E,1.0,1.0,2.0,428.0,4.0,r1,2017-07-08,2017-07-06,2017-07-06,Booked,Resort Hotel,POR,True,64,True,True,4.66
+BB,SPA,Online TA,TA/TO,A,1.0,1.0,1.0,105.0,5.0,r1,2017-07-09,2017-07-08,2017-07-08,Booked,Resort Hotel,POR,True,64,True,True,4.66
+HB,,Online TA,TA/TO,D,1.0,,3.0,672.99,3.0,r1,2017-07-07,2017-07-01,2017-07-01,Booked,Resort Hotel,POR,True,64,True,True,4.66
+BB,AUT,Online TA,TA/TO,D,1.0,1.0,3.0,417.0,5.0,r1,2017-07-09,2017-07-08,2017-07-08,Booked,Resort Hotel,POR,True,64,True,True,4.66
+HB,POR,Online TA,TA/TO,D,1.0,1.0,4.0,904.0,5.0,r1,2017-07-08,2017-07-01,2017-07-01,Booked,Resort Hotel,POR,True,64,True,True,4.66
+BB,FRA,Direct,Direct,C,1.0,,1.0,154.0,3.0,r1,2017-07-12,2017-07-12,2017-07-12,Booked,Resort Hotel,POR,True,64,True,True,4.66
+BB,SPA,Corporate,Corporate,A,1.0,0.0,1.0,142.0,2.0,r1,2017-07-11,2017-07-05,2017-07-05,Booked,Resort Hotel,POR,True,64,True,True,4.66
+HB,SPA,Direct,Direct,A,,3.0,6.0,1485.9,5.0,r1,2017-08-14,2017-08-07,2017-08-07,Booked,Resort Hotel,POR,True,64,True,True,4.66
+BB,SPA,Direct,Direct,A,1.0,2.0,4.0,896.0,4.0,r1,2017-08-17,2017-08-13,2017-08-13,Booked,Resort Hotel,POR,True,64,True,True,4.66
+HB,SPA,Online TA,TA/TO,G,1.0,1.0,3.0,1176.0,16.88534761940745,r1,2017-08-17,2017-08-05,2017-08-05,Booked,Resort Hotel,POR,True,64,True,True,4.66
+HB,POR,Online TA,TA/TO,A,1.0,2.0,,1300.0,4.0,r1,2017-08-16,2017-08-12,2017-08-12,Booked,Resort Hotel,POR,True,64,True,True,4.66
+BB,SPA,Direct,Direct,D,1.0,1.0,1.0,228.0,5.0,r1,2017-08-21,2017-08-19,2017-08-19,Booked,Resort Hotel,POR,True,64,True,True,4.66
+BB,POR,Online TA,TA/TO,E,0.0,4.0,1.0,284.0,5.0,r1,2017-08-18,2017-07-21,2017-07-21,Booked,Resort Hotel,POR,True,64,True,True,4.66
+BB,POR,Online TA,TA/TO,E,,4.0,1.0,270.0,5.0,r1,2017-08-18,2017-07-21,2017-07-21,Booked,Resort Hotel,POR,True,64,True,True,4.66
+BB,USA,Online TA,TA/TO,D,,4.0,1.0,250.0,5.0,r1,2017-08-18,2017-08-06,2017-08-06,Booked,Resort Hotel,POR,True,64,True,True,4.66
+BB,GBR,Offline TA/TO,TA/TO,D,0.0,0.0,11.0,1281.5,1.0,r1,2017-08-14,2017-08-07,2017-08-07,Booked,Resort Hotel,POR,True,64,True,True,4.66
+BB,BRA,Online TA,TA/TO,F,1.0,1.0,,634.47,5.0,r1,2017-08-19,2017-08-17,2017-08-17,Booked,Resort Hotel,POR,True,64,True,True,4.66
+HB,SPA,Direct,Direct,E,1.0,1.0,1.0,268.3,4.0,r1,2017-08-21,2017-08-18,2017-08-18,Booked,Resort Hotel,POR,True,64,True,True,4.66
+HB,SPA,Online TA,Direct,A,1.0,1.0,5.0,1118.0,5.0,r1,2017-08-22,2017-08-10,2017-08-10,Booked,Resort Hotel,POR,True,64,True,True,4.66
+BB,POR,Direct,Direct,F,1.0,1.0,1.0,299.0,5.0,r1,2017-08-21,2017-08-06,2017-08-06,Booked,Resort Hotel,POR,True,64,True,True,4.66
+BB,BRA,Online TA,TA/TO,A,,3.0,2.0,448.0,5.0,r1,2017-08-21,2017-08-15,2017-08-15,Booked,Resort Hotel,POR,True,64,True,True,4.66
+BB,SPA,Direct,Direct,A,1.0,1.0,6.0,1333.98,4.0,r1,2017-08-17,2017-08-10,2017-08-10,Booked,Resort Hotel,POR,True,64,True,True,4.66
+BB,SPA,Direct,Direct,A,1.0,2.0,3.0,717.0,4.0,r1,2017-08-12,2017-07-13,2017-07-13,Booked,Resort Hotel,POR,True,64,True,True,4.66
+BB,POR,Online TA,TA/TO,A,1.0,1.0,1.0,161.1,5.0,r1,2017-08-15,2017-08-15,2017-08-15,Booked,Resort Hotel,POR,True,64,True,True,4.66
+BB,USA,Online TA,TA/TO,A,1.0,2.0,1.0,181.2,4.0,r1,2017-08-13,2017-07-30,2017-07-30,Booked,Resort Hotel,POR,True,64,True,True,4.66
+HB,GBR,Direct,Direct,D,1.0,1.0,2.0,566.0,5.0,r1,2017-08-12,2017-08-10,2017-08-10,Booked,Resort Hotel,POR,True,64,True,True,4.66
+BB,GBR,Offline TA/TO,TA/TO,D,0.0,3.0,33.274385106774496,945.0,5.0,r1,2017-08-11,2017-08-06,2017-08-06,Booked,Resort Hotel,POR,True,64,True,True,4.66
+HB,POR,Online TA,TA/TO,A,,3.0,1.0,,5.0,r1,2017-08-17,2017-08-16,2017-08-16,Booked,Resort Hotel,POR,True,64,True,True,4.66
+BB,USA,Online TA,TA/TO,F,1.0,1.0,2.0,445.6,4.0,r1,2017-08-16,2017-07-29,2017-07-29,Booked,Resort Hotel,POR,True,64,True,True,4.66
+HB,POR,Online TA,TA/TO,F,1.0,1.0,4.0,961.48,5.0,r1,2017-08-14,2017-07-28,2017-07-28,Booked,Resort Hotel,POR,True,64,True,True,4.66
+BB,SPA,Online TA,TA/TO,A,0.0,4.0,2.0,418.0,5.0,r1,2017-08-15,2017-08-01,2017-08-01,Booked,Resort Hotel,POR,True,64,True,True,4.66
+BB,CN,Offline TA/TO,TA/TO,D,1.0,,3.0,480.99,3.0,r1,2017-08-30,2017-07-23,2017-07-23,Booked,Resort Hotel,POR,True,64,True,True,4.66
+BB,TUR,Online TA,TA/TO,A,1.0,3.0,2.0,382.0,5.0,r1,2017-08-31,2017-08-16,2017-08-16,Booked,Resort Hotel,POR,True,64,True,True,4.66
+BB,POR,Online TA,TA/TO,A,1.0,2.0,4.0,786.0,5.0,r1,2017-08-29,2017-08-14,2017-08-14,Booked,Resort Hotel,POR,True,64,True,True,4.66
+BB,CHE,Online TA,TA/TO,F,1.0,1.0,7.0,1238.02,5.0,r1,2017-08-26,2017-08-21,2017-08-21,Booked,Resort Hotel,POR,True,64,True,True,4.66
+BB,NLD,Online TA,TA/TO,A,0.0,3.0,2.0,360.0,5.0,r1,2017-08-31,2017-08-11,2017-08-11,Booked,Resort Hotel,POR,True,64,True,True,4.66
+BB,POR,Direct,Direct,A,1.0,,2.0,368.0,4.0,r1,2017-08-31,2017-08-30,2017-08-30,Booked,Resort Hotel,POR,True,64,True,True,4.66
+BB,SPA,Online TA,TA/TO,A,1.0,2.0,7.0,1290.03,4.0,r1,2017-08-27,2017-07-10,2017-07-10,Booked,Resort Hotel,POR,True,64,True,True,4.66
+BB,SPA,Online TA,TA/TO,A,1.0,1.0,6.0,967.98,4.0,r1,2017-08-28,2017-08-02,2017-08-02,Booked,Resort Hotel,POR,True,64,True,True,4.66
+BB,SVK,Online TA,TA/TO,D,1.0,2.0,5.0,997.0,5.0,r1,2017-08-28,2017-07-22,2017-07-22,Booked,Resort Hotel,POR,True,64,True,True,4.66
+BB,SWE,Online TA,TA/TO,E,,3.0,3.0,690.0,5.0,r1,2017-08-29,2017-07-19,2017-07-19,Booked,Resort Hotel,POR,True,64,True,True,4.66
+HB,LUX,Online TA,TA/TO,E,1.0,2.0,3.0,828.0,4.0,r1,2017-08-28,2017-08-14,2017-08-14,Booked,Resort Hotel,POR,True,64,True,True,4.66
+HB,CHE,Online TA,TA/TO,D,,3.0,4.0,968.0,5.0,r1,2017-08-27,2017-07-30,2017-07-30,Booked,Resort Hotel,POR,True,64,True,True,4.66
+,,Online TA,TA/TO,E,,3.0,4.0,1048.0,5.0,r1,2017-08-27,2017-07-30,2017-07-30,Booked,Resort Hotel,POR,True,64,True,True,4.66
+,CHE,Online TA,TA/TO,A,0.0,3.0,4.0,888.0,5.0,r1,2017-08-27,2017-07-30,2017-07-30,Booked,Resort Hotel,POR,True,64,True,True,4.66
+HB,POR,Direct,Direct,E,1.0,1.0,6.0,1666.02,4.0,r1,2017-08-26,2017-08-07,2017-08-07,Booked,Resort Hotel,POR,True,64,True,True,4.66
+HB,POR,Online TA,TA/TO,A,1.0,,3.0,574.8,16.88534761940745,r1,2017-08-28,2017-07-31,2017-07-31,Booked,Resort Hotel,POR,True,64,True,True,4.66
+BB,POR,Online TA,TA/TO,A,1.0,2.0,4.0,787.0,5.0,r1,2017-08-28,2017-08-12,2017-08-12,Booked,Resort Hotel,POR,True,64,True,True,4.66
+BB,POR,Online TA,TA/TO,E,,3.0,4.0,850.0,5.0,r1,2017-08-28,2017-08-27,2017-08-27,Booked,Resort Hotel,POR,True,64,True,True,4.66
+HB,POR,Online TA,TA/TO,A,,4.0,5.0,1150.0,5.0,r1,2017-08-26,2017-07-27,2017-07-27,Booked,Resort Hotel,POR,True,64,True,True,4.66
+BB,SPA,Direct,Direct,A,1.0,,3.0,522.0,3.0,r1,2017-08-31,2017-08-30,2017-08-30,Booked,Resort Hotel,POR,True,64,True,True,4.66
+HB,SPA,Direct,Direct,A,,2.0,11.0,2323.2,4.0,r1,2017-08-26,2017-07-13,2017-07-13,Booked,Resort Hotel,POR,True,64,True,True,4.66
+BB,SPA,Online TA,TA/TO,A,1.0,2.0,7.0,1305.01,5.0,r1,2017-08-29,2017-08-29,2017-08-29,Booked,Resort Hotel,POR,True,64,True,True,4.66
+HB,DEU,Online TA,TA/TO,E,1.0,2.0,3.0,783.0,5.0,r1,2017-08-31,2017-08-29,2017-08-29,Booked,Resort Hotel,POR,True,64,True,True,4.66
+HB,POR,Online TA,TA/TO,A,,3.0,3.0,621.0,5.0,r1,2017-08-31,2017-08-22,2017-08-22,Booked,Resort Hotel,POR,True,64,True,True,4.66
+HB,POR,Online TA,TA/TO,A,0.0,3.0,3.0,663.0,5.0,r1,2017-08-31,2017-08-22,2017-08-22,Booked,Resort Hotel,POR,True,64,True,True,4.66
+HB,SPA,Online TA,TA/TO,A,,3.0,4.0,843.0,5.0,r1,2017-08-30,2017-08-22,2017-08-22,Booked,Resort Hotel,POR,True,64,True,True,4.66
+BB,POR,Online TA,TA/TO,A,1.0,1.0,5.0,960.0,5.0,r1,2017-08-30,2017-08-26,2017-08-26,Booked,Resort Hotel,POR,True,64,True,True,4.66
+BB,ITA,Offline TA/TO,TA/TO,D,1.0,,7.0,1067.01,3.0,r1,2017-08-29,2017-07-01,2017-07-01,Booked,Resort Hotel,POR,True,64,True,True,4.66
+HB,POR,Online TA,TA/TO,A,0.0,4.0,5.0,1150.0,5.0,r1,2017-08-26,2017-07-27,2017-07-27,Booked,Resort Hotel,POR,True,64,True,True,4.66
+BB,POR,Online TA,TA/TO,E,1.0,2.0,2.0,548.0,4.0,r1,2017-08-25,2017-08-22,2017-08-22,Booked,Resort Hotel,POR,True,64,True,True,4.66
+BB,SPA,Direct,Direct,E,1.0,1.0,3.0,783.0,5.0,r1,2017-08-22,2017-08-11,2017-08-11,Booked,Resort Hotel,POR,True,64,True,True,4.66
+BB,SPA,Direct,Direct,F,1.0,,1.0,244.0,4.0,r1,2017-08-25,2017-08-25,2017-08-25,Booked,Resort Hotel,POR,True,64,True,True,4.66
+HB,POR,Online TA,TA/TO,D,1.0,2.0,4.0,1064.0,4.0,r1,2017-08-26,2017-08-05,2017-08-05,Booked,Resort Hotel,POR,True,64,True,True,4.66
+HB,POR,Online TA,TA/TO,A,1.0,2.0,3.0,708.0,4.0,r1,2017-08-27,2017-07-15,2017-07-15,Booked,Resort Hotel,POR,True,64,True,True,4.66
+BB,BEL,Online TA,TA/TO,A,1.0,2.0,3.0,612.0,4.0,r1,2017-08-27,2017-08-13,2017-08-13,Booked,Resort Hotel,POR,True,64,True,True,4.66
+BB,CHE,Direct,Direct,C,1.0,,1.0,185.0,4.0,r1,2017-08-27,2017-08-27,2017-08-27,Booked,Resort Hotel,POR,True,64,True,True,4.66
+BB,CHE,Direct,Direct,E,1.0,,1.0,194.0,4.0,r1,2017-08-28,2017-08-28,2017-08-28,Booked,Resort Hotel,POR,True,64,True,True,4.66
+BB,DEU,Direct,Direct,D,1.0,1.0,5.0,1255.0,5.0,r1,2017-08-23,2017-08-08,2017-08-08,Booked,Resort Hotel,POR,True,64,True,True,4.66
+HB,PAK,Online TA,TA/TO,D,1.0,0.0,3.0,731.4300000000001,4.0,r1,2017-08-25,2017-08-24,2017-08-24,Booked,Resort Hotel,POR,True,64,True,True,4.66
+BB,USA,Online TA,TA/TO,A,1.0,1.0,2.0,364.0,4.0,r1,2017-08-26,2017-08-11,2017-08-11,Booked,Resort Hotel,POR,True,64,True,True,4.66
+BB,SPA,Online TA,TA/TO,E,,3.0,4.0,1076.0,5.0,r1,2017-08-24,2017-08-21,2017-08-21,Booked,Resort Hotel,POR,True,64,True,True,4.66
+BB,HRV,Online TA,TA/TO,E,1.0,,2.0,488.0,3.0,r1,2017-08-27,2017-08-27,2017-08-27,Booked,Resort Hotel,POR,True,64,True,True,4.66
+BB,POR,Direct,Direct,D,1.0,0.0,1.0,185.0,3.0,r1,2017-07-27,2017-07-27,2017-07-27,Booked,Resort Hotel,POR,True,64,True,True,4.66
+BB,POR,Online TA,TA/TO,D,1.0,,2.0,388.0,3.0,r1,2017-07-27,2017-07-13,2017-07-13,Booked,Resort Hotel,POR,True,64,True,True,4.66
+BB,ITA,Online TA,TA/TO,D,1.0,1.0,5.0,1105.0,4.0,r1,2017-07-21,2017-07-18,2017-07-18,Booked,Resort Hotel,POR,True,64,True,True,4.66
+BB,ISL,Online TA,TA/TO,F,1.0,1.0,5.0,,4.0,r1,2017-07-21,2017-07-09,2017-07-09,Booked,Resort Hotel,POR,True,64,True,True,4.66
+BB,BRA,Direct,Direct,A,1.0,2.0,3.0,642.0,5.0,r1,2017-07-28,2017-07-03,2017-07-03,Booked,Resort Hotel,POR,True,64,True,True,4.66
+BB,BEL,Direct,Direct,A,1.0,1.0,3.0,642.0,4.0,r1,2017-07-28,2017-07-19,2017-07-19,Booked,Resort Hotel,POR,True,64,True,True,4.66
+BB,SPA,Online TA,TA/TO,A,1.0,1.0,3.0,518.01,16.88534761940745,r1,2017-07-28,2017-07-27,2017-07-27,Booked,Resort Hotel,POR,True,64,True,True,4.66
+BB,USA,Online TA,TA/TO,A,1.0,,3.0,315.93,4.0,r1,2017-07-28,2017-07-28,2017-07-28,Booked,Resort Hotel,POR,True,64,True,True,4.66
+BB,CHN,Online TA,TA/TO,A,0.0,3.0,1.0,184.5,5.0,r1,2017-07-29,2017-07-19,2017-07-19,Booked,Resort Hotel,POR,True,64,True,True,4.66
+BB,CHN,Online TA,TA/TO,A,0.0,3.0,1.0,184.5,5.0,r1,2017-07-29,2017-07-19,2017-07-19,Booked,Resort Hotel,POR,True,64,True,True,4.66
+BB,JPN,Online TA,TA/TO,A,0.0,3.0,1.0,184.5,5.0,r1,2017-07-29,2017-07-19,2017-07-19,Booked,Resort Hotel,POR,True,64,True,True,4.66
+HB,,Online TA,TA/TO,E,1.0,1.0,5.0,1340.0,5.0,r1,2017-07-25,2017-07-24,2017-07-24,Booked,Resort Hotel,POR,True,64,True,True,4.66
+BB,POR,Online TA,TA/TO,D,1.0,1.0,2.0,478.0,5.0,r1,2017-07-23,2017-07-13,2017-07-13,Booked,Resort Hotel,POR,True,64,True,True,4.66
+BB,USA,Direct,Direct,F,1.0,1.0,1.0,228.0,5.0,r1,2017-07-20,2017-07-19,2017-07-19,Booked,Resort Hotel,POR,True,64,True,True,4.66
+BB,POR,Direct,Direct,D,1.0,,2.0,366.0,3.0,r1,2017-07-20,2017-07-20,2017-07-20,Booked,Resort Hotel,POR,True,64,True,True,4.66
+BB,SPA,Direct,Direct,E,1.0,2.0,5.0,1100.0,4.0,r1,2017-07-15,2017-07-13,2017-07-13,Booked,Resort Hotel,POR,True,64,True,True,4.66
+HB,POR,Online TA,TA/TO,A,1.0,2.0,3.0,661.2,4.0,r1,2017-07-21,2017-07-17,2017-07-17,Booked,Resort Hotel,POR,True,64,True,True,4.66
+BB,POR,Direct,Direct,D,1.0,,1.0,189.0,4.0,r1,2017-07-25,2017-07-25,2017-07-25,Booked,Resort Hotel,POR,True,64,True,True,4.66
+BB,POR,Online TA,TA/TO,D,1.0,1.0,2.0,426.0,5.0,r1,2017-07-21,2017-07-19,2017-07-19,Booked,Resort Hotel,POR,True,64,True,True,4.66
+BB,SPA,Direct,Direct,A,1.0,1.0,1.0,219.0,4.0,r1,2017-07-22,2017-07-21,2017-07-21,Booked,Resort Hotel,POR,True,64,True,True,4.66
+BB,SPA,Direct,Direct,A,1.0,1.0,2.0,438.0,4.0,r1,2017-08-06,2017-08-01,2017-08-01,Booked,Resort Hotel,POR,True,64,True,True,4.66
+HB,POR,Online TA,TA/TO,E,1.0,3.0,6.0,1846.02,6.0,r1,2017-08-03,2017-07-22,2017-07-22,Booked,Resort Hotel,POR,True,64,True,True,4.66
+BB,SPA,Online TA,TA/TO,D,1.0,4.0,4.0,1056.0,6.0,r1,2017-08-05,2017-07-24,2017-07-24,Booked,Resort Hotel,POR,True,64,True,True,4.66
+BB,POR,Direct,Direct,D,1.0,2.0,5.0,1258.0,5.0,r1,2017-08-02,2017-07-27,2017-07-27,Booked,Resort Hotel,POR,True,64,True,True,4.66
+BB,SPA,Online TA,TA/TO,C,1.0,1.0,1.0,249.0,4.0,r1,2017-08-06,2017-07-28,2017-07-28,Booked,Resort Hotel,POR,True,64,True,True,4.66
+BB,SPA,Online TA,TA/TO,A,,3.0,1.0,230.0,5.0,r1,2017-08-06,2017-08-05,2017-08-05,Booked,Resort Hotel,POR,True,64,True,True,4.66
+BB,BRA,Online TA,TA/TO,A,1.0,1.0,4.0,4035.342891330138,4.0,r1,2017-08-04,2017-07-25,2017-07-25,Booked,Resort Hotel,POR,True,64,True,True,4.66
+BB,POR,Online TA,TA/TO,A,1.0,1.0,2.0,359.18,5.0,r1,2017-08-10,2017-07-24,2017-07-24,Booked,Resort Hotel,POR,True,64,True,True,4.66
+BB,GBR,Online TA,TA/TO,A,0.0,3.0,5.0,940.0,5.0,r1,2017-08-08,2017-07-16,2017-07-16,Booked,Resort Hotel,POR,True,64,True,True,4.66
+BB,CHL,Online TA,TA/TO,E,1.0,2.0,1.0,284.0,4.0,r1,2017-08-12,2017-07-17,2017-07-17,Booked,Resort Hotel,POR,True,64,True,True,4.66
+HB,POR,Direct,Direct,A,1.0,1.0,7.0,1897.0,5.0,r1,2017-08-06,2017-07-18,2017-07-18,Booked,Resort Hotel,POR,True,64,True,True,4.66
+BB,SPA,Direct,Direct,D,1.0,,1.0,214.0,4.0,r1,2017-08-12,2017-08-12,2017-08-12,Booked,Resort Hotel,POR,True,64,True,True,4.66
+BB,SPA,Direct,Direct,A,1.0,0.0,1.0,244.0,3.0,r1,2017-08-09,2017-08-09,2017-08-09,Booked,Resort Hotel,POR,True,64,True,True,4.66
+BB,RUS,Direct,Direct,D,1.0,0.0,1.0,194.0,4.0,r1,2017-08-10,2017-08-10,2017-08-10,Booked,Resort Hotel,POR,True,64,True,True,4.66
+BB,FRA,Direct,Direct,D,1.0,0.0,1.0,259.0,3.0,r1,2017-08-05,2017-08-05,2017-08-05,Booked,Resort Hotel,POR,True,64,True,True,4.66
+BB,FRA,Online TA,TA/TO,D,1.0,2.0,2.0,488.0,4.0,r1,2017-08-05,2017-08-05,2017-08-05,Booked,Resort Hotel,POR,True,64,True,True,4.66
+BB,POR,Online TA,TA/TO,D,1.0,2.0,6.0,1317.48,5.0,r1,2017-07-31,2017-07-19,2017-07-19,Booked,Resort Hotel,POR,True,64,True,True,4.66
+BB,CN,Online TA,TA/TO,A,1.0,1.0,1.0,178.0,5.0,r1,2017-08-04,2017-07-08,2017-07-08,Booked,Resort Hotel,POR,True,64,True,True,4.66
+BB,SPA,Direct,Direct,A,1.0,1.0,5.0,1150.0,5.0,r1,2017-07-31,2017-07-14,2017-07-14,Booked,Resort Hotel,POR,True,64,True,True,4.66
+HB,SPA,Direct,TA/TO,F,1.0,2.0,3.0,993.0,5.0,r1,2017-08-18,2017-07-28,2017-07-28,Booked,Resort Hotel,POR,True,64,True,True,4.66
+BB,SPA,Corporate,Corporate,E,,3.0,1.0,119.7,5.0,r1,2017-07-11,2017-07-10,2017-07-10,Booked,Resort Hotel,POR,True,64,True,True,4.66
+HB,SPA,Direct,Direct,D,1.0,1.0,4.0,927.52,4.0,r1,2017-07-20,2017-07-02,2017-07-02,Booked,Resort Hotel,POR,True,64,True,True,4.66
+BB,SPA,Online TA,Direct,A,1.0,2.0,4.0,786.0,4.0,r1,2017-08-29,2017-08-27,2017-08-27,Booked,Resort Hotel,POR,True,64,True,True,4.66
+BB,SPA,Corporate,Corporate,A,0.0,1.0,1.0,,3.0,r5,2017-07-24,2017-07-15,2017-07-15,Booked,Resort Hotel,POR,False,39,True,False,3.99
+,SPA,Corporate,Corporate,A,,1.0,,142.0,3.0,r5,2017-07-11,2017-07-05,2017-07-05,Booked,Resort Hotel,POR,False,39,True,False,3.99
+HB,FRA,Online TA,TA/TO,A,0.0,1.0,6.0,1291.98,3.0,r5,2017-08-28,2017-08-01,2017-08-01,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,POR,Online TA,TA/TO,A,0.0,,8.0,1440.0,3.0,r5,2017-08-28,2017-07-29,2017-07-29,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,SPA,Direct,Direct,A,0.0,0.0,3.0,,3.0,r5,2017-08-29,2017-08-14,2017-08-14,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,SPA,Direct,Direct,A,0.0,,3.0,540.0,3.0,r5,2017-08-29,2017-08-14,2017-08-14,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,BRA,Online TA,TA/TO,D,0.0,1.0,3.0,630.0,3.0,r5,2017-08-30,2017-07-12,2017-07-12,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,POR,Online TA,TA/TO,A,,1.0,4.0,720.0,3.0,r5,2017-08-30,2017-08-04,2017-08-04,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,POR,Online TA,TA/TO,A,,,5.0,890.0,3.0,r5,2017-08-30,2017-07-31,2017-07-31,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,SPA,Direct,Direct,A,,0.0,1.0,185.0,3.0,r5,2017-08-31,2017-08-08,2017-08-08,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,POR,Online TA,TA/TO,D,,2.0,5.0,1030.0,3.0,r5,2017-08-28,2017-07-22,2017-07-22,Booked,Resort Hotel,POR,False,39,True,False,3.99
+HB,POR,Online TA,TA/TO,A,0.0,2.0,4.0,888.0,3.0,r5,2017-08-27,2017-07-27,2017-07-27,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,POR,Online TA,TA/TO,A,,1.0,2.0,380.0,3.0,r5,2017-08-28,2017-07-10,2017-07-10,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,POR,Online TA,TA/TO,A,0.0,1.0,2.0,380.0,3.0,r5,2017-08-28,2017-07-10,2017-07-10,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,POR,Online TA,TA/TO,A,,1.0,2.0,380.0,3.0,r5,2017-08-28,2017-07-10,2017-07-10,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,POR,Online TA,TA/TO,A,,2.0,3.0,570.0,3.0,r5,2017-08-28,2017-08-01,2017-08-01,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,POR,Online TA,,D,0.0,2.0,5.0,1030.0,3.0,r5,2017-08-28,2017-07-22,2017-07-22,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,SPA,Online TA,TA/TO,A,0.0,,2.0,304.0,3.0,r5,2017-08-28,2017-07-31,2017-07-31,Booked,Resort Hotel,POR,False,39,True,False,3.99
+HB,POR,Online TA,TA/TO,A,,2.0,3.0,621.0,3.0,r5,2017-08-31,2017-08-22,2017-08-22,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,POR,Online TA,TA/TO,D,,1.0,3.0,590.01,3.0,r5,2017-08-31,2017-07-27,2017-07-27,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,GBR,Online TA,TA/TO,A,,1.0,5.0,870.0,3.0,r5,2017-08-31,2017-08-08,2017-08-08,Booked,Resort Hotel,POR,False,39,True,False,3.99
+HB,POR,Direct,Direct,F,,0.0,7.0,2057.02,3.0,r5,2017-08-26,2017-08-06,2017-08-06,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,ITA,Online TA,TA/TO,E,,1.0,8.0,2160.0,3.0,r5,2017-08-17,2017-07-15,2017-07-15,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,SPA,Online TA,TA/TO,A,,1.0,1.0,213.0,3.0,r5,2017-08-18,2017-07-27,2017-07-27,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,SPA,Direct,Direct,E,,,1.0,234.0,,r5,2017-08-19,2017-08-18,2017-08-18,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,USA,Direct,Direct,E,,1.0,5.0,1325.0,3.0,r5,2017-08-18,2017-07-11,2017-07-11,Booked,Resort Hotel,POR,False,39,True,False,3.99
+HB,SPA,Online TA,TA/TO,F,0.0,1.0,33.274385106774496,1288.0,3.0,r5,2017-08-18,2017-07-29,2017-07-29,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,POR,Online TA,TA/TO,D,,1.0,5.0,1250.0,3.0,r5,2017-08-18,2017-07-17,2017-07-17,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,CN,Online TA,TA/TO,E,0.0,1.0,3.0,810.0,3.0,r5,2017-08-21,2017-08-08,2017-08-08,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,POR,Online TA,TA/TO,A,0.0,,4.0,880.0,3.0,r5,2017-08-24,2017-07-19,2017-07-19,Booked,Resort Hotel,POR,False,39,True,False,3.99
+HB,SPA,Online TA,TA/TO,A,,,7.0,1673.98,3.0,r5,2017-08-24,2017-07-26,2017-07-26,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,GIB,Online TA,TA/TO,E,,2.0,4.0,,3.0,r5,2017-08-25,2017-08-09,2017-08-09,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,GBR,Online TA,TA/TO,E,0.0,1.0,4.0,1020.0,3.0,r5,2017-08-24,2017-08-14,2017-08-14,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,SPA,Direct,Direct,G,,,1.0,235.0,3.0,r5,2017-08-26,2017-08-26,2017-08-26,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,GBR,Online TA,TA/TO,A,,1.0,7.0,,3.0,r5,2017-08-26,2017-07-12,2017-07-12,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,IRL,Online TA,TA/TO,A,,1.0,7.0,1360.03,3.0,r5,2017-08-26,2017-08-17,2017-08-17,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,GBR,Online TA,TA/TO,D,,1.0,4.0,960.0,3.0,r5,2017-08-24,2017-08-02,2017-08-02,Booked,Resort Hotel,POR,False,39,True,False,3.99
+HB,SPA,Online TA,TA/TO,A,,1.0,4.0,796.48,3.0,r5,2017-08-21,2017-08-02,2017-08-02,Booked,Resort Hotel,POR,False,39,True,False,3.99
+HB,SPA,Online TA,TA/TO,A,,0.0,5.0,1210.0,3.0,r5,2017-08-21,2017-08-15,2017-08-15,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,SPA,Online TA,TA/TO,D,,,1.0,125.46,3.0,r5,2017-08-22,2017-08-20,2017-08-20,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,POR,Online TA,TA/TO,A,,2.0,2.0,460.0,3.0,r5,2017-08-22,2017-07-28,2017-07-28,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,AGO,Online TA,TA/TO,A,,1.0,6.0,1300.02,3.0,r5,2017-08-23,2017-08-11,2017-08-11,Booked,Resort Hotel,POR,False,39,True,False,3.99
+HB,POR,Online TA,TA/TO,A,0.0,,4.0,1008.0,3.0,r5,2017-08-24,2017-07-25,2017-07-25,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,SPA,Corporate,Corporate,A,,,1.0,228.0,3.0,r5,2017-07-11,2017-07-11,2017-07-11,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,SPA,Direct,Direct,E,0.0,0.0,3.0,554.01,3.0,r5,2017-08-29,2017-08-29,2017-08-29,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,GBR,Online TA,TA/TO,A,,,3.0,615.0,3.0,r5,2017-07-28,2017-07-03,2017-07-03,Booked,Resort Hotel,POR,False,39,True,False,3.99
+,SPA,Direct,Direct,A,,,33.274385106774496,0.0,3.0,r5,2017-07-28,2017-07-28,2017-07-28,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,CHN,Online TA,TA/TO,E,0.0,1.0,2.0,490.0,3.0,r5,2017-07-28,2017-07-19,2017-07-19,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,POR,Online TA,TA/TO,A,,1.0,2.0,410.0,3.0,r5,2017-07-28,2017-07-19,2017-07-19,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,SPA,Direct,Direct,H,0.0,,2.0,620.0,3.0,r5,2017-07-28,2017-07-20,2017-07-20,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,GBR,Online TA,TA/TO,E,,1.0,6.0,1470.0,3.0,r5,2017-07-26,2017-07-13,2017-07-13,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,SPA,Direct,Direct,D,0.0,2.0,7.0,1540.0,3.0,r5,2017-07-26,2017-07-05,2017-07-05,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,SPA,Online TA,TA/TO,D,,1.0,6.0,1375.02,3.0,r5,2017-07-31,2017-07-19,2017-07-19,Booked,Resort Hotel,POR,False,39,True,False,3.99
+HB,POR,Online TA,TA/TO,D,0.0,2.0,5.0,1285.0,3.0,r5,2017-07-30,2017-07-02,2017-07-02,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,SPA,Corporate,Corporate,E,,2.0,8.0,1216.8,3.0,r5,2017-07-30,2017-07-21,2017-07-21,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,SPA,Online TA,TA/TO,A,,2.0,1.0,160.0,3.0,r5,2017-07-31,2017-07-31,2017-07-31,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,SPA,Online TA,TA/TO,D,,1.0,2.0,278.4,3.0,r5,2017-07-20,2017-07-19,2017-07-19,Booked,Resort Hotel,POR,False,39,True,False,3.99
+HB,POL,Online TA,TA/TO,D,0.0,,4.0,998.0,3.0,r5,2017-07-20,2017-07-09,2017-07-09,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,SPA,Direct,Direct,D,,,1.0,147.9,3.0,r5,2017-07-21,2017-07-20,2017-07-20,Booked,Resort Hotel,POR,False,39,True,False,3.99
+HB,POR,Online TA,TA/TO,A,,0.0,6.0,1257.0,3.0,r5,2017-07-17,2017-07-16,2017-07-16,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,SPA,Direct,Direct,D,,1.0,1.0,174.0,3.0,r5,2017-07-18,2017-07-18,2017-07-18,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,SPA,Direct,Direct,G,,0.0,1.0,255.0,3.0,r5,2017-07-18,2017-07-14,2017-07-14,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,SPA,Direct,Direct,D,0.0,0.0,1.0,147.9,3.0,r5,2017-07-21,2017-07-20,2017-07-20,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,SPA,Direct,Direct,D,0.0,0.0,1.0,140.0,3.0,r5,2017-07-24,2017-07-23,2017-07-23,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,SPA,Direct,Direct,E,0.0,,5.0,1140.0,3.0,r5,2017-07-24,2017-07-12,2017-07-12,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,POR,Direct,Direct,D,,,5.0,1170.0,3.0,r5,2017-07-23,2017-07-03,2017-07-03,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,GBR,Online TA,TA/TO,A,0.0,1.0,7.0,1509.97,3.0,r5,2017-08-01,2017-07-18,2017-07-18,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,SPA,Online TA,TA/TO,E,0.0,,1.0,207.0,3.0,r5,2017-08-13,2017-08-13,2017-08-13,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,ITA,Online TA,TA/TO,A,,1.0,6.0,1380.0,3.0,r5,2017-08-12,2017-07-25,2017-07-25,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,SPA,Direct,Direct,A,0.0,0.0,1.0,225.0,3.0,r5,2017-08-14,2017-08-14,2017-08-14,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,SPA,Online TA,TA/TO,D,,,1.0,264.0,3.0,r5,2017-08-14,2017-08-14,2017-08-14,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,SPA,Online TA,TA/TO,A,,2.0,4.0,920.0,3.0,r5,2017-08-16,2017-07-14,2017-07-14,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,SPA,Online TA,TA/TO,A,0.0,2.0,4.0,920.0,3.0,r5,2017-08-16,2017-07-14,2017-07-14,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,POR,Online TA,TA/TO,A,,1.0,6.0,1380.0,,r5,2017-08-16,2017-07-28,2017-07-28,Booked,Resort Hotel,POR,False,39,True,False,3.99
+HB,POR,Online TA,TA/TO,A,0.0,2.0,1.0,215.0,3.0,r5,2017-08-17,2017-08-16,2017-08-16,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,SPA,Direct,Direct,F,,0.0,1.0,,3.0,r5,2017-08-17,2017-08-17,2017-08-17,Booked,Resort Hotel,POR,False,39,True,False,3.99
+HB,SPA,Online TA,TA/TO,F,,1.0,4.0,1159.2,3.0,r5,2017-08-17,2017-07-28,2017-07-28,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,POR,Online TA,TA/TO,A,,2.0,1.0,230.0,3.0,r5,2017-08-16,2017-07-22,2017-07-22,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,SPA,Corporate,,D,,0.0,7.0,1113.0,3.0,r5,2017-08-14,2017-08-07,2017-08-07,Booked,Resort Hotel,POR,False,39,True,False,3.99
+HB,LUX,Online TA,TA/TO,A,,1.0,7.0,1834.0,3.0,r5,2017-08-14,2017-07-28,2017-07-28,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,POR,Online TA,TA/TO,A,0.0,1.0,1.0,209.0,3.0,r5,2017-08-15,2017-08-07,2017-08-07,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,POR,Online TA,TA/TO,A,0.0,1.0,1.0,190.0,3.0,r5,2017-08-15,2017-08-11,2017-08-11,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,POR,Online TA,TA/TO,A,0.0,2.0,1.0,230.0,3.0,r5,2017-08-16,2017-07-22,2017-07-22,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,SPA,Online TA,TA/TO,D,0.0,1.0,3.0,579.99,3.0,r5,2017-08-04,2017-07-23,2017-07-23,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,SPA,Online TA,TA/TO,A,,1.0,2.0,428.0,3.0,r5,2017-08-05,2017-07-30,2017-07-30,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,SPA,Online TA,TA/TO,A,,1.0,2.0,320.4,3.0,r5,2017-08-05,2017-07-26,2017-07-26,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,POR,Online TA,TA/TO,A,0.0,2.0,7.0,1610.0,3.0,r5,2017-08-05,2017-07-17,2017-07-17,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,POR,Online TA,TA/TO,A,,1.0,8.0,1840.0,3.0,r5,2017-08-05,2017-07-20,2017-07-20,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,SPA,Direct,Direct,A,,0.0,2.0,425.0,3.0,r5,2017-08-04,2017-07-14,2017-07-14,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,PHL,Online TA,TA/TO,A,0.0,1.0,2.0,410.0,3.0,r5,2017-08-03,2017-07-20,2017-07-20,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,PHL,Online TA,TA/TO,D,,0.0,2.0,450.0,3.0,r5,2017-08-03,2017-07-20,2017-07-20,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,PHL,Online TA,TA/TO,A,,1.0,2.0,410.0,3.0,r5,2017-08-03,2017-07-20,2017-07-20,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,PHL,Online TA,TA/TO,A,0.0,2.0,1.0,205.0,3.0,r5,2017-08-04,2017-07-20,2017-07-20,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,POR,Online TA,TA/TO,A,0.0,0.0,10.0,2300.0,3.0,r5,2017-08-05,2017-07-13,2017-07-13,Booked,Resort Hotel,POR,False,39,True,False,3.99
+HB,SPA,Online TA,TA/TO,F,0.0,2.0,6.0,1391.04,3.0,r5,2017-08-08,2017-07-22,2017-07-22,Booked,Resort Hotel,POR,False,39,True,False,3.99
+HB,SPA,Online TA,TA/TO,D,,1.0,5.0,1128.0,3.0,r5,2017-08-06,2017-07-21,2017-07-21,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,SPA,Direct,Direct,D,,0.0,3.0,525.0,3.0,r5,2017-07-10,2017-07-05,2017-07-05,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,,Online TA,TA/TO,D,0.0,1.0,1.0,125.0,3.0,r5,2017-07-11,2017-07-08,2017-07-08,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,SPA,Corporate,Corporate,E,0.0,3.0,1.0,119.7,3.0,r5,2017-07-11,2017-07-10,2017-07-10,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,SPA,Online TA,TA/TO,D,0.0,1.0,1.0,125.0,3.0,r5,2017-07-10,2017-07-08,2017-07-08,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,SPA,Direct,Direct,A,,1.0,1.0,155.0,3.0,r5,2017-07-15,2017-07-15,2017-07-15,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,SPA,Online TA,TA/TO,D,,1.0,3.0,504.0,3.0,r5,2017-07-15,2017-07-15,2017-07-15,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,POR,Online TA,TA/TO,E,,2.0,3.0,600.0,3.0,r5,2017-07-12,2017-07-02,2017-07-02,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,SPA,Direct,Direct,E,,1.0,3.0,577.14,3.0,r5,2017-07-12,2017-07-04,2017-07-04,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,DEU,Direct,Direct,D,,1.0,4.0,695.0,3.0,r5,2017-07-07,2017-07-01,2017-07-01,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,SPA,Complementary,TA/TO,A,0.0,2.0,1.0,0.0,3.0,r5,2017-07-04,2017-07-01,2017-07-01,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,SPA,Direct,TA/TO,A,,2.0,1.0,170.0,3.0,r5,2017-07-24,2017-07-24,2017-07-24,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,SPA,Complementary,Direct,A,0.0,1.0,1.0,0.0,3.0,r5,2017-08-31,2017-08-30,2017-08-30,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,SPA,Corporate,Corporate,A,,1.0,4.0,580.0,3.0,r5,2017-07-15,2017-07-10,2017-07-10,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,SPA,Direct,Direct,E,0.0,0.0,1.0,123.0,3.0,r5,2017-07-05,2017-07-05,2017-07-05,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,SPA,Direct,Direct,D,,,1.0,108.0,3.0,r5,2017-07-05,2017-07-05,2017-07-05,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,SPA,Corporate,Corporate,A,,,1.0,93.0,3.0,r5,2017-07-05,2017-07-05,2017-07-05,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,SPA,Direct,Direct,A,,1.0,1.0,147.25,3.0,r5,2017-07-06,2017-07-02,2017-07-02,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,CN,Online TA,TA/TO,D,,1.0,1.0,96.0,3.0,r5,2017-07-06,2017-07-06,2017-07-06,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,POR,Online TA,TA/TO,E,,2.0,1.0,200.0,3.0,r5,2017-07-08,2017-07-05,2017-07-05,Booked,Resort Hotel,POR,False,39,True,False,3.99
+HB,POR,Online TA,TA/TO,A,0.0,1.0,3.0,618.0,3.0,r5,2017-07-06,2017-07-04,2017-07-04,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,SPA,Online TA,TA/TO,A,0.0,,1.0,105.0,3.0,r5,2017-07-08,2017-07-08,2017-07-08,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,POR,Direct,TA/TO,A,,1.0,1.0,100.0,3.0,r5,2017-07-09,2017-07-08,2017-07-08,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,AUT,Online TA,TA/TO,A,0.0,2.0,1.0,105.0,3.0,r5,2017-07-07,2017-07-07,2017-07-07,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,SPA,Direct,Direct,A,,,1.0,113.0,3.0,r5,2017-07-01,2017-07-01,2017-07-01,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,POR,Online TA,TA/TO,A,,1.0,2.0,320.0,3.0,r5,2017-07-13,2017-07-02,2017-07-02,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,GBR,Online TA,TA/TO,E,0.0,1.0,4.0,688.6,3.0,r5,2017-07-12,2017-07-05,2017-07-05,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,POR,Online TA,TA/TO,A,,1.0,2.0,315.0,3.0,r5,2017-07-14,2017-07-14,2017-07-14,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,USA,Direct,Direct,A,,1.0,2.0,334.5,3.0,r5,2017-07-12,2017-07-01,2017-07-01,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,SPA,Online TA,TA/TO,A,0.0,,1.0,160.0,3.0,r5,2017-07-13,2017-07-06,2017-07-06,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,SPA,Online TA,TA/TO,E,0.0,1.0,3.0,522.0,3.0,r5,2017-07-11,2017-07-05,2017-07-05,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,UKR,Online TA,TA/TO,A,,,1.0,105.0,3.0,r5,2017-07-13,2017-07-13,2017-07-13,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,NLD,Online TA,TA/TO,D,,2.0,1.0,120.0,3.0,r5,2017-07-13,2017-07-13,2017-07-13,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,SPA,Online TA,TA/TO,A,0.0,1.0,1.0,115.19,3.0,r5,2017-07-14,2017-07-14,2017-07-14,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,SPA,Direct,Direct,E,0.0,0.0,1.0,175.0,3.0,r5,2017-07-14,2017-07-14,2017-07-14,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,BEL,Online TA,TA/TO,D,,1.0,1.0,120.0,3.0,r5,2017-07-13,2017-07-11,2017-07-11,Booked,Resort Hotel,POR,False,39,True,False,3.99
+HB,BEL,Online TA,TA/TO,E,,1.0,3.0,641.01,3.0,r5,2017-07-13,2017-07-12,2017-07-12,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,USA,Online TA,TA/TO,D,,0.0,3.0,504.0,3.0,r5,2017-07-15,2017-07-15,2017-07-15,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,POR,Direct,Direct,A,,0.0,33.274385106774496,154.0,3.0,r5,2017-07-17,2017-07-17,2017-07-17,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,NLD,Online TA,TA/TO,A,0.0,1.0,2.0,318.0,3.0,r5,2017-07-19,2017-07-18,2017-07-18,Booked,Resort Hotel,POR,False,39,True,False,3.99
+HB,LUX,Online TA,TA/TO,E,0.0,1.0,4.0,988.0,3.0,r5,2017-07-15,2017-07-11,2017-07-11,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,IRL,Direct,Direct,A,,,7.0,1204.98,3.0,r5,2017-07-12,2017-07-06,2017-07-06,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,POR,Online TA,TA/TO,E,,1.0,2.0,430.0,3.0,r5,2017-07-14,2017-07-01,2017-07-01,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,BEL,Online TA,TA/TO,E,,1.0,3.0,639.99,3.0,r5,2017-07-14,2017-07-13,2017-07-13,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,GBR,Direct,Direct,A,0.0,,1.0,195.0,3.0,r5,2017-07-15,2017-07-15,2017-07-15,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,SPA,Online TA,TA/TO,A,,1.0,2.0,315.0,3.0,r5,2017-07-14,2017-07-09,2017-07-09,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,GBR,Direct,Direct,A,,0.0,1.0,195.0,3.0,r5,2017-07-15,2017-07-15,2017-07-15,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,SPA,Online TA,TA/TO,D,,,1.0,125.0,3.0,r5,2017-07-11,2017-07-09,2017-07-09,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,FRA,Online TA,TA/TO,A,,2.0,3.0,480.0,3.0,r5,2017-07-07,2017-07-02,2017-07-02,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,SPA,Online TA,TA/TO,A,0.0,1.0,1.0,105.0,3.0,r5,2017-07-09,2017-07-08,2017-07-08,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,SPA,Online TA,TA/TO,E,0.0,1.0,1.0,135.0,3.0,r5,2017-07-11,2017-07-11,2017-07-11,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,GBR,Online TA,TA/TO,A,,,1.0,4035.342891330138,3.0,r5,2017-07-12,2017-07-12,2017-07-12,Booked,Resort Hotel,POR,False,39,True,False,3.99
+HB,HKG,Online TA,TA/TO,A,0.0,1.0,1.0,92.0,3.0,r5,2017-07-18,2017-07-18,2017-07-18,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,GBR,Online TA,TA/TO,A,,2.0,3.0,690.0,3.0,r5,2017-08-17,2017-08-06,2017-08-06,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,POR,Direct,Direct,A,0.0,0.0,1.0,176.0,3.0,r5,2017-08-20,2017-08-20,2017-08-20,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,ITA,Online TA,TA/TO,A,0.0,1.0,4.0,736.0,3.0,r5,2017-08-17,2017-08-16,2017-08-16,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,POL,Online TA,TA/TO,A,0.0,1.0,6.0,1016.88,3.0,r5,2017-08-15,2017-08-07,2017-08-07,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,SPA,Online TA,TA/TO,A,,2.0,3.0,690.0,,r5,2017-08-18,2017-08-05,2017-08-05,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,IRL,Online TA,TA/TO,E,0.0,1.0,4.0,828.8,3.0,r5,2017-08-18,2017-07-19,2017-07-19,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,USA,Online TA,TA/TO,D,,1.0,2.0,500.0,3.0,r5,2017-08-20,2017-08-06,2017-08-06,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,POR,Online TA,TA/TO,A,0.0,2.0,3.0,690.0,3.0,r5,2017-08-19,2017-08-09,2017-08-09,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,USA,Online TA,TA/TO,F,0.0,1.0,2.0,464.0,3.0,r5,2017-08-17,2017-08-07,2017-08-07,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,SPA,Direct,Direct,A,,,2.0,388.0,3.0,r5,2017-08-17,2017-08-17,2017-08-17,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,POR,Online TA,TA/TO,A,,1.0,2.0,358.0,3.0,r5,2017-08-17,2017-08-17,2017-08-17,Booked,Resort Hotel,POR,False,39,True,False,3.99
+HB,ITA,Online TA,TA/TO,A,,1.0,3.0,828.0,3.0,r5,2017-08-17,2017-07-13,2017-07-13,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,ITA,Online TA,TA/TO,E,0.0,2.0,2.0,572.0,16.88534761940745,r5,2017-08-18,2017-07-17,2017-07-17,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,POR,Online TA,TA/TO,E,0.0,,7.0,1512.0,3.0,r5,2017-08-17,2017-07-07,2017-07-07,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,ROU,Online TA,TA/TO,F,,1.0,5.0,1096.0,3.0,r5,2017-08-19,2017-08-10,2017-08-10,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,POR,Online TA,TA/TO,D,,1.0,1.0,159.2,3.0,r5,2017-08-23,2017-08-22,2017-08-22,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,POR,Online TA,TA/TO,A,0.0,2.0,3.0,630.0,3.0,r5,2017-08-21,2017-08-11,2017-08-11,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,CN,Online TA,TA/TO,A,,1.0,4.0,672.0,3.0,r5,2017-08-21,2017-08-12,2017-08-12,Booked,Resort Hotel,POR,False,39,True,False,3.99
+HB,POR,Online TA,TA/TO,A,,2.0,5.0,1230.0,3.0,r5,2017-08-17,2017-08-13,2017-08-13,Booked,Resort Hotel,POR,False,39,True,False,3.99
+,SPA,Online TA,TA/TO,E,,2.0,33.274385106774496,568.0,3.0,r5,2017-08-20,2017-08-09,2017-08-09,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,,Online TA,TA/TO,A,,2.0,6.0,1450.02,3.0,r5,2017-08-16,2017-07-09,2017-07-09,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,POR,Online TA,TA/TO,D,0.0,2.0,3.0,798.0,3.0,r5,2017-08-19,2017-08-09,2017-08-09,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,SPA,Complementary,Corporate,A,,1.0,2.0,0.0,3.0,r5,2017-08-20,2017-08-18,2017-08-18,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,POR,Online TA,TA/TO,E,,2.0,2.0,506.0,3.0,r5,2017-08-21,2017-08-19,2017-08-19,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,POR,Online TA,TA/TO,A,0.0,1.0,2.0,364.0,3.0,r5,2017-08-21,2017-08-11,2017-08-11,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,FRA,Online TA,TA/TO,D,,1.0,4.0,1048.0,3.0,r5,2017-08-19,2017-07-31,2017-07-31,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,SPA,Direct,Direct,A,,1.0,1.0,180.0,3.0,r5,2017-08-14,2017-08-04,2017-08-04,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,SPA,Direct,Direct,A,0.0,1.0,1.0,180.0,3.0,r5,2017-08-14,2017-08-04,2017-08-04,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,SPA,Online TA,TA/TO,A,,1.0,2.0,420.0,3.0,r5,2017-08-13,2017-08-13,2017-08-13,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,SPA,Online TA,TA/TO,A,0.0,2.0,1.0,103.2,3.0,r5,2017-08-15,2017-08-14,2017-08-14,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,POR,Direct,Direct,D,0.0,,1.0,194.0,3.0,r5,2017-08-15,2017-08-15,2017-08-15,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,POR,Direct,Direct,D,,,1.0,194.0,3.0,r5,2017-08-15,2017-08-15,2017-08-15,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,SPA,Online TA,TA/TO,D,,2.0,2.0,500.0,3.0,r5,2017-08-14,2017-07-25,2017-07-25,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,SPA,Direct,Direct,A,,,1.0,185.0,16.88534761940745,r5,2017-08-13,2017-08-13,2017-08-13,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,CN,Online TA,TA/TO,A,,0.0,4.0,760.4,3.0,r5,2017-08-10,2017-07-22,2017-07-22,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,AUS,Online TA,TA/TO,A,,1.0,1.0,,3.0,r5,2017-08-13,2017-08-12,2017-08-12,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,NOR,Direct,Direct,A,0.0,,6.0,1152.0,3.0,r5,2017-08-09,2017-08-09,2017-08-09,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,USA,Online TA,TA/TO,D,,2.0,2.0,432.0,3.0,r5,2017-08-16,2017-07-08,2017-07-08,Booked,Resort Hotel,POR,False,39,True,False,3.99
+HB,SPA,Direct,Direct,E,,1.0,2.0,476.6,3.0,r5,2017-08-16,2017-08-15,2017-08-15,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,CN,Online TA,TA/TO,A,,2.0,2.0,420.0,3.0,r5,2017-08-16,2017-08-08,2017-08-08,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,SPA,Online TA,TA/TO,F,0.0,1.0,2.0,464.0,3.0,r5,2017-08-15,2017-07-07,2017-07-07,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,IRL,Online TA,,A,,1.0,7.0,1334.2,3.0,r5,2017-08-18,2017-07-16,2017-07-16,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,USA,Online TA,TA/TO,D,,2.0,2.0,428.0,3.0,r5,2017-08-31,2017-08-08,2017-08-08,Booked,Resort Hotel,POR,False,39,True,False,3.99
+HB,SPA,Online TA,TA/TO,A,0.0,1.0,5.0,872.0,3.0,r5,2017-08-28,2017-08-03,2017-08-03,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,GBR,Online TA,TA/TO,D,,0.0,4.0,597.8,3.0,r5,2017-08-29,2017-08-26,2017-08-26,Booked,Resort Hotel,POR,False,39,True,False,3.99
+HB,SPA,Online TA,TA/TO,A,0.0,1.0,6.0,1141.62,3.0,r5,2017-08-25,2017-08-21,2017-08-21,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,SPA,Direct,Direct,D,,2.0,4.0,4035.342891330138,3.0,r5,2017-08-27,2017-08-25,2017-08-25,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,RUS,Online TA,TA/TO,A,0.0,3.0,4.0,788.0,3.0,r5,2017-08-27,2017-08-14,2017-08-14,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,NLD,Online TA,TA/TO,A,0.0,2.0,2.0,350.0,3.0,r5,2017-08-31,2017-08-26,2017-08-26,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,RUS,Online TA,TA/TO,E,0.0,2.0,1.0,217.0,3.0,r5,2017-08-31,2017-08-19,2017-08-19,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,GBR,Direct,Direct,A,,1.0,2.0,355.5,3.0,r5,2017-08-30,2017-08-08,2017-08-08,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,GBR,Online TA,TA/TO,A,,,7.0,983.99,3.0,r5,2017-08-30,2017-08-01,2017-08-01,Booked,Resort Hotel,POR,False,39,True,False,3.99
+HB,GBR,Online TA,TA/TO,E,,1.0,,1449.21,3.0,r5,2017-08-31,2017-07-08,2017-07-08,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,CHE,Direct,Direct,F,,1.0,7.0,1640.03,3.0,r5,2017-08-28,2017-08-14,2017-08-14,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,SPA,Online TA,TA/TO,A,,1.0,5.0,770.0,3.0,r5,2017-08-31,2017-08-14,2017-08-14,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,ITA,Online TA,TA/TO,E,0.0,1.0,1.0,230.0,3.0,r5,2017-08-26,2017-08-26,2017-08-26,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,DEU,Online TA,TA/TO,D,,1.0,2.0,440.0,3.0,r5,2017-08-25,2017-08-24,2017-08-24,Booked,Resort Hotel,POR,False,39,True,False,3.99
+HB,POR,Online TA,TA/TO,D,,0.0,4.0,958.4,3.0,r5,2017-08-23,2017-07-25,2017-07-25,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,IRL,Online TA,TA/TO,A,0.0,1.0,6.0,1380.0,3.0,r5,2017-08-21,2017-08-08,2017-08-08,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,SPA,Online TA,TA/TO,D,,2.0,2.0,392.5,3.0,r5,2017-08-25,2017-08-24,2017-08-24,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,SPA,Online TA,TA/TO,D,,2.0,2.0,480.0,3.0,r5,2017-08-25,2017-08-13,2017-08-13,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,SPA,Online TA,TA/TO,G,,,1.0,235.0,3.0,r5,2017-08-26,2017-08-26,2017-08-26,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,IRL,Online TA,TA/TO,A,0.0,2.0,2.0,460.0,3.0,r5,2017-08-25,2017-07-26,2017-07-26,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,SPA,Online TA,TA/TO,F,,2.0,2.0,376.0,3.0,r5,2017-08-25,2017-08-25,2017-08-25,Booked,Resort Hotel,POR,False,39,True,False,3.99
+HB,ITA,Online TA,TA/TO,A,,0.0,4.0,4035.342891330138,3.0,r5,2017-08-23,2017-07-18,2017-07-18,Booked,Resort Hotel,POR,False,39,True,False,3.99
+HB,SPA,Online TA,,A,0.0,0.0,4.0,971.36,3.0,r5,2017-08-21,2017-07-31,2017-07-31,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,SPA,Online TA,TA/TO,D,,2.0,3.0,792.0,3.0,r5,2017-08-22,2017-07-25,2017-07-25,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,SPA,Online TA,TA/TO,D,,2.0,4.0,820.0,3.0,r5,2017-08-21,2017-07-21,2017-07-21,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,POR,Online TA,TA/TO,A,0.0,2.0,5.0,1050.0,3.0,r5,2017-08-21,2017-08-17,2017-08-17,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,SPA,Online TA,TA/TO,D,,1.0,1.0,171.5,3.0,r5,2017-08-25,2017-08-24,2017-08-24,Booked,Resort Hotel,POR,False,39,True,False,3.99
+HB,SPA,Online TA,TA/TO,F,,1.0,7.0,1621.83,3.0,r5,2017-08-23,2017-07-16,2017-07-16,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,CN,Online TA,TA/TO,D,0.0,1.0,4.0,668.8,3.0,r5,2017-08-26,2017-07-20,2017-07-20,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,SPA,Online TA,TA/TO,A,,1.0,2.0,370.0,3.0,r5,2017-08-28,2017-07-27,2017-07-27,Booked,Resort Hotel,POR,False,39,True,False,3.99
+HB,POR,Online TA,TA/TO,E,,2.0,3.0,908.01,3.0,r5,2017-08-25,2017-08-14,2017-08-14,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,SPA,Direct,Direct,C,,0.0,1.0,4035.342891330138,3.0,r5,2017-08-27,2017-08-27,2017-08-27,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,SPA,Direct,Direct,A,0.0,0.0,1.0,185.0,3.0,r5,2017-08-27,2017-08-27,2017-08-27,Booked,Resort Hotel,POR,False,39,True,False,3.99
+HB,POR,Online TA,TA/TO,D,,2.0,4.0,1068.0,3.0,r5,2017-08-24,2017-08-21,2017-08-21,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,CHL,Online TA,TA/TO,A,,2.0,3.0,651.99,3.0,r5,2017-08-26,2017-08-06,2017-08-06,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,POR,Online TA,TA/TO,A,,1.0,3.0,504.0,3.0,r5,2017-08-26,2017-08-14,2017-08-14,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,GBR,Online TA,TA/TO,D,,2.0,1.0,190.0,3.0,r5,2017-07-27,2017-07-26,2017-07-26,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,SPA,Direct,Direct,E,0.0,3.0,4.0,,3.0,r5,2017-07-23,2017-07-21,2017-07-21,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,GBR,Online TA,TA/TO,D,,1.0,7.0,1140.58,3.0,r5,2017-07-22,2017-07-10,2017-07-10,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,IRL,Online TA,TA/TO,E,,1.0,3.0,478.05,3.0,r5,2017-07-25,2017-07-22,2017-07-22,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,SPA,Direct,Direct,A,,0.0,1.0,170.0,,r5,2017-07-25,2017-07-25,2017-07-25,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,USA,Online TA,TA/TO,E,,1.0,2.0,462.0,3.0,r5,2017-07-25,2017-07-22,2017-07-22,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,IRL,Online TA,TA/TO,A,0.0,1.0,4.0,656.0,3.0,r5,2017-07-27,2017-07-18,2017-07-18,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,CN,Online TA,TA/TO,E,0.0,1.0,4.0,,3.0,r5,2017-07-27,2017-07-12,2017-07-12,Booked,Resort Hotel,POR,False,39,True,False,3.99
+HB,SPA,Online TA,TA/TO,A,,,6.0,1369.98,16.88534761940745,r5,2017-07-25,2017-07-22,2017-07-22,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,USA,Online TA,TA/TO,A,0.0,0.0,3.0,308.19,3.0,r5,2017-07-28,2017-07-28,2017-07-28,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,BRA,Online TA,TA/TO,D,,2.0,4.0,956.0,3.0,r5,2017-07-27,2017-07-21,2017-07-21,Booked,Resort Hotel,POR,False,39,True,False,3.99
+HB,POR,Direct,Direct,E,,0.0,7.0,1904.0,3.0,r5,2017-07-24,2017-07-11,2017-07-11,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,POR,Online TA,TA/TO,A,0.0,1.0,3.0,492.0,3.0,r5,2017-07-26,2017-07-17,2017-07-17,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,GBR,Online TA,TA/TO,E,0.0,1.0,1.0,205.0,3.0,r5,2017-07-29,2017-07-29,2017-07-29,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,SPA,Online TA,TA/TO,A,0.0,1.0,,178.0,3.0,r5,2017-07-28,2017-07-02,2017-07-02,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,GBR,Online TA,TA/TO,A,0.0,1.0,2.0,350.0,3.0,r5,2017-07-27,2017-07-27,2017-07-27,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,GBR,Online TA,TA/TO,E,,2.0,3.0,735.0,16.88534761940745,r5,2017-07-27,2017-07-12,2017-07-12,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,SPA,Complementary,Direct,E,,,2.0,28.0,3.0,r5,2017-07-28,2017-07-19,2017-07-19,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,CN,Online TA,TA/TO,A,,2.0,3.0,615.0,3.0,r5,2017-07-27,2017-07-18,2017-07-18,Booked,Resort Hotel,POR,False,39,True,False,3.99
+HB,POR,Direct,Direct,A,0.0,,7.0,4035.342891330138,3.0,r5,2017-07-14,2017-07-03,2017-07-03,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,,Online TA,TA/TO,F,,1.0,7.0,1476.02,3.0,r5,2017-07-14,2017-07-11,2017-07-11,Booked,Resort Hotel,POR,False,39,True,False,3.99
+HB,POR,Online TA,TA/TO,F,0.0,1.0,7.0,1677.62,3.0,r5,2017-07-14,2017-07-11,2017-07-11,Booked,Resort Hotel,POR,False,39,True,False,3.99
+HB,SPA,Online TA,TA/TO,D,,1.0,7.0,1663.97,3.0,r5,2017-07-14,2017-07-09,2017-07-09,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,CN,Online TA,TA/TO,D,0.0,1.0,1.0,157.2,3.0,r5,2017-07-18,2017-07-18,2017-07-18,Booked,Resort Hotel,POR,False,39,True,False,3.99
+,USA,Online TA,TA/TO,A,,1.0,1.0,190.0,3.0,r5,2017-07-20,2017-07-04,2017-07-04,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,SPA,Direct,Direct,A,,,1.0,254.0,3.0,r5,2017-07-19,2017-07-19,2017-07-19,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,SPA,Direct,Direct,F,,1.0,5.0,1165.0,3.0,r5,2017-07-15,2017-07-13,2017-07-13,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,SPA,Online TA,TA/TO,A,,2.0,3.0,732.0,3.0,r5,2017-08-18,2017-08-05,2017-08-05,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,POR,Online TA,TA/TO,A,0.0,1.0,1.0,209.0,3.0,r5,2017-07-22,2017-07-19,2017-07-19,Booked,Resort Hotel,POR,False,39,True,False,3.99
+,POR,Online TA,TA/TO,A,,1.0,1.0,159.0,3.0,r5,2017-07-23,2017-07-21,2017-07-21,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,POR,Online TA,TA/TO,G,,1.0,4.0,940.0,3.0,r5,2017-07-19,2017-07-09,2017-07-09,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,SPA,Online TA,TA/TO,D,,1.0,2.0,320.0,3.0,r5,2017-07-21,2017-07-21,2017-07-21,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,AUS,Online TA,TA/TO,D,0.0,1.0,2.0,320.0,3.0,r5,2017-07-21,2017-07-21,2017-07-21,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,DEU,Online TA,TA/TO,D,,,1.0,154.98,3.0,r5,2017-08-07,2017-08-06,2017-08-06,Booked,Resort Hotel,POR,False,39,True,False,3.99
+HB,SPA,Direct,Direct,E,0.0,1.0,2.0,582.0,3.0,r5,2017-08-06,2017-08-03,2017-08-03,Booked,Resort Hotel,POR,False,39,True,False,3.99
+HB,POR,Direct,Direct,A,,2.0,,1645.0,3.0,r5,2017-08-02,2017-07-07,2017-07-07,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,LUX,Direct,Direct,H,0.0,1.0,1.0,269.0,3.0,r5,2017-08-08,2017-08-07,2017-08-07,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,AUS,Online TA,TA/TO,A,,2.0,4.0,914.0,3.0,r5,2017-08-05,2017-07-29,2017-07-29,Booked,Resort Hotel,POR,False,39,True,False,3.99
+HB,POR,Online TA,TA/TO,A,,,3.0,728.52,3.0,r5,2017-08-05,2017-07-24,2017-07-24,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,IRL,Online TA,TA/TO,D,,1.0,1.0,151.99,3.0,r5,2017-08-06,2017-08-04,2017-08-04,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,AUS,Direct,Direct,A,,1.0,3.0,621.99,3.0,r5,2017-08-04,2017-07-27,2017-07-27,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,AUS,Direct,Direct,D,,1.0,1.0,225.0,16.88534761940745,r5,2017-08-07,2017-08-05,2017-08-05,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,GBR,Online TA,TA/TO,E,,1.0,3.0,541.5,3.0,r5,2017-08-05,2017-08-03,2017-08-03,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,CN,Online TA,TA/TO,A,,1.0,3.0,565.8,3.0,r5,2017-08-05,2017-07-25,2017-07-25,Booked,Resort Hotel,POR,False,39,True,False,3.99
+HB,POR,Online TA,TA/TO,A,0.0,2.0,5.0,1380.0,3.0,r5,2017-08-05,2017-07-20,2017-07-20,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,SPA,Online TA,TA/TO,A,,1.0,1.0,4035.342891330138,3.0,r5,2017-08-11,2017-08-11,2017-08-11,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,GBR,Online TA,TA/TO,A,,1.0,2.0,336.0,3.0,r5,2017-08-11,2017-08-05,2017-08-05,Booked,Resort Hotel,POR,False,39,True,False,3.99
+HB,POR,Online TA,TA/TO,D,,2.0,1.0,282.0,3.0,r5,2017-08-09,2017-08-07,2017-08-07,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,USA,Online TA,TA/TO,E,,1.0,2.0,464.0,3.0,r5,2017-08-08,2017-07-25,2017-07-25,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,BRA,Online TA,TA/TO,D,0.0,,33.274385106774496,1379.98,3.0,r5,2017-08-04,2017-07-14,2017-07-14,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,SPA,Direct,Direct,D,0.0,1.0,1.0,205.0,3.0,r5,2017-08-10,2017-08-09,2017-08-09,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,SPA,Direct,Direct,E,,1.0,1.0,241.0,3.0,r5,2017-08-10,2017-08-09,2017-08-09,Booked,Resort Hotel,POR,False,39,True,False,3.99
+HB,FRA,Online TA,TA/TO,E,0.0,2.0,1.0,230.0,3.0,r5,2017-08-02,2017-07-02,2017-07-02,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,SPA,Online TA,TA/TO,D,,2.0,4.0,1031.0,3.0,r5,2017-07-31,2017-07-01,2017-07-01,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,POR,Online TA,TA/TO,A,,1.0,2.0,410.0,3.0,r5,2017-08-02,2017-07-18,2017-07-18,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,SPA,Direct,Direct,A,,0.0,1.0,169.0,3.0,r5,2017-07-31,2017-07-31,2017-07-31,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,GBR,Direct,Direct,A,0.0,0.0,1.0,155.0,3.0,r5,2017-07-31,2017-07-30,2017-07-30,Booked,Resort Hotel,POR,False,39,True,False,3.99
+HB,POR,Online TA,TA/TO,A,0.0,1.0,6.0,1422.0,3.0,r5,2017-07-26,2017-07-17,2017-07-17,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,GBR,Online TA,TA/TO,A,,2.0,4.0,656.0,16.88534761940745,r5,2017-07-29,2017-07-17,2017-07-17,Booked,Resort Hotel,POR,False,39,True,False,3.99
+HB,SPA,Online TA,TA/TO,E,0.0,1.0,2.0,471.2,3.0,r5,2017-07-31,2017-07-05,2017-07-05,Booked,Resort Hotel,POR,False,39,True,False,3.99
+HB,POR,Online TA,TA/TO,A,,1.0,6.0,1422.0,3.0,r5,2017-07-26,2017-07-17,2017-07-17,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,SPA,Online TA,TA/TO,A,,2.0,2.0,420.0,3.0,r5,2017-08-02,2017-07-30,2017-07-30,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,PHL,Online TA,TA/TO,A,,1.0,2.0,328.0,3.0,r5,2017-08-04,2017-08-02,2017-08-02,Booked,Resort Hotel,POR,False,39,True,False,3.99
+HB,GBR,Online TA,TA/TO,D,,2.0,2.0,,3.0,r5,2017-08-04,2017-07-15,2017-07-15,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,USA,Online TA,TA/TO,A,,1.0,2.0,328.0,3.0,r5,2017-08-04,2017-08-02,2017-08-02,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,PHL,Online TA,TA/TO,A,,1.0,2.0,328.0,3.0,r5,2017-08-04,2017-08-02,2017-08-02,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,POR,Direct,Direct,A,,2.0,5.0,1020.0,3.0,r5,2017-07-30,2017-07-10,2017-07-10,Booked,Resort Hotel,POR,False,39,True,False,3.99
+,SPA,Direct,Direct,A,,,2.0,427.5,3.0,r5,2017-08-03,2017-08-03,2017-08-03,Booked,Resort Hotel,POR,False,39,True,False,3.99
+HB,GBR,Direct,Direct,A,,1.0,2.0,432.0,3.0,r5,2017-08-05,2017-08-04,2017-08-04,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,SPA,Corporate,Corporate,A,0.0,,2.0,290.0,3.0,r5,2017-08-23,2017-08-06,2017-08-06,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,SPA,Online TA,TA/TO,A,0.0,2.0,1.0,174.0,3.0,r5,2017-08-20,2017-08-20,2017-08-20,Booked,Resort Hotel,POR,False,39,True,False,3.99
+BB,SPA,Online TA,TA/TO,A,,1.0,2.0,385.0,4.0,r4,2017-07-28,2017-07-28,2017-07-28,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,IRL,Online TA,TA/TO,D,0.0,2.0,7.0,1410.01,4.0,r4,2017-08-28,2017-07-29,2017-07-29,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,GBR,Online TA,TA/TO,E,,1.0,3.0,675.0,4.0,r4,2017-08-29,2017-08-13,2017-08-13,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,SPA,Direct,Direct,A,0.0,1.0,,555.0,4.0,r4,2017-08-29,2017-08-11,2017-08-11,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,GIB,Online TA,TA/TO,D,0.0,1.0,3.0,630.0,4.0,r4,2017-08-29,2017-07-22,2017-07-22,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,BHR,Online TA,TA/TO,A,,1.0,2.0,380.0,4.0,r4,2017-08-30,2017-07-24,2017-07-24,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,BRA,Online TA,TA/TO,D,,1.0,3.0,630.0,4.0,r4,2017-08-30,2017-07-12,2017-07-12,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,SPA,Offline TA/TO,TA/TO,D,0.0,1.0,3.0,423.0,4.0,r4,2017-08-30,2017-08-03,2017-08-03,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,POR,Online TA,TA/TO,A,,1.0,4.0,760.0,4.0,r4,2017-08-29,2017-07-03,2017-07-03,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+HB,SPA,Offline TA/TO,TA/TO,E,,1.0,7.0,1274.0,4.0,r4,2017-08-27,2017-08-17,2017-08-17,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+HB,SPA,Offline TA/TO,TA/TO,E,,1.0,7.0,1274.0,4.0,r4,2017-08-27,2017-08-17,2017-08-17,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+HB,GIB,Online TA,TA/TO,A,,2.0,3.0,708.0,4.0,r4,2017-08-28,2017-07-27,2017-07-27,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,POR,Online TA,TA/TO,E,0.0,1.0,4.0,920.0,4.0,r4,2017-08-28,2017-08-10,2017-08-10,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+HB,POR,Online TA,TA/TO,A,0.0,1.0,4.0,873.0,4.0,r4,2017-08-28,2017-08-21,2017-08-21,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+HB,POR,Online TA,TA/TO,A,0.0,2.0,,621.0,4.0,r4,2017-08-31,2017-08-22,2017-08-22,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,GBR,Online TA,TA/TO,D,,1.0,4.0,1000.0,16.88534761940745,r4,2017-08-20,2017-07-19,2017-07-19,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+HB,SPA,Online TA,TA/TO,F,,1.0,5.0,1288.0,4.0,r4,2017-08-18,2017-07-27,2017-07-27,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,POR,Online TA,TA/TO,A,,1.0,1.0,207.0,4.0,r4,2017-08-25,2017-07-26,2017-07-26,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,POR,Online TA,TA/TO,A,,1.0,3.0,650.01,4.0,r4,2017-08-25,2017-08-12,2017-08-12,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,USA,Online TA,TA/TO,D,0.0,2.0,2.0,480.0,4.0,r4,2017-08-26,2017-08-17,2017-08-17,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,CHL,Online TA,TA/TO,E,,1.0,3.0,729.99,4.0,r4,2017-08-26,2017-08-03,2017-08-03,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,SPA,Offline TA/TO,,D,,1.0,4.0,540.0,4.0,r4,2017-08-26,2017-07-17,2017-07-17,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,SPA,Offline TA/TO,TA/TO,D,,1.0,4.0,540.0,4.0,r4,2017-08-26,2017-07-17,2017-07-17,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,SPA,Online TA,TA/TO,E,,3.0,4.0,1080.0,4.0,r4,2017-08-21,2017-08-04,2017-08-04,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,IRL,Online TA,TA/TO,A,,1.0,6.0,1380.0,4.0,r4,2017-08-21,2017-08-06,2017-08-06,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,POR,Online TA,TA/TO,E,,1.0,4.0,1080.0,4.0,r4,2017-08-23,2017-08-01,2017-08-01,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,CHN,Online TA,TA/TO,A,,1.0,2.0,369.0,4.0,r4,2017-07-28,2017-07-19,2017-07-19,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+HB,POR,Online TA,TA/TO,D,0.0,1.0,2.0,514.0,4.0,r4,2017-07-28,2017-07-11,2017-07-11,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,AGO,Online TA,TA/TO,A,,2.0,2.0,369.0,4.0,r4,2017-07-28,2017-07-18,2017-07-18,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,USA,Online TA,TA/TO,A,0.0,2.0,2.0,385.0,4.0,r4,2017-07-28,2017-07-26,2017-07-26,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,IRL,Online TA,TA/TO,A,,1.0,4.0,820.0,4.0,r4,2017-07-28,2017-07-15,2017-07-15,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,SPA,Online TA,TA/TO,A,0.0,1.0,,410.0,4.0,r4,2017-07-29,2017-07-07,2017-07-07,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,NLD,Online TA,TA/TO,A,,1.0,4.0,820.0,4.0,r4,2017-07-26,2017-07-08,2017-07-08,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,SPA,Direct,Direct,D,0.0,2.0,7.0,1540.0,4.0,r4,2017-07-26,2017-07-05,2017-07-05,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,SWE,Online TA,TA/TO,E,,2.0,7.0,1715.0,4.0,r4,2017-07-26,2017-07-16,2017-07-16,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,POR,Online TA,TA/TO,A,0.0,2.0,5.0,1025.0,4.0,r4,2017-07-31,2017-07-21,2017-07-21,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,RUS,Online TA,TA/TO,D,,1.0,2.0,460.0,4.0,r4,2017-07-31,2017-07-30,2017-07-30,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,RUS,Online TA,TA/TO,E,,1.0,2.0,500.0,4.0,r4,2017-07-31,2017-07-30,2017-07-30,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,POR,Online TA,TA/TO,A,0.0,1.0,5.0,1025.0,4.0,r4,2017-07-30,2017-07-10,2017-07-10,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,MAR,Online TA,TA/TO,E,,1.0,4.0,920.0,4.0,r4,2017-07-17,2017-07-06,2017-07-06,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,POR,Online TA,TA/TO,D,,2.0,2.0,435.0,4.0,r4,2017-07-21,2017-07-11,2017-07-11,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,POR,Online TA,TA/TO,A,,2.0,6.0,1380.0,4.0,r4,2017-08-13,2017-07-18,2017-07-18,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,ROU,Online TA,TA/TO,E,,1.0,4.0,1080.0,4.0,r4,2017-08-10,2017-07-18,2017-07-18,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,FRA,Online TA,TA/TO,A,,1.0,4.0,920.0,4.0,r4,2017-08-11,2017-07-18,2017-07-18,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+HB,SPA,Online TA,TA/TO,A,0.0,1.0,4.0,1008.0,4.0,r4,2017-08-11,2017-08-05,2017-08-05,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,POR,Online TA,TA/TO,A,,1.0,2.0,420.0,4.0,r4,2017-08-11,2017-08-05,2017-08-05,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,SPA,Online TA,TA/TO,A,0.0,1.0,2.0,368.0,4.0,r4,2017-08-17,2017-07-09,2017-07-09,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+HB,SPA,Online TA,TA/TO,F,0.0,1.0,4.0,1159.2,4.0,r4,2017-08-17,2017-07-28,2017-07-28,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+HB,SPA,Online TA,TA/TO,A,0.0,1.0,4.0,988.0,4.0,r4,2017-08-17,2017-08-11,2017-08-11,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,SPA,Online TA,TA/TO,F,,1.0,2.0,417.6,4.0,r4,2017-08-16,2017-07-29,2017-07-29,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,SPA,Online TA,TA/TO,A,0.0,1.0,2.0,368.0,4.0,r4,2017-08-16,2017-07-29,2017-07-29,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,POR,Online TA,TA/TO,A,,2.0,4.0,860.0,4.0,r4,2017-08-14,2017-08-07,2017-08-07,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,POR,Online TA,TA/TO,A,,1.0,1.0,209.0,4.0,r4,2017-08-15,2017-08-07,2017-08-07,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,POR,Online TA,TA/TO,A,,1.0,1.0,190.0,4.0,r4,2017-08-15,2017-08-12,2017-08-12,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,SPA,Online TA,TA/TO,A,,1.0,6.0,1380.0,4.0,r4,2017-08-15,2017-07-26,2017-07-26,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,SPA,Online TA,TA/TO,A,,1.0,7.0,1568.0,4.0,r4,2017-08-15,2017-08-03,2017-08-03,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,IRL,Online TA,TA/TO,A,0.0,1.0,4.0,895.0,4.0,r4,2017-08-04,2017-07-15,2017-07-15,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,POR,Online TA,TA/TO,A,0.0,1.0,2.0,428.0,4.0,r4,2017-08-05,2017-07-28,2017-07-28,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,POR,Online TA,TA/TO,A,0.0,1.0,2.0,428.0,4.0,r4,2017-08-05,2017-07-28,2017-07-28,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,POR,Online TA,TA/TO,D,,1.0,3.0,690.0,4.0,r4,2017-08-05,2017-08-03,2017-08-03,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,PHL,Online TA,TA/TO,A,,1.0,2.0,410.0,4.0,r4,2017-08-03,2017-07-20,2017-07-20,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,PHL,Online TA,TA/TO,A,0.0,1.0,2.0,410.0,4.0,r4,2017-08-03,2017-07-20,2017-07-20,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,PHL,Online TA,TA/TO,A,,1.0,2.0,410.0,4.0,r4,2017-08-03,2017-07-20,2017-07-20,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,POR,Online TA,TA/TO,A,0.0,1.0,3.0,639.99,4.0,r4,2017-08-03,2017-07-12,2017-07-12,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+HB,MOZ,Online TA,TA/TO,D,0.0,1.0,,539.0,4.0,r4,2017-08-04,2017-07-21,2017-07-21,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,PHL,Online TA,TA/TO,A,0.0,1.0,2.0,410.0,4.0,r4,2017-08-03,2017-07-20,2017-07-20,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,GBR,Online TA,TA/TO,D,,2.0,3.0,630.0,4.0,r4,2017-07-16,2017-07-03,2017-07-03,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,SPA,Online TA,TA/TO,A,0.0,1.0,2.0,320.0,4.0,r4,2017-07-08,2017-07-03,2017-07-03,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,AUS,Online TA,TA/TO,A,0.0,2.0,2.0,342.0,4.0,r4,2017-07-15,2017-07-03,2017-07-03,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+HB,POR,Online TA,TA/TO,A,,1.0,7.0,1523.97,4.0,r4,2017-07-14,2017-07-03,2017-07-03,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,SPA,Online TA,TA/TO,A,,1.0,2.0,320.0,4.0,r4,2017-07-12,2017-07-01,2017-07-01,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,POR,Online TA,TA/TO,E,0.0,2.0,3.0,600.0,4.0,r4,2017-07-12,2017-07-02,2017-07-02,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,POR,Online TA,TA/TO,A,,2.0,1.0,105.0,4.0,r4,2017-07-13,2017-07-13,2017-07-13,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,SPA,Online TA,TA/TO,E,,1.0,1.0,8.0,4.0,r4,2017-07-06,2017-07-05,2017-07-05,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,SPA,Direct,Direct,A,0.0,2.0,1.0,93.0,4.0,r4,2017-07-05,2017-07-05,2017-07-05,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,POR,Online TA,TA/TO,D,,1.0,2.0,245.0,4.0,r4,2017-07-07,2017-07-06,2017-07-06,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,FRA,Online TA,TA/TO,A,,2.0,1.0,105.0,4.0,r4,2017-07-07,2017-07-07,2017-07-07,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,USA,Direct,Direct,F,0.0,1.0,1.0,173.0,4.0,r4,2017-07-03,2017-07-02,2017-07-02,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,USA,Online TA,TA/TO,A,,1.0,1.0,117.74,4.0,r4,2017-07-02,2017-07-02,2017-07-02,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,POR,Online TA,TA/TO,D,,2.0,2.0,280.0,4.0,r4,2017-07-13,2017-07-12,2017-07-12,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,GBR,Online TA,TA/TO,D,,1.0,5.0,720.0,4.0,r4,2017-07-10,2017-07-06,2017-07-06,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,SPA,Online TA,TA/TO,D,,1.0,1.0,96.0,4.0,r4,2017-07-13,2017-07-13,2017-07-13,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,USA,Online TA,TA/TO,D,0.0,1.0,1.0,96.0,4.0,r4,2017-07-13,2017-07-13,2017-07-13,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,SPA,Direct,Direct,D,,1.0,1.0,172.5,4.0,r4,2017-07-14,2017-07-11,2017-07-11,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,CN,Online TA,TA/TO,A,,1.0,2.0,370.0,4.0,r4,2017-07-15,2017-07-13,2017-07-13,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,POR,Online TA,TA/TO,A,,1.0,1.0,171.0,4.0,r4,2017-07-15,2017-07-12,2017-07-12,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,FRA,Online TA,TA/TO,A,,1.0,1.0,183.0,4.0,r4,2017-07-17,2017-07-17,2017-07-17,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+HB,SPA,Online TA,TA/TO,D,,1.0,7.0,929.6,4.0,r4,2017-07-11,2017-07-09,2017-07-09,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,POR,Online TA,TA/TO,D,0.0,2.0,1.0,,4.0,r4,2017-07-17,2017-07-16,2017-07-16,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,SPA,Online TA,TA/TO,A,,2.0,3.0,510.0,4.0,r4,2017-07-14,2017-07-12,2017-07-12,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,NOR,Online TA,TA/TO,D,0.0,1.0,3.0,498.0,4.0,r4,2017-07-13,2017-07-04,2017-07-04,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,SPA,Direct,Direct,D,,1.0,2.0,,4.0,r4,2017-07-15,2017-07-15,2017-07-15,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,SPA,Online TA,TA/TO,D,0.0,2.0,1.0,120.0,4.0,r4,2017-07-13,2017-07-12,2017-07-12,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,CN,Online TA,TA/TO,A,,1.0,1.0,84.01,4.0,r4,2017-07-09,2017-07-08,2017-07-08,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,GBR,Online TA,TA/TO,D,0.0,1.0,2.0,288.0,4.0,r4,2017-07-11,2017-07-06,2017-07-06,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,POR,Online TA,TA/TO,A,0.0,1.0,3.0,268.79999999999995,4.0,r4,2017-07-10,2017-07-08,2017-07-08,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,SPA,Online TA,TA/TO,E,0.0,1.0,1.0,135.0,4.0,r4,2017-07-11,2017-07-11,2017-07-11,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,SPA,Online TA,TA/TO,A,,1.0,2.0,320.0,4.0,r4,2017-07-10,2017-07-03,2017-07-03,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,GBR,Online TA,Direct,E,0.0,1.0,3.0,435.0,4.0,r4,2017-07-09,2017-07-09,2017-07-09,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+HB,GBR,Online TA,TA/TO,E,,2.0,4.0,1084.0,4.0,r4,2017-08-17,2017-08-15,2017-08-15,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,SPA,Direct,Direct,A,,2.0,4.0,840.0,4.0,r4,2017-08-17,2017-08-13,2017-08-13,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,POR,Online TA,TA/TO,A,,2.0,2.0,488.0,4.0,r4,2017-08-18,2017-07-05,2017-07-05,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,IRN,Online TA,TA/TO,A,0.0,1.0,3.0,535.17,4.0,r4,2017-08-16,2017-08-07,2017-08-07,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,SPA,Direct,Direct,D,0.0,3.0,1.0,196.0,4.0,r4,2017-08-18,2017-08-06,2017-08-06,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,IRL,Online TA,TA/TO,A,0.0,1.0,5.0,856.0,16.88534761940745,r4,2017-08-17,2017-08-13,2017-08-13,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+HB,POR,Online TA,TA/TO,A,,2.0,,1635.0,4.0,r4,2017-08-16,2017-08-01,2017-08-01,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+HB,SPA,Offline TA/TO,TA/TO,D,0.0,2.0,11.0,1793.0,4.0,r4,2017-08-13,2017-08-07,2017-08-07,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+HB,POR,,TA/TO,E,,2.0,33.274385106774496,824.01,4.0,r4,2017-08-21,2017-08-17,2017-08-17,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,POR,Online TA,TA/TO,A,,2.0,1.0,189.0,4.0,r4,2017-08-23,2017-08-21,2017-08-21,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,COL,Online TA,TA/TO,A,,1.0,2.0,371.98,4.0,r4,2017-08-22,2017-08-10,2017-08-10,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+HB,POR,Online TA,TA/TO,A,,2.0,4.0,1024.0,4.0,r4,2017-08-21,2017-08-15,2017-08-15,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,CHE,Online TA,TA/TO,D,,2.0,1.0,209.0,4.0,r4,2017-08-23,2017-08-22,2017-08-22,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,SPA,Online TA,TA/TO,A,,2.0,6.0,1380.0,4.0,r4,2017-08-16,2017-07-12,2017-07-12,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,SPA,Direct,Direct,A,,3.0,3.0,675.0,4.0,r4,2017-08-12,2017-07-13,2017-07-13,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,FRA,Online TA,TA/TO,A,,1.0,2.0,420.0,4.0,r4,2017-08-13,2017-08-10,2017-08-10,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,FRA,Direct,TA/TO,A,0.0,1.0,1.0,174.0,4.0,r4,2017-08-15,2017-08-15,2017-08-15,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,SPA,Online TA,TA/TO,A,,1.0,2.0,396.0,4.0,r4,2017-08-13,2017-07-19,2017-07-19,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,FRA,Online TA,TA/TO,A,0.0,2.0,1.0,190.0,4.0,r4,2017-08-15,2017-08-14,2017-08-14,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,SPA,Online TA,TA/TO,A,0.0,2.0,1.0,103.2,4.0,r4,2017-08-15,2017-08-14,2017-08-14,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,SPA,Online TA,TA/TO,A,0.0,1.0,1.0,161.1,4.0,r4,2017-08-15,2017-08-15,2017-08-15,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,POR,Online TA,TA/TO,A,0.0,2.0,5.0,1150.0,4.0,r4,2017-08-08,2017-07-24,2017-07-24,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+HB,BRA,Online TA,TA/TO,A,0.0,2.0,,980.0,4.0,r4,2017-08-08,2017-07-22,2017-07-22,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,CHE,Online TA,TA/TO,A,,1.0,5.0,1220.0,4.0,r4,2017-08-09,2017-07-17,2017-07-17,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+HB,POR,Online TA,TA/TO,A,0.0,1.0,4.0,1104.0,4.0,r4,2017-08-10,2017-07-18,2017-07-18,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,IRL,Online TA,TA/TO,A,,1.0,3.0,503.19,4.0,r4,2017-08-11,2017-08-05,2017-08-05,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,GBR,Offline TA/TO,TA/TO,D,0.0,2.0,7.0,803.32,4.0,r4,2017-08-07,2017-07-25,2017-07-25,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,IRL,Direct,Direct,A,0.0,1.0,4.0,819.0,4.0,r4,2017-08-10,2017-08-04,2017-08-04,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,MAR,Online TA,TA/TO,A,0.0,2.0,1.0,143.0,4.0,r4,2017-08-15,2017-08-14,2017-08-14,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,BRA,Online TA,TA/TO,A,0.0,2.0,3.0,561.99,4.0,r4,2017-08-14,2017-08-07,2017-08-07,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,GBR,Offline TA/TO,TA/TO,D,,3.0,7.0,959.0,4.0,r4,2017-08-11,2017-08-06,2017-08-06,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+HB,POR,Online TA,TA/TO,A,0.0,3.0,1.0,231.0,4.0,r4,2017-08-17,2017-08-16,2017-08-16,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,POR,Online TA,TA/TO,A,,2.0,3.0,651.99,4.0,r4,2017-08-15,2017-08-12,2017-08-12,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,ITA,Online TA,TA/TO,A,,2.0,1.0,230.0,4.0,r4,2017-08-17,2017-08-08,2017-08-08,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,AUS,Online TA,TA/TO,A,0.0,2.0,4.0,920.0,4.0,r4,2017-08-14,2017-07-25,2017-07-25,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,USA,Online TA,TA/TO,D,0.0,2.0,2.0,400.0,4.0,r4,2017-08-16,2017-07-08,2017-07-08,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,USA,Online TA,TA/TO,A,,2.0,1.0,210.0,4.0,r4,2017-08-16,2017-08-13,2017-08-13,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,MAR,Online TA,TA/TO,A,0.0,2.0,1.0,129.0,4.0,r4,2017-08-15,2017-08-14,2017-08-14,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,BRA,Online TA,TA/TO,F,,1.0,2.0,464.0,4.0,r4,2017-08-15,2017-07-07,2017-07-07,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,DNK,Online TA,TA/TO,A,0.0,1.0,2.0,326.1,4.0,r4,2017-08-15,2017-08-14,2017-08-14,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,CN,Online TA,TA/TO,D,,2.0,5.0,1090.0,4.0,r4,2017-08-28,2017-08-25,2017-08-25,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,TUR,Online TA,TA/TO,A,,4.0,2.0,284.0,4.0,r4,2017-08-31,2017-08-16,2017-08-16,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,SPA,Online TA,TA/TO,A,0.0,1.0,5.0,964.0,4.0,r4,2017-08-28,2017-08-28,2017-08-28,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+,GBR,Offline TA/TO,TA/TO,A,,1.0,6.0,711.0,4.0,r4,2017-08-28,2017-07-27,2017-07-27,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,CN,Online TA,TA/TO,A,0.0,1.0,3.0,381.6,4.0,r4,2017-08-31,2017-08-08,2017-08-08,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+HB,CHE,Online TA,TA/TO,A,,3.0,4.0,888.0,4.0,r4,2017-08-27,2017-07-30,2017-07-30,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,NLD,Online TA,TA/TO,A,,1.0,1.0,171.0,4.0,r4,2017-08-30,2017-08-27,2017-08-27,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+HB,SPA,Online TA,TA/TO,E,,2.0,3.0,786.0,4.0,r4,2017-08-28,2017-08-14,2017-08-14,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,BRA,Online TA,TA/TO,A,,1.0,2.0,278.0,4.0,r4,2017-08-30,2017-08-20,2017-08-20,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,IRL,Online TA,TA/TO,A,,1.0,7.0,867.16,4.0,r4,2017-08-30,2017-08-05,2017-08-05,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+HB,GBR,Online TA,TA/TO,A,,1.0,5.0,747.25,4.0,r4,2017-08-31,2017-08-16,2017-08-16,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,GBR,Offline TA/TO,TA/TO,A,,1.0,7.0,829.5,4.0,r4,2017-08-27,2017-07-09,2017-07-09,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,GBR,Offline TA/TO,TA/TO,D,,2.0,6.0,810.0,4.0,r4,2017-08-28,2017-08-19,2017-08-19,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,GBR,Offline TA/TO,TA/TO,D,0.0,2.0,7.0,959.0,4.0,r4,2017-08-28,2017-07-28,2017-07-28,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,GBR,Offline TA/TO,TA/TO,D,,2.0,7.0,945.0,4.0,r4,2017-08-29,2017-08-19,2017-08-19,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,GBR,Online TA,TA/TO,F,,1.0,5.0,935.95,4.0,r4,2017-08-31,2017-07-30,2017-07-30,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,IRL,Online TA,TA/TO,A,0.0,1.0,7.0,911.61,4.0,r4,2017-08-29,2017-08-26,2017-08-26,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,IRL,Online TA,TA/TO,D,,1.0,7.0,1277.5,4.0,r4,2017-08-20,2017-07-20,2017-07-20,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+HB,POR,Online TA,TA/TO,A,0.0,1.0,4.0,1048.0,4.0,r4,2017-08-23,2017-08-02,2017-08-02,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,ROU,Online TA,TA/TO,A,,2.0,2.0,428.0,4.0,r4,2017-08-25,2017-08-23,2017-08-23,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,USA,Direct,Direct,E,,1.0,4.0,1060.0,4.0,r4,2017-08-23,2017-07-22,2017-07-22,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,GBR,Online TA,TA/TO,A,,1.0,4.0,629.68,4.0,r4,2017-08-24,2017-08-18,2017-08-18,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,USA,Online TA,TA/TO,A,,1.0,3.0,473.97,4.0,r4,2017-08-25,2017-07-31,2017-07-31,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+HB,SPA,Online TA,TA/TO,A,,3.0,5.0,1310.0,4.0,r4,2017-08-20,2017-07-09,2017-07-09,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,SPA,Online TA,TA/TO,A,0.0,1.0,1.0,154.0,4.0,r4,2017-08-25,2017-08-24,2017-08-24,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,SPA,Direct,Direct,E,,1.0,1.0,200.0,4.0,r4,2017-08-26,2017-08-26,2017-08-26,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,GBR,Online TA,TA/TO,A,,2.0,3.0,570.0,4.0,r4,2017-08-27,2017-07-23,2017-07-23,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+HB,GBR,Online TA,TA/TO,E,0.0,2.0,3.0,707.4000000000001,4.0,r4,2017-08-28,2017-08-26,2017-08-26,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,SPA,Direct,Direct,A,,1.0,1.0,175.0,4.0,r4,2017-08-30,2017-08-30,2017-08-30,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,POR,Online TA,TA/TO,A,0.0,2.0,4.0,896.0,4.0,r4,2017-08-25,2017-08-14,2017-08-14,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,SPA,Online TA,TA/TO,A,,2.0,7.0,1470.0,4.0,r4,2017-08-22,2017-08-17,2017-08-17,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,SPA,Direct,Direct,A,,2.0,1.0,204.0,4.0,r4,2017-08-29,2017-08-28,2017-08-28,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,GBR,Online TA,TA/TO,A,0.0,2.0,3.0,585.0,4.0,r4,2017-08-25,2017-07-27,2017-07-27,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+HB,POR,Online TA,TA/TO,E,0.0,3.0,2.0,584.0,4.0,r4,2017-08-26,2017-08-19,2017-08-19,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+HB,GBR,Online TA,TA/TO,D,,1.0,6.0,1245.12,4.0,r4,2017-08-23,2017-08-06,2017-08-06,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,SPA,Online TA,TA/TO,A,,2.0,6.0,1354.02,4.0,r4,2017-08-23,2017-08-18,2017-08-18,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,SPA,Online TA,TA/TO,A,,1.0,5.0,,4.0,r4,2017-07-22,2017-07-09,2017-07-09,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,SWE,Online TA,TA/TO,A,,1.0,1.0,140.0,4.0,r4,2017-07-27,2017-07-27,2017-07-27,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,CN,Online TA,TA/TO,A,0.0,1.0,3.0,474.0,4.0,r4,2017-07-22,2017-07-16,2017-07-16,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,SPA,Online TA,TA/TO,A,0.0,1.0,3.0,567.0,4.0,r4,2017-07-24,2017-07-23,2017-07-23,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,LUX,Online TA,TA/TO,A,,3.0,4.0,876.0,4.0,r4,2017-07-27,2017-07-13,2017-07-13,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+HB,POR,Online TA,TA/TO,A,,2.0,4.0,1004.0,4.0,r4,2017-07-27,2017-07-11,2017-07-11,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,FRA,Online TA,TA/TO,A,,1.0,3.0,606.99,4.0,r4,2017-07-28,2017-07-24,2017-07-24,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,GBR,Online TA,TA/TO,E,0.0,1.0,2.0,430.0,4.0,r4,2017-07-27,2017-07-27,2017-07-27,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,GBR,Online TA,TA/TO,A,,1.0,2.0,350.0,4.0,r4,2017-07-27,2017-07-27,2017-07-27,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,SPA,Online TA,TA/TO,E,0.0,3.0,3.0,735.0,4.0,r4,2017-07-27,2017-07-03,2017-07-03,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+HB,,Online TA,TA/TO,A,,1.0,2.0,449.0,4.0,r4,2017-07-28,2017-07-26,2017-07-26,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,POR,Online TA,TA/TO,A,,1.0,5.0,1020.0,4.0,r4,2017-07-17,2017-07-09,2017-07-09,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,CN,Online TA,TA/TO,E,0.0,1.0,3.0,477.6,4.0,r4,2017-07-19,2017-07-19,2017-07-19,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+HB,SPA,Online TA,TA/TO,A,0.0,1.0,1.0,222.0,4.0,r4,2017-07-20,2017-07-17,2017-07-17,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,GBR,Online TA,TA/TO,D,,1.0,,748.7,4.0,r4,2017-07-20,2017-07-16,2017-07-16,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,USA,Online TA,TA/TO,D,,1.0,2.0,313.2,4.0,r4,2017-07-21,2017-07-12,2017-07-12,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,USA,Online TA,TA/TO,A,,1.0,2.0,284.42,4.0,r4,2017-07-21,2017-07-18,2017-07-18,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+HB,POR,Online TA,TA/TO,A,0.0,1.0,6.0,1257.0,4.0,r4,2017-07-17,2017-07-16,2017-07-16,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,POR,Online TA,TA/TO,A,,1.0,1.0,209.0,4.0,r4,2017-07-22,2017-07-19,2017-07-19,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,GBR,Offline TA/TO,TA/TO,D,0.0,2.0,7.0,850.5,4.0,r4,2017-08-02,2017-07-22,2017-07-22,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+HB,POR,Online TA,TA/TO,A,,3.0,5.0,1285.0,4.0,r4,2017-08-04,2017-07-13,2017-07-13,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,POR,Online TA,TA/TO,A,0.0,2.0,3.0,690.0,4.0,r4,2017-08-07,2017-08-05,2017-08-05,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,POR,Online TA,TA/TO,A,0.0,3.0,3.0,,4.0,r4,2017-08-04,2017-07-27,2017-07-27,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+HB,POR,Online TA,TA/TO,A,,4.0,2.0,520.0,4.0,r4,2017-08-05,2017-07-26,2017-07-26,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,ISL,Online TA,TA/TO,A,0.0,2.0,6.0,,4.0,r4,2017-08-01,2017-07-26,2017-07-26,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,SPA,Online TA,TA/TO,A,,1.0,1.0,199.0,4.0,r4,2017-08-06,2017-07-28,2017-07-28,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,AUS,Online TA,TA/TO,A,0.0,2.0,4.0,959.0,4.0,r4,2017-08-04,2017-07-17,2017-07-17,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,SPA,Online TA,TA/TO,A,0.0,1.0,1.0,144.4,4.0,r4,2017-08-06,2017-08-05,2017-08-05,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,FRA,Direct,Direct,A,0.0,2.0,2.0,454.0,4.0,r4,2017-08-06,2017-07-23,2017-07-23,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,SPA,Online TA,TA/TO,A,,1.0,1.0,144.4,4.0,r4,2017-08-06,2017-08-05,2017-08-05,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,SPA,Online TA,TA/TO,A,0.0,2.0,3.0,695.01,4.0,r4,2017-08-07,2017-07-30,2017-07-30,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,SPA,Online TA,TA/TO,A,,2.0,1.0,244.0,4.0,r4,2017-08-10,2017-08-07,2017-08-07,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+HB,POR,Online TA,TA/TO,A,,2.0,3.0,723.0,4.0,r4,2017-08-09,2017-08-02,2017-08-02,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,GBR,Offline TA/TO,TA/TO,D,,2.0,7.0,850.5,4.0,r4,2017-08-05,2017-07-24,2017-07-24,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,SPA,Online TA,TA/TO,A,0.0,2.0,3.0,732.0,4.0,r4,2017-08-09,2017-07-22,2017-07-22,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,SPA,Online TA,TA/TO,D,,3.0,2.0,480.0,4.0,r4,2017-08-10,2017-08-08,2017-08-08,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,POR,Online TA,TA/TO,A,0.0,3.0,6.0,1284.0,4.0,r4,2017-08-06,2017-07-29,2017-07-29,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,POR,Online TA,TA/TO,A,,2.0,5.0,1220.0,4.0,r4,2017-08-07,2017-07-21,2017-07-21,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+HB,GBR,Online TA,TA/TO,A,0.0,2.0,1.0,241.0,4.0,r4,2017-08-11,2017-07-30,2017-07-30,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,POR,Direct,TA/TO,D,,2.0,1.0,205.0,4.0,r4,2017-08-10,2017-08-09,2017-08-09,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,USA,Online TA,TA/TO,D,,1.0,2.0,,4.0,r4,2017-08-08,2017-07-25,2017-07-25,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,SPA,Direct,Direct,D,,1.0,1.0,180.0,4.0,r4,2017-08-10,2017-08-10,2017-08-10,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+HB,SPA,Online TA,TA/TO,D,,2.0,4.0,1184.0,4.0,r4,2017-08-07,2017-07-16,2017-07-16,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,SPA,Online TA,TA/TO,D,,2.0,5.0,1120.0,4.0,r4,2017-08-06,2017-08-04,2017-08-04,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+HB,POR,Online TA,TA/TO,D,0.0,3.0,5.0,1329.3000000000002,4.0,r4,2017-07-29,2017-07-16,2017-07-16,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,IRL,Direct,Direct,D,,1.0,7.0,1514.03,4.0,r4,2017-07-27,2017-07-26,2017-07-26,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,SWE,Online TA,TA/TO,A,0.0,3.0,3.0,615.0,4.0,r4,2017-07-31,2017-07-15,2017-07-15,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,GBR,Online TA,TA/TO,D,0.0,1.0,4.0,672.6,4.0,r4,2017-07-28,2017-07-25,2017-07-25,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,GBR,Online TA,TA/TO,D,,1.0,6.0,1026.0,4.0,r4,2017-07-26,2017-07-10,2017-07-10,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,POR,Direct,Direct,D,,1.0,4.0,900.0,16.88534761940745,r4,2017-07-29,2017-07-29,2017-07-29,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,BRA,Direct,Direct,A,,1.0,2.0,430.0,4.0,r4,2017-08-04,2017-08-01,2017-08-01,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,SPA,Online TA,TA/TO,A,,1.0,4.0,914.0,4.0,r4,2017-08-02,2017-07-28,2017-07-28,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,PHL,Online TA,TA/TO,D,0.0,1.0,2.0,342.0,4.0,r4,2017-08-04,2017-08-03,2017-08-03,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,PHL,Online TA,TA/TO,A,,1.0,2.0,328.0,4.0,r4,2017-08-04,2017-08-02,2017-08-02,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+HB,POR,Online TA,TA/TO,A,0.0,1.0,4.0,773.6,4.0,r4,2017-08-01,2017-07-27,2017-07-27,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,SWE,Online TA,TA/TO,D,,2.0,5.0,1125.0,4.0,r4,2017-07-31,2017-07-20,2017-07-20,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,IRL,Online TA,TA/TO,A,0.0,1.0,4.0,743.96,4.0,r4,2017-08-01,2017-07-01,2017-07-01,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+HB,SPA,Online TA,TA/TO,A,0.0,2.0,1.0,231.0,4.0,r4,2017-08-19,2017-08-16,2017-08-16,Booked,Resort Hotel,SPA,False,45,True,False,4.54
+BB,SPA,Online TA,Direct,A,0.0,1.0,1.0,230.0,4.0,r4,2017-08-12,2017-07-19,2017-07-19,Booked,Resort Hotel,SPA,False,45,True,False,4.54
