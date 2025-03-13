@@ -1,5 +1,4 @@
 import numpy as np
-import pandas as pd
 from sklearn.model_selection import StratifiedKFold, GridSearchCV, cross_val_score
 from sklearn.feature_selection import SelectKBest, f_classif
 from sklearn.linear_model import SGDClassifier
@@ -35,7 +34,7 @@ def find_best_sgdclassifier_params_and_k_grid(X_train_processed, y_train, X_test
 
     # 3. Definición del espacio de búsqueda de hiperparámetros
     param_grid = {
-        'selector__k': range(1, min(X_train.shape[1] + 1, 10)),
+        'selector__k': range(1, min(X_train_processed.shape[1] + 1, 10)),
         'model__penalty': ['l1', 'l2'],
         'model__max_iter': [1000],
         'model__learning_rate': ['optimal', 'adaptive'],  # Añadir learning_rate
