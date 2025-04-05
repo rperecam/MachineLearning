@@ -1,120 +1,57 @@
-# inference.py
 import pandas as pd
-import argparse
+import cloudpickle
 import os
-import sys
-from typing import Optional
 
-# Import the pipeline class definition from the separate file
-try:
-    from train import HotelBookingPipeline
-except ImportError:
-    print("Error: Asegúrate de que 'train.py' existe y contiene la clase 'HotelBookingPipeline'.")
-    sys.exit(1)
+# Definir las rutas de los archivos desde las variables de entorno
+model_path = os.getenv('MODEL_PATH', 'model/model.pkl')
+input_data_path = os.getenv('INPUT_DATA_PATH', 'data/bookings_train.csv')
+output_predictions_path = os.getenv('OUTPUT_PREDICTIONS_PATH', 'data/predictions.csv')
 
-def run_inference(input_csv: str, output_csv: str, model_path: str, model_type: str = 'logistic') -> bool:
-    """
-    Loads the pipeline, performs inference on input_csv, and saves results to output_csv.
-
-    Args:
-        input_csv (str): Path to the input CSV file with new data.
-        output_csv (str): Path to save the output CSV file with predictions.
-        model_path (str): Path to the saved pipeline (.pkl) file.
-        model_type (str): Type of model to use ('logistic' or 'sgd').
-
-    Returns:
-        bool: True if inference was successful, False otherwise.
-    """
-    print(f"--- Iniciando Inferencia ---")
-    print(f"Modelo a cargar: {model_path}")
-    print(f"Datos de entrada: {input_csv}")
-    print(f"Archivo de salida: {output_csv}")
-    print(f"Tipo de modelo especificado: {model_type}")
-
-    # 1. Load the pipeline
-    pipeline_instance: Optional[HotelBookingPipeline] = HotelBookingPipeline.load_pipeline(model_path)
-
-    if pipeline_instance is None:
-        print(f"Error fatal: No se pudo cargar el pipeline desde {model_path}")
-        return False
-
-    # Verify the correct model type is loaded/available if needed
-    if model_type == 'logistic' and pipeline_instance.full_pipeline_logistic is None:
-        print(f"Error: Se especificó el modelo 'logistic', pero no está cargado en el pipeline.")
-        return False
-    elif model_type == 'sgd' and pipeline_instance.full_pipeline_sgd is None:
-        print(f"Error: Se especificó el modelo 'sgd', pero no está cargado en el pipeline.")
-        return False
-
-
-    # 2. Load input data
+# Cargar el modelo entrenado
+def load_model(filepath):
     try:
-        input_df = pd.read_csv(input_csv)
-        print(f"Datos de entrada cargados. Shape: {input_df.shape}")
+        with open(filepath, 'rb') as f:
+            model = cloudpickle.load(f)
+        print(f"Modelo cargado desde: {filepath}")
+        return model
     except FileNotFoundError:
-        print(f"Error fatal: Archivo de entrada no encontrado en {input_csv}")
-        return False
+        print(f"Error: Archivo no encontrado en: {filepath}")
     except Exception as e:
-        print(f"Error fatal al leer el archivo de entrada {input_csv}: {e}")
-        return False
+        print(f"Error al cargar el modelo: {e}")
+    return None
 
-    # 3. Perform prediction
-    print(f"Realizando predicciones con el modelo {model_type.upper()}...")
+# Alinear las columnas del DataFrame de entrada con las columnas esperadas por el modelo
+def align_columns(df, expected_columns):
+    for col in expected_columns:
+        if col not in df.columns:
+            df[col] = 0  # O usa un valor por defecto apropiado
+    return df[expected_columns]
+
+# Realizar predicciones y guardar en un archivo CSV
+def make_predictions(model, input_data_path, output_predictions_path):
     try:
-        predictions = pipeline_instance.predict(input_df, model_type=model_type)
-        # Optional: Get probabilities as well
-        # probabilities = pipeline_instance.predict_proba(input_df, model_type=model_type)
+        # Cargar los datos de entrada
+        df_input = pd.read_csv(input_data_path)
+
+        # Alinear las columnas del DataFrame de entrada con las columnas esperadas por el modelo
+        expected_columns = model.named_steps['preprocessor'].transformers_[0][2] + model.named_steps['preprocessor'].transformers_[1][2]
+        df_input_aligned = align_columns(df_input, expected_columns)
+
+        # Realizar predicciones
+        predictions = model.predict(df_input_aligned)
+        probabilities = model.predict_proba(df_input_aligned)[:, 1]
+
+        # Guardar las predicciones en un archivo CSV
+        df_output = pd.DataFrame({
+            'predicted_cancellation': predictions,
+            'probability_cancellation': probabilities
+        })
+        df_output.to_csv(output_predictions_path, index=False)
+        print(f"Predicciones guardadas en: {output_predictions_path}")
     except Exception as e:
-        print(f"Error fatal durante la predicción: {e}")
-        import traceback
-        traceback.print_exc()
-        return False
+        print(f"Error durante la predicción: {e}")
 
-    if predictions is None:
-        print("Error fatal: La función predict devolvió None.")
-        return False
-
-    print(f"Predicciones generadas ({len(predictions)} registros).")
-
-    # 4. Prepare output data
-    output_df = input_df.copy()
-    output_df['prediction'] = predictions
-    # Optional: Add probability score if needed (e.g., probability of class 1)
-    # if probabilities is not None:
-    #     output_df['prediction_probability_1'] = probabilities[:, 1] # Assuming binary classification
-
-    # 5. Save output data
-    try:
-        # Ensure output directory exists
-        os.makedirs(os.path.dirname(output_csv) or '.', exist_ok=True)
-        output_df.to_csv(output_csv, index=False)
-        print(f"Resultados guardados exitosamente en: {output_csv}")
-    except Exception as e:
-        print(f"Error fatal al guardar los resultados en {output_csv}: {e}")
-        return False
-
-    print(f"--- Inferencia Completada Exitosamente ---")
-    return True
-
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Ejecutar inferencia con el pipeline de Hotel Booking.")
-    parser.add_argument("--input-csv", type=str, required=True,
-                        help="Ruta al archivo CSV de entrada con los nuevos datos.")
-    parser.add_argument("--output-csv", type=str, required=True,
-                        help="Ruta al archivo CSV de salida donde se guardarán las predicciones.")
-    parser.add_argument("--model-path", type=str, required=True,
-                        help="Ruta al archivo .pkl del pipeline entrenado.")
-    parser.add_argument("--model-type", type=str, default='logistic', choices=['logistic', 'sgd'],
-                        help="Tipo de modelo a usar para la predicción ('logistic' o 'sgd'). Default: logistic.")
-
-    args = parser.parse_args()
-
-    success = run_inference(
-        input_csv=args.input_csv,
-        output_csv=args.output_csv,
-        model_path=args.model_path,
-        model_type=args.model_type
-    )
-
-    if not success:
-        sys.exit(1) # Exit with error code if inference failed
+if __name__ == '__main__':
+    model = load_model(model_path)
+    if model:
+        make_predictions(model, input_data_path, output_predictions_path)
