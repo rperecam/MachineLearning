@@ -6,7 +6,7 @@ Este documento presenta un análisis detallado del desarrollo de un modelo de re
 
 ## 2. Pipeline del Modelo
 
-![Pipeline del modelo](pipeline.png)
+![Pipeline del modelo](png/pipeline.png)
 
 *Figura 1: Representación visual del pipeline de procesamiento y modelado*
 
