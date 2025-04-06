@@ -3,9 +3,9 @@ import cloudpickle
 import os
 
 # Definir las rutas de los archivos desde las variables de entorno
-model_path = os.getenv('MODEL_PATH', 'model/model.pkl')
-input_data_path = os.getenv('INPUT_DATA_PATH', 'data/bookings_train.csv')
-output_predictions_path = os.getenv('OUTPUT_PREDICTIONS_PATH', 'data/predictions.csv')
+model_path = os.environ.get('MODEL_PATH')
+input_data_path = os.environ.get('INPUT_DATA_PATH')
+output_predictions_path = os.environ.get('OUTPUT_PREDICTIONS_PATH')
 
 # Cargar el modelo entrenado
 def load_model(filepath):
@@ -16,9 +16,10 @@ def load_model(filepath):
         return model
     except FileNotFoundError:
         print(f"Error: Archivo no encontrado en: {filepath}")
+        return None
     except Exception as e:
         print(f"Error al cargar el modelo: {e}")
-    return None
+        return None
 
 # Alinear las columnas del DataFrame de entrada con las columnas esperadas por el modelo
 def align_columns(df, expected_columns):
