@@ -1,10 +1,18 @@
 import pandas as pd
 import cloudpickle
 import os
+import numpy as np  # Importa numpy
+
+# Configuración de variables de entorno
+#os.environ['MODEL_PATH'] = 'model/model.pkl'  # Ruta al modelo entrenado
+#os.environ['INPUT_BOOKINGS_PATH'] = 'data/bookings_train.csv'  # Ruta al archivo bookings.csv
+#os.environ['INPUT_HOTELS_PATH'] = 'data/hotels.csv'  # Ruta al archivo hotels.csv
+#os.environ['OUTPUT_PREDICTIONS_PATH'] = 'data/output_predictions.csv'  # Ruta para guardar las predicciones
 
 # Definir las rutas de los archivos desde las variables de entorno
 model_path = os.environ.get('MODEL_PATH')
-input_data_path = os.environ.get('INPUT_DATA_PATH')
+input_bookings_path = os.environ.get('INPUT_BOOKINGS_PATH')
+input_hotels_path = os.environ.get('INPUT_HOTELS_PATH')  # Ruta para el archivo hotels.csv
 output_predictions_path = os.environ.get('OUTPUT_PREDICTIONS_PATH')
 
 # Cargar el modelo entrenado
@@ -29,13 +37,28 @@ def align_columns(df, expected_columns):
     return df[expected_columns]
 
 # Realizar predicciones y guardar en un archivo CSV
-def make_predictions(model, input_data_path, output_predictions_path):
+def make_predictions(model, input_bookings_path, input_hotels_path, output_predictions_path):
     try:
         # Cargar los datos de entrada
-        df_input = pd.read_csv(input_data_path)
+        df_bookings = pd.read_csv(input_bookings_path)
+        df_hotels = pd.read_csv(input_hotels_path)
+
+        # Fusionar los DataFrames
+        df_input = pd.merge(df_bookings, df_hotels, on='hotel_id', how='left').drop('hotel_id', axis=1, errors='ignore')
+
+        # Asegurarse de que no haya 'reservation_status' en 'Booked' o NaN
+        df_input = df_input[~df_input['reservation_status'].isin(['Booked', np.nan])].copy()
+
+        # Separar características y target (si es necesario para la alineación)
+        if 'is_canceled' in df_input.columns:
+            y = df_input['is_canceled']
+            df_input = df_input.drop('is_canceled', axis=1)
 
         # Alinear las columnas del DataFrame de entrada con las columnas esperadas por el modelo
+        # Obtener las columnas utilizadas durante el entrenamiento
         expected_columns = model.named_steps['preprocessor'].transformers_[0][2] + model.named_steps['preprocessor'].transformers_[1][2]
+
+        # Alinear las columnas del DataFrame de entrada con las columnas esperadas por el modelo
         df_input_aligned = align_columns(df_input, expected_columns)
 
         # Realizar predicciones
@@ -55,4 +78,4 @@ def make_predictions(model, input_data_path, output_predictions_path):
 if __name__ == '__main__':
     model = load_model(model_path)
     if model:
-        make_predictions(model, input_data_path, output_predictions_path)
+        make_predictions(model, input_bookings_path, input_hotels_path, output_predictions_path)

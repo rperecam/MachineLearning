@@ -60,10 +60,13 @@ class ContinentMapper(BaseEstimator, TransformerMixin):
 class FeatureEngineer(BaseEstimator, TransformerMixin):
     def __init__(self, date_cols=['arrival_date', 'booking_date'],
                  asset_cols=['pool_and_spa', 'restaurant', 'parking'],
-                 country_cols=['country_x', 'country_y']):
+                 country_cols=['country_x', 'country_y'],
+                 # ¡NUEVO! Añade un parámetro para el formato de fecha si es necesario
+                 date_format=None):
         self.date_cols = date_cols
         self.asset_cols = asset_cols
         self.country_cols = country_cols
+        self.date_format = date_format # Guarda el formato
 
     def fit(self, X, y=None):
         return self
@@ -71,23 +74,59 @@ class FeatureEngineer(BaseEstimator, TransformerMixin):
     def transform(self, X):
         X_copy = X.copy()
 
+        arrival_col = self.date_cols[0]
+        booking_col = self.date_cols[1]
+
+        # Crea la instancia especificando el formato exacto
+        feature_engineer = FeatureEngineer(date_format='%Y-%m-%d')
+
         # Verificar y calcular lead_time
-        if 'arrival_date' in X_copy.columns and 'booking_date' in X_copy.columns:
-            X_copy['arrival_date'] = pd.to_datetime(X_copy['arrival_date'], errors='coerce')
-            X_copy['booking_date'] = pd.to_datetime(X_copy['booking_date'], errors='coerce')
-            X_copy['lead_time'] = (X_copy['arrival_date'] - X_copy['booking_date']).dt.days
-        else:
-            X_copy['lead_time'] = np.nan
+        if arrival_col in X_copy.columns and booking_col in X_copy.columns:
+            # Intenta convertir especificando el formato si se proporcionó
+            try:
+                X_copy[arrival_col] = pd.to_datetime(X_copy[arrival_col],
+                                                     format=self.date_format,
+                                                     errors='coerce')
+                X_copy[booking_col] = pd.to_datetime(X_copy[booking_col],
+                                                     format=self.date_format,
+                                                     errors='coerce')
 
-        # num_assets
+                # Calcula lead_time solo si ambas fechas son válidas (no NaT)
+                # La resta ya maneja NaT, resultando en NaT si uno de los operandos es NaT
+                time_diff = X_copy[arrival_col] - X_copy[booking_col]
+
+                # Extrae los días. .dt.days sobre NaT resulta en NaN
+                X_copy['lead_time'] = time_diff.dt.days
+
+                # Opcional: Podrías querer manejar lead_time negativos si booking_date > arrival_date
+                # X_copy.loc[X_copy['lead_time'] < 0, 'lead_time'] = np.nan # o 0, o como decidas
+
+            except Exception as e:
+                # Si hay un error incluso con el formato (quizás formato incorrecto?)
+                print(f"Error al convertir fechas o calcular lead_time: {e}")
+                X_copy['lead_time'] = np.nan
+
+        else:
+            print(f"Advertencia: Columnas de fecha '{arrival_col}' o '{booking_col}' no encontradas. 'lead_time' será NaN.")
+            X_copy['lead_time'] = np.nan # Columna llena de NaN si faltan las columnas originales
+
+        # num_assets (sin cambios)
         present_assets = [col for col in self.asset_cols if col in X_copy.columns]
-        X_copy['num_assets'] = X_copy[present_assets].fillna(0).astype(int).sum(axis=1)
-
-        # is_foreign
-        if all(col in X_copy.columns for col in self.country_cols):
-            X_copy['is_foreign'] = (X_copy[self.country_cols[0]] != X_copy[self.country_cols[1]]).astype(int)
+        if present_assets: # Asegurarse de que hay columnas de assets presentes
+            X_copy['num_assets'] = X_copy[present_assets].fillna(0).astype(int).sum(axis=1)
         else:
-            X_copy['is_foreign'] = 0
+            X_copy['num_assets'] = 0 # O np.nan si prefieres
+
+        # is_foreign (sin cambios)
+        country_col_x = self.country_cols[0]
+        country_col_y = self.country_cols[1]
+        if country_col_x in X_copy.columns and country_col_y in X_copy.columns:
+            # Asegurarse que la comparación funciona bien con NaN/None si los hubiera
+            X_copy['is_foreign'] = (X_copy[country_col_x].astype(str) != X_copy[country_col_y].astype(str)).astype(int)
+            # Tratar NaNs en las columnas de país como "no extranjero" o como decidas
+            X_copy.loc[X_copy[country_col_x].isna() | X_copy[country_col_y].isna(), 'is_foreign'] = 0 # Ejemplo: NaN no es extranjero
+        else:
+            X_copy['is_foreign'] = 0 # O np.nan
 
         return X_copy
 
@@ -120,22 +159,43 @@ class OutlierCapper(BaseEstimator, TransformerMixin):
         return X_copy
 
 # --- Ingeniería de la Variable Objetivo Simplificada ---
+# --- Ingeniería de la Variable Objetivo Simplificada ---
 def engineer_target(df: pd.DataFrame) -> Tuple[Optional[pd.DataFrame], Optional[pd.Series]]:
     if not all(col in df.columns for col in ['reservation_status', 'arrival_date', 'reservation_status_date']):
         print("Error: Columnas necesarias para la ingeniería del target no encontradas.")
         return None, None
 
     df_eng = df.copy()
-    df_eng['arrival_date'] = pd.to_datetime(df_eng['arrival_date'], errors='coerce')
-    df_eng['reservation_status_date'] = pd.to_datetime(df_eng['reservation_status_date'], errors='coerce')
+    # Asegúrate que las fechas se conviertan ANTES de usarlas aquí, o verifica el formato
+    # Si FeatureEngineer ya las convirtió, esta conversión podría ser redundante o necesitar try-except
+    try:
+        df_eng['arrival_date'] = pd.to_datetime(df_eng['arrival_date'], errors='coerce')
+        df_eng['reservation_status_date'] = pd.to_datetime(df_eng['reservation_status_date'], errors='coerce')
+    except Exception as e:
+        print(f"Error convirtiendo fechas en engineer_target (puede ser normal si ya se hizo): {e}")
+        # Asume que ya son datetime si falla la conversión
 
     # Simplificación de la lógica de cancelación tardía
     df_eng['is_canceled'] = df_eng['reservation_status'].isin(['Canceled', 'No-Show']).astype(int)
-    df_eng['days_to_arrival'] = (df_eng['arrival_date'] - df_eng['reservation_status_date']).dt.days
+    # Calcula days_to_arrival asegurándose que las fechas son datetime
+    if pd.api.types.is_datetime64_any_dtype(df_eng['arrival_date']) and pd.api.types.is_datetime64_any_dtype(df_eng['reservation_status_date']):
+        df_eng['days_to_arrival'] = (df_eng['arrival_date'] - df_eng['reservation_status_date']).dt.days
+    else:
+        print("Advertencia: No se pudo calcular days_to_arrival, fechas no son datetime.")
+        df_eng['days_to_arrival'] = np.nan # o algún valor por defecto
+
     df_eng['cancelled_last_30_days'] = (df_eng['is_canceled'] == 1) & (df_eng['days_to_arrival'] <= 30)
     y = df_eng['cancelled_last_30_days'].fillna(False).astype(int)
-    X = df_eng.drop(columns=['reservation_status', 'arrival_date', 'reservation_status_date',
-                             'is_canceled', 'days_to_arrival'], errors='ignore')
+
+    # --- CAMBIO AQUÍ ---
+    # No elimines 'arrival_date' ni 'booking_date' si FeatureEngineer las necesita
+    columns_to_drop = ['reservation_status', 'reservation_status_date',
+                       'is_canceled', 'days_to_arrival', 'cancelled_last_30_days'] # Elimina la propia target también de X
+    # Asegúrate que solo intentas eliminar columnas que existen
+    columns_to_drop = [col for col in columns_to_drop if col in df_eng.columns]
+    X = df_eng.drop(columns=columns_to_drop, errors='ignore')
+    # --------------------
+
     return X, y
 
 # --- Clase de Pipeline Simplificada ---
@@ -220,7 +280,7 @@ class HotelBookingPipeline:
                                                             stratify=y, random_state=self.random_state)
 
         cv = StratifiedKFold(n_splits=self.cv_folds, shuffle=True, random_state=self.random_state)
-        grid_search = GridSearchCV(self.pipeline, self.param_grid, cv=cv, scoring='f1', n_jobs=-1, verbose=1, error_score='raise')
+        grid_search = GridSearchCV(self.pipeline, self.param_grid, cv=cv, scoring='f1', verbose=1, error_score='raise')
         grid_search.fit(X_train, y_train)
 
         self.best_model = grid_search.best_estimator_
