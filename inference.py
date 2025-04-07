@@ -1,7 +1,7 @@
 import pandas as pd
 import cloudpickle
 import os
-import numpy as np  # Importa numpy
+import numpy as np
 
 # Configuración de variables de entorno
 #os.environ['MODEL_PATH'] = 'model/model.pkl'  # Ruta al modelo entrenado
