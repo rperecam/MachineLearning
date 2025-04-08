@@ -7,11 +7,11 @@ from sklearn.compose import ColumnTransformer, make_column_selector
 from sklearn.feature_selection import SelectKBest, f_classif, VarianceThreshold
 from sklearn.model_selection import train_test_split, StratifiedKFold, GridSearchCV
 from sklearn.linear_model import LogisticRegression, SGDClassifier
-from sklearn.metrics import f1_score, precision_score, recall_score, roc_auc_score, accuracy_score, precision_recall_curve, roc_curve, auc
+from sklearn.metrics import f1_score, precision_score, recall_score, roc_auc_score, accuracy_score, precision_recall_curve,  auc
 from sklearn.base import BaseEstimator, TransformerMixin
 from imblearn.pipeline import Pipeline as ImbPipeline
 from imblearn.over_sampling import SMOTE
-import cloudpickle
+import joblib
 import os
 from typing import Optional, Tuple
 import numpy as np
@@ -159,7 +159,6 @@ class OutlierCapper(BaseEstimator, TransformerMixin):
         return X_copy
 
 # --- Ingeniería de la Variable Objetivo Simplificada ---
-# --- Ingeniería de la Variable Objetivo Simplificada ---
 def engineer_target(df: pd.DataFrame) -> Tuple[Optional[pd.DataFrame], Optional[pd.Series]]:
     if not all(col in df.columns for col in ['reservation_status', 'arrival_date', 'reservation_status_date']):
         print("Error: Columnas necesarias para la ingeniería del target no encontradas.")
@@ -303,42 +302,38 @@ class HotelBookingPipeline:
 
     def save_model(self, filepath: str):
         if self.best_model:
-            os.makedirs(os.path.dirname(filepath), exist_ok=True)
-            with open(filepath, 'wb') as f:
-                cloudpickle.dump(self.best_model, f)
-            print(f"Modelo guardado en: {filepath}")
+            try:
+                os.makedirs(os.path.dirname(filepath), exist_ok=True)
+                joblib.dump(self.best_model, filepath)
+                print(f"Modelo guardado en: {filepath}")
+            except Exception as e:
+                print(f"Error al guardar el modelo con joblib: {e}")
         else:
             print("Advertencia: No hay un modelo entrenado para guardar.")
 
     def load_model(self, filepath: str):
         try:
-            with open(filepath, 'rb') as f:
-                self.best_model = cloudpickle.load(f)
+            self.best_model = joblib.load(filepath)
             print(f"Modelo cargado desde: {filepath}")
         except FileNotFoundError:
             print(f"Error: Archivo no encontrado en: {filepath}")
         except Exception as e:
-            print(f"Error al cargar el modelo: {e}")
+            print(f"Error al cargar el modelo con joblib: {e}")
 
 if __name__ == '__main__':
-    # Definir las rutas de los archivos
     bookings_file_train = 'data/bookings_train.csv'
     hotels_file = 'data/hotels.csv'
     model_path = 'model/model.pkl'
 
-    # Crear una instancia del pipeline
     pipeline = HotelBookingPipeline(
         test_size=0.25,
         random_state=42,
         variance_threshold=0.001,
-        model_type='logistic',  # Puedes cambiar a 'sgd' si prefieres usar SGDClassifier
+        model_type='logistic',
         cv_folds=5,
         k_best=22,
-        outlier_columns=('rate', 'stay_nights', 'total_guests') # Especifica las columnas si deseas manejar outliers
+        outlier_columns=('rate', 'stay_nights', 'total_guests')
     )
 
-    # Entrenar el modelo
     pipeline.train(bookings_file=bookings_file_train, hotels_file=hotels_file)
-
-    # Guardar el modelo entrenado
     pipeline.save_model(filepath=model_path)
