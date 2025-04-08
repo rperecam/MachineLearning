@@ -20,3 +20,11 @@ ENV INPUT_HOTELS_PATH=/app/data/hotels.csv
 ENV OUTPUT_PREDICTIONS_PATH=/app/data/predictions.csv
 
 CMD ["python", "inference.py"]
+
+
+#---------------BUILD AND RUN IN TERMINAL----------------
+# Construir la imagen
+#docker build -t hotel-predictor .
+
+# Ejecutar el contenedor
+#docker run -v "$(pwd)/data:/app/data" -v "$(pwd)/model:/app/model" hotel-predictor
