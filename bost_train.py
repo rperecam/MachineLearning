@@ -10,6 +10,8 @@ import xgboost as xgb
 from imblearn.combine import SMOTETomek
 import pickle
 import warnings
+import os
+
 warnings.filterwarnings('ignore')
 
 # 1. Carga de datos
@@ -240,33 +242,39 @@ def create_and_evaluate_model(X_train, X_test, y_train, y_test, preprocessor):
     X_test_transformed = preprocessor.transform(X_test)
 
     # Aplicamos SMOTETomek para balancear clases (solo al conjunto de entrenamiento)
-    # SMOTETomek combina over-sampling y under-sampling para mejor manejo del desbalance
     smote_tomek = SMOTETomek(random_state=42)
     X_train_resampled, y_train_resampled = smote_tomek.fit_resample(X_train_transformed, y_train)
 
-    # Creamos y entrenamos el modelo con mejor configuración inicial
-    model = xgb.XGBClassifier(
-        objective='binary:logistic',
-        eval_metric='logloss',                # Cambiado de 'f1' a 'auc' que es soportado
-        tree_method='hist',
-        grow_policy='lossguide',
-        scale_pos_weight=1.5,
-        random_state=42
-    )
+    # Convertimos los datos a DMatrix
+    dtrain = xgb.DMatrix(X_train_resampled, label=y_train_resampled)
+    dtest = xgb.DMatrix(X_test_transformed, label=y_test)
 
-    # Entrenar con early stopping para evitar overfitting
-    eval_set = [(X_train_resampled, y_train_resampled), (X_test_transformed, y_test)]
-    model.fit(
-        X_train_resampled,
-        y_train_resampled,
-        eval_set=eval_set,
-        early_stopping_rounds=50,  # XGBoost en versiones recientes acepta early_stopping_rounds
-        verbose=False
+    # Definimos los parámetros del modelo
+    params = {
+        'objective': 'binary:logistic',
+        'eval_metric': 'logloss',
+        'tree_method': 'hist',
+        'grow_policy': 'lossguide',
+        'scale_pos_weight': 1.5,
+        'seed': 42
+    }
+
+    # Entrenamos el modelo con early stopping
+    evals = [(dtrain, 'train'), (dtest, 'eval')]
+    evals_result = {}
+    model = xgb.train(
+        params,
+        dtrain,
+        num_boost_round=1000,
+        evals=evals,
+        early_stopping_rounds=50,
+        evals_result=evals_result,
+        verbose_eval=False
     )
 
     # Predicciones
-    y_pred = model.predict(X_test_transformed)
-    y_pred_proba = model.predict_proba(X_test_transformed)[:, 1]
+    y_pred_proba = model.predict(dtest)
+    y_pred = (y_pred_proba >= 0.5).astype(int)
 
     # Ajustar el umbral de clasificación para optimizar F1
     thresholds = np.arange(0.3, 0.7, 0.01)
@@ -302,7 +310,7 @@ def create_and_evaluate_model(X_train, X_test, y_train, y_test, preprocessor):
     print("\nReporte de clasificación (umbral optimizado):")
     print(classification_report(y_test, y_pred_optimized))
 
-    # Mostrar las características más importantes (top 20)
+    # Obtener y guardar las características más importantes
     feature_names = []
     if hasattr(preprocessor, 'get_feature_names_out'):
         feature_names = preprocessor.get_feature_names_out()
@@ -310,7 +318,9 @@ def create_and_evaluate_model(X_train, X_test, y_train, y_test, preprocessor):
         # Nombres genéricos si no se pueden obtener los nombres de características
         feature_names = [f'feature_{i}' for i in range(X_train_transformed.shape[1])]
 
-    feature_importances = model.feature_importances_
+    importance_dict = model.get_score(importance_type='weight')
+    feature_importances = [importance_dict.get(f'f{i}', 0) for i in range(len(feature_names))]
+
     if len(feature_importances) == len(feature_names):
         feature_imp = pd.DataFrame({
             'Feature': feature_names,
@@ -319,6 +329,11 @@ def create_and_evaluate_model(X_train, X_test, y_train, y_test, preprocessor):
 
         print("\nTop 20 características más importantes:")
         print(feature_imp.head(20))
+
+        # Guardar las características importantes en un CSV
+        os.makedirs('data', exist_ok=True)
+        feature_imp.to_csv('data/features_importance_baseline.csv', index=False)
+        print("Características importantes guardadas en 'data/features_importance_baseline.csv'")
 
     # Creamos el pipeline completo para serialización
     # Incluimos el umbral optimizado como parte del modelo
@@ -330,7 +345,7 @@ def create_and_evaluate_model(X_train, X_test, y_train, y_test, preprocessor):
     # Guardamos el mejor umbral como atributo del pipeline
     full_pipeline.best_threshold = best_threshold
 
-    return full_pipeline, metrics
+    return full_pipeline, metrics, feature_imp
 
 # 6. Optimización de hiperparámetros
 def optimize_hyperparameters(X_train, y_train, preprocessor):
@@ -338,14 +353,16 @@ def optimize_hyperparameters(X_train, y_train, preprocessor):
     Optimiza los hiperparámetros del modelo usando RandomizedSearchCV
     """
     # Aplicamos el preprocesamiento
+    print("Aplicando preprocesamiento para optimización...")
     preprocessor.fit(X_train)
     X_train_transformed = preprocessor.transform(X_train)
 
-    # Aplicamos SMOTETomek para balancear clases (mejor que SMOTE solo)
+    # Aplicamos SMOTETomek para balancear clases
+    print("Aplicando SMOTETomek para balancear clases...")
     smote_tomek = SMOTETomek(random_state=42)
     X_train_resampled, y_train_resampled = smote_tomek.fit_resample(X_train_transformed, y_train)
 
-    # Definimos los hiperparámetros a optimizar con rangos más amplios
+    # Definimos los hiperparámetros a optimizar
     param_dist = {
         'n_estimators': [100, 200, 300, 500],
         'max_depth': [3, 5, 7, 9],
@@ -354,31 +371,34 @@ def optimize_hyperparameters(X_train, y_train, preprocessor):
         'colsample_bytree': [0.6, 0.7, 0.8, 0.9],
         'min_child_weight': [1, 3, 5, 7],
         'gamma': [0, 0.1, 0.2, 0.3],
-        'scale_pos_weight': [1, 1.5, 2, 3],  # Importante para clases desbalanceadas
-        'reg_alpha': [0, 0.1, 0.5, 1],       # Regularización L1
-        'reg_lambda': [0, 0.1, 0.5, 1]       # Regularización L2
+        'scale_pos_weight': [1, 1.5, 2, 3],
+        'reg_alpha': [0, 0.1, 0.5, 1],
+        'reg_lambda': [0, 0.1, 0.5, 1]
     }
 
+    # Creamos el modelo base para la optimización
     model = xgb.XGBClassifier(
         objective='binary:logistic',
         eval_metric='logloss',
         tree_method='hist',
         grow_policy='lossguide',
-        random_state=42
+        random_state=42,
+        use_label_encoder=False  # Evitar warning en XGBoost recientes
     )
 
-    # RandomizedSearchCV es más eficiente que GridSearchCV para grandes espacios de búsqueda
+    # RandomizedSearchCV para buscar los mejores hiperparámetros
     random_search = RandomizedSearchCV(
         model,
         param_distributions=param_dist,
-        n_iter=30,          # Número de combinaciones a probar
+        n_iter=30,
         cv=3,
-        scoring='f1',       # Optimizamos para F1
+        scoring='f1',
         n_jobs=-1,
         verbose=1,
         random_state=42
     )
 
+    print("Iniciando búsqueda de hiperparámetros...")
     random_search.fit(X_train_resampled, y_train_resampled)
 
     print(f"Mejores parámetros: {random_search.best_params_}")
@@ -391,6 +411,9 @@ def save_model(model, filename='model/model_boost.pkl'):
     """
     Guarda el modelo entrenado para su uso en producción
     """
+    # Crear directorio si no existe
+    os.makedirs(os.path.dirname(filename), exist_ok=True)
+
     with open(filename, 'wb') as file:
         pickle.dump(model, file)
     print(f"Modelo guardado como {filename}")
@@ -413,100 +436,136 @@ def predict_with_optimal_threshold(pipeline, X, threshold=None):
 
     return y_pred
 
-# 8. Función principal
-def main():
-    # Carga de datos
-    print("Cargando datos...")
-    hotels_df, bookings_df = load_data()
+# Nueva función para evaluar el modelo optimizado correctamente
+def evaluate_optimized_model(best_model, X_train, X_test, y_train, y_test, preprocessor):
+    """
+    Evalúa el modelo optimizado con los hiperparámetros encontrados
+    """
+    print("Evaluando modelo optimizado...")
+    # Aplicamos el preprocesamiento
+    X_train_transformed = preprocessor.transform(X_train)
+    X_test_transformed = preprocessor.transform(X_test)
 
-    # Fusión de datasets y filtrado para evitar data leakage
-    print("Uniendo datasets y filtrando registros 'Booked'...")
-    merged_df = merge_datasets(hotels_df, bookings_df)
+    # Balanceamos clases solo en el conjunto de entrenamiento
+    smote_tomek = SMOTETomek(random_state=42)
+    X_train_resampled, y_train_resampled = smote_tomek.fit_resample(X_train_transformed, y_train)
 
-    # Preprocesamiento e ingeniería de características
-    print("Preprocesando datos y aplicando ingeniería de características...")
-    processed_data = preprocess_data(merged_df)
-
-    # Visualización de la distribución de la variable objetivo
-    print("Distribución de la variable objetivo:")
-    target_counts = processed_data['target'].value_counts()
-    print(target_counts)
-    print(f"Ratio de cancelaciones: {target_counts[1] / len(processed_data):.2%}")
-
-    # Preparación de características
-    print("Preparando características...")
-    X, y, preprocessor = prepare_features(processed_data)
-
-    # División en conjuntos de entrenamiento y prueba
-    print("Dividiendo en conjuntos de entrenamiento y prueba (estratificado)...")
-    X_train, X_test, y_train, y_test = train_test_split(
-        X, y, test_size=0.3, random_state=42, stratify=y
+    # Entrenamos el modelo optimizado
+    # IMPORTANTE: XGBClassifier no acepta eval_metric en fit() en las versiones más recientes
+    # Usamos eval_set pero no eval_metric
+    eval_set = [(X_test_transformed, y_test)]
+    best_model.fit(
+        X_train_resampled,
+        y_train_resampled,
+        eval_set=eval_set,
+        verbose=False
     )
 
-    # Evaluación del modelo baseline mejorado
-    print("Evaluando modelo baseline mejorado...")
-    baseline_model, baseline_metrics = create_and_evaluate_model(
+    # Predecimos probabilidades
+    y_pred_proba = best_model.predict_proba(X_test_transformed)[:, 1]
+
+    # Buscamos umbral óptimo para F1
+    thresholds = np.arange(0.3, 0.7, 0.01)
+    best_threshold = 0.5
+    best_f1 = 0
+
+    for threshold in thresholds:
+        y_pred_threshold = (y_pred_proba >= threshold).astype(int)
+        f1 = f1_score(y_test, y_pred_threshold)
+        if f1 > best_f1:
+            best_f1 = f1
+            best_threshold = threshold
+
+    # Predicciones con umbral optimizado
+    y_pred_optimized = (y_pred_proba >= best_threshold).astype(int)
+
+    # Métricas con umbral optimizado
+    metrics = {
+        'Accuracy': accuracy_score(y_test, y_pred_optimized),
+        'F1 Score': f1_score(y_test, y_pred_optimized),
+        'Precision': precision_score(y_test, y_pred_optimized),
+        'Recall': recall_score(y_test, y_pred_optimized),
+        'ROC AUC': roc_auc_score(y_test, y_pred_proba),
+        'Best Threshold': best_threshold
+    }
+
+    # Mostramos las métricas
+    print("\nMétricas del modelo optimizado en el conjunto de prueba:")
+    for metric_name, metric_value in metrics.items():
+        print(f"{metric_name}: {metric_value:.4f}")
+
+    # Reporte de clasificación detallado
+    print("\nReporte de clasificación (umbral optimizado):")
+    print(classification_report(y_test, y_pred_optimized))
+
+    # Obtenemos las características más importantes
+    if hasattr(preprocessor, 'get_feature_names_out'):
+        feature_names = preprocessor.get_feature_names_out()
+    else:
+        feature_names = [f'feature_{i}' for i in range(X_train_transformed.shape[1])]
+
+    # Extraemos importancias de características para XGBClassifier
+    importances = best_model.feature_importances_
+
+    # Creamos DataFrame y ordenamos
+    feature_imp = pd.DataFrame({
+        'Feature': feature_names,
+        'Importance': importances
+    }).sort_values('Importance', ascending=False)
+
+    print("\nTop 20 características más importantes (modelo optimizado):")
+    print(feature_imp.head(20))
+
+    # Guardamos las características importantes en un CSV
+    os.makedirs('data', exist_ok=True)
+    feature_imp.to_csv('data/features_importance.csv', index=False)
+    print("Características importantes (modelo optimizado) guardadas en 'data/features_importance.csv'")
+
+    # Creamos el pipeline completo para serialización
+    full_pipeline = Pipeline([
+        ('preprocessor', preprocessor),
+        ('classifier', best_model)
+    ])
+
+    # Guardamos el mejor umbral como atributo del pipeline
+    full_pipeline.best_threshold = best_threshold
+
+    return full_pipeline, metrics, feature_imp
+
+def main():
+    # 1. Load the data
+    hotels_df, bookings_df = load_data()
+
+    # 2. Merge the datasets
+    merged_df = merge_datasets(hotels_df, bookings_df)
+
+    # 3. Preprocess the data
+    preprocessed_data = preprocess_data(merged_df)
+
+    # 4. Prepare features and target
+    X, y, preprocessor = prepare_features(preprocessed_data)
+
+    # 5. Split the data into training and test sets
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42, stratify=y)
+
+    # 6. Create and evaluate the baseline model
+    baseline_pipeline, baseline_metrics, baseline_feature_imp = create_and_evaluate_model(
         X_train, X_test, y_train, y_test, preprocessor
     )
 
-    try:
-        # Optimización de hiperparámetros
-        print("Optimizando hiperparámetros con RandomizedSearchCV...")
-        best_model = optimize_hyperparameters(X_train, y_train, preprocessor)
+    # 7. Optimize hyperparameters
+    best_model = optimize_hyperparameters(X_train, y_train, preprocessor)
 
-        # Evaluación del modelo optimizado
-        print("Evaluando modelo optimizado...")
-        X_train_transformed = preprocessor.transform(X_train)
-        X_test_transformed = preprocessor.transform(X_test)
+    # 8. Evaluate the optimized model
+    optimized_pipeline, optimized_metrics, optimized_feature_imp = evaluate_optimized_model(
+        best_model, X_train, X_test, y_train, y_test, preprocessor
+    )
 
-        # Uso SMOTETomek para el balanceo de clases
-        smote_tomek = SMOTETomek(random_state=42)
-        X_train_resampled, y_train_resampled = smote_tomek.fit_resample(X_train_transformed, y_train)
+    # 9. Save the optimized model
+    save_model(optimized_pipeline)
 
-        # Entrenar modelo con early stopping
-        eval_set = [(X_train_resampled, y_train_resampled), (X_test_transformed, y_test)]
-        best_model.fit(
-            X_train_resampled,
-            y_train_resampled,
-            eval_set=eval_set,
-            eval_metric='logloss',
-            verbose=False
-        )
+    print("Model training and evaluation complete.")
 
-        # Buscar umbral óptimo para F1
-        y_pred_proba = best_model.predict_proba(X_test_transformed)[:, 1]
-        thresholds = np.arange(0.3, 0.7, 0.01)
-        best_threshold = 0.5
-        best_f1 = 0
-
-        for threshold in thresholds:
-            y_pred_threshold = (y_pred_proba >= threshold).astype(int)
-            f1 = f1_score(y_test, y_pred_threshold)
-            if f1 > best_f1:
-                best_f1 = f1
-                best_threshold = threshold
-
-        # Usar el mejor umbral
-        y_pred_optimized = (y_pred_proba >= best_threshold).astype(int)
-
-        print("\nMétricas del mejor modelo (umbral optimizado):")
-        print(f"F1 Score: {f1_score(y_test, y_pred_optimized):.4f}")
-        print(f"Umbral óptimo: {best_threshold:.4f}")
-        print("\nReporte de clasificación (umbral optimizado):")
-        print(classification_report(y_test, y_pred_optimized))
-
-        # Guardar el modelo optimizado
-        print("Guardando el modelo optimizado...")
-        full_pipeline = Pipeline([
-            ('preprocessor', preprocessor),
-            ('classifier', best_model)
-        ])
-        full_pipeline.best_threshold = best_threshold
-        save_model(full_pipeline)
-
-    except Exception as e:
-        print(f"Error durante la optimización de hiperparámetros o evaluación: {e}")
-
-# Ejecutar la función principal
+# Run the main function
 if __name__ == "__main__":
     main()
