@@ -376,6 +376,7 @@ def optimize_hyperparameters(X_train, y_train, preprocessor):
         'reg_lambda': [0, 0.1, 0.5, 1]
     }
 
+
     # Creamos el modelo base para la optimización
     model = xgb.XGBClassifier(
         objective='binary:logistic',
@@ -546,7 +547,7 @@ def main():
     X, y, preprocessor = prepare_features(preprocessed_data)
 
     # 5. Split the data into training and test sets
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42, stratify=y)
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42, stratify=y)
 
     # 6. Create and evaluate the baseline model
     baseline_pipeline, baseline_metrics, baseline_feature_imp = create_and_evaluate_model(
