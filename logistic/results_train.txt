@@ -1,0 +1,36 @@
+Fitting 5 folds for each of 100 candidates, totalling 500 fits
+Mejores parámetros: {'classifier__C': 0.1, 'classifier__penalty': 'l1', 'feature_selection__k': 45}
+Mejor valor de k encontrado: 45
+Métricas en el conjunto de prueba:
+f1_score: 0.4756
+precision: 0.3450
+recall: 0.7656
+accuracy: 0.6935
+roc_auc: 0.7881
+pr_auc: 0.3921
+Modelo guardado en: model/model.pkl
+
+
+pipeline.pipeline
+Out[3]:
+Pipeline(steps=[('feature_engineer', FeatureEngineer()),
+                ('continent_mapper', ContinentMapper()),
+                ('outlier_capper',
+                 OutlierCapper(columns=('rate', 'stay_nights',
+                                        'total_guests'))),
+                ('preprocessor',
+                 ColumnTransformer(transformers=[('num',
+                                                  Pipeline(steps=[('imputer',
+                                                                   SimpleImputer(strategy='median')),
+                                                                  ('scaler',
+                                                                   StandardScaler())]),
+                                                  <sklearn.compose._column_trans...
+                                                                   OneHotEncoder(handle_unknown='ignore',
+                                                                                 sparse_output=False))]),
+                                                  <sklearn.compose._column_transformer.make_column_selector object at 0x00000232A23C76A0>)])),
+                ('variance_threshold', VarianceThreshold(threshold=0.001)),
+                ('smote', SMOTE(random_state=42)),
+                ('feature_selection', SelectKBest()),
+                ('classifier',
+                 LogisticRegression(max_iter=2000, random_state=42,
+                                    solver='liblinear'))])

@@ -7,7 +7,7 @@ from sklearn.compose import ColumnTransformer, make_column_selector
 from sklearn.feature_selection import SelectKBest, f_classif, VarianceThreshold
 from sklearn.model_selection import train_test_split, StratifiedKFold, GridSearchCV
 from sklearn.linear_model import LogisticRegression, SGDClassifier
-from sklearn.metrics import f1_score, precision_score, recall_score, roc_auc_score, accuracy_score, precision_recall_curve,  auc
+from sklearn.metrics import f1_score, precision_score, recall_score, roc_auc_score, accuracy_score, precision_recall_curve, auc
 from sklearn.base import BaseEstimator, TransformerMixin
 from imblearn.pipeline import Pipeline as ImbPipeline
 from imblearn.over_sampling import SMOTE
@@ -61,12 +61,11 @@ class FeatureEngineer(BaseEstimator, TransformerMixin):
     def __init__(self, date_cols=['arrival_date', 'booking_date'],
                  asset_cols=['pool_and_spa', 'restaurant', 'parking'],
                  country_cols=['country_x', 'country_y'],
-                 # ¡NUEVO! Añade un parámetro para el formato de fecha si es necesario
                  date_format=None):
         self.date_cols = date_cols
         self.asset_cols = asset_cols
         self.country_cols = country_cols
-        self.date_format = date_format # Guarda el formato
+        self.date_format = date_format
 
     def fit(self, X, y=None):
         return self
@@ -77,12 +76,8 @@ class FeatureEngineer(BaseEstimator, TransformerMixin):
         arrival_col = self.date_cols[0]
         booking_col = self.date_cols[1]
 
-        # Crea la instancia especificando el formato exacto
-        feature_engineer = FeatureEngineer(date_format='%Y-%m-%d')
-
         # Verificar y calcular lead_time
         if arrival_col in X_copy.columns and booking_col in X_copy.columns:
-            # Intenta convertir especificando el formato si se proporcionó
             try:
                 X_copy[arrival_col] = pd.to_datetime(X_copy[arrival_col],
                                                      format=self.date_format,
@@ -91,42 +86,32 @@ class FeatureEngineer(BaseEstimator, TransformerMixin):
                                                      format=self.date_format,
                                                      errors='coerce')
 
-                # Calcula lead_time solo si ambas fechas son válidas (no NaT)
-                # La resta ya maneja NaT, resultando en NaT si uno de los operandos es NaT
                 time_diff = X_copy[arrival_col] - X_copy[booking_col]
-
-                # Extrae los días. .dt.days sobre NaT resulta en NaN
                 X_copy['lead_time'] = time_diff.dt.days
 
-                # Opcional: Podrías querer manejar lead_time negativos si booking_date > arrival_date
-                # X_copy.loc[X_copy['lead_time'] < 0, 'lead_time'] = np.nan # o 0, o como decidas
-
             except Exception as e:
-                # Si hay un error incluso con el formato (quizás formato incorrecto?)
                 print(f"Error al convertir fechas o calcular lead_time: {e}")
                 X_copy['lead_time'] = np.nan
 
         else:
             print(f"Advertencia: Columnas de fecha '{arrival_col}' o '{booking_col}' no encontradas. 'lead_time' será NaN.")
-            X_copy['lead_time'] = np.nan # Columna llena de NaN si faltan las columnas originales
+            X_copy['lead_time'] = np.nan
 
-        # num_assets (sin cambios)
+        # num_assets
         present_assets = [col for col in self.asset_cols if col in X_copy.columns]
-        if present_assets: # Asegurarse de que hay columnas de assets presentes
+        if present_assets:
             X_copy['num_assets'] = X_copy[present_assets].fillna(0).astype(int).sum(axis=1)
         else:
-            X_copy['num_assets'] = 0 # O np.nan si prefieres
+            X_copy['num_assets'] = 0
 
-        # is_foreign (sin cambios)
+        # is_foreign
         country_col_x = self.country_cols[0]
         country_col_y = self.country_cols[1]
         if country_col_x in X_copy.columns and country_col_y in X_copy.columns:
-            # Asegurarse que la comparación funciona bien con NaN/None si los hubiera
             X_copy['is_foreign'] = (X_copy[country_col_x].astype(str) != X_copy[country_col_y].astype(str)).astype(int)
-            # Tratar NaNs en las columnas de país como "no extranjero" o como decidas
-            X_copy.loc[X_copy[country_col_x].isna() | X_copy[country_col_y].isna(), 'is_foreign'] = 0 # Ejemplo: NaN no es extranjero
+            X_copy.loc[X_copy[country_col_x].isna() | X_copy[country_col_y].isna(), 'is_foreign'] = 0
         else:
-            X_copy['is_foreign'] = 0 # O np.nan
+            X_copy['is_foreign'] = 0
 
         return X_copy
 
@@ -165,51 +150,44 @@ def engineer_target(df: pd.DataFrame) -> Tuple[Optional[pd.DataFrame], Optional[
         return None, None
 
     df_eng = df.copy()
-    # Asegúrate que las fechas se conviertan ANTES de usarlas aquí, o verifica el formato
-    # Si FeatureEngineer ya las convirtió, esta conversión podría ser redundante o necesitar try-except
     try:
         df_eng['arrival_date'] = pd.to_datetime(df_eng['arrival_date'], errors='coerce')
         df_eng['reservation_status_date'] = pd.to_datetime(df_eng['reservation_status_date'], errors='coerce')
     except Exception as e:
         print(f"Error convirtiendo fechas en engineer_target (puede ser normal si ya se hizo): {e}")
-        # Asume que ya son datetime si falla la conversión
 
-    # Simplificación de la lógica de cancelación tardía
     df_eng['is_canceled'] = df_eng['reservation_status'].isin(['Canceled', 'No-Show']).astype(int)
-    # Calcula days_to_arrival asegurándose que las fechas son datetime
     if pd.api.types.is_datetime64_any_dtype(df_eng['arrival_date']) and pd.api.types.is_datetime64_any_dtype(df_eng['reservation_status_date']):
         df_eng['days_to_arrival'] = (df_eng['arrival_date'] - df_eng['reservation_status_date']).dt.days
     else:
         print("Advertencia: No se pudo calcular days_to_arrival, fechas no son datetime.")
-        df_eng['days_to_arrival'] = np.nan # o algún valor por defecto
+        df_eng['days_to_arrival'] = np.nan
 
     df_eng['cancelled_last_30_days'] = (df_eng['is_canceled'] == 1) & (df_eng['days_to_arrival'] <= 30)
     y = df_eng['cancelled_last_30_days'].fillna(False).astype(int)
 
-    # --- CAMBIO AQUÍ ---
-    # No elimines 'arrival_date' ni 'booking_date' si FeatureEngineer las necesita
     columns_to_drop = ['reservation_status', 'reservation_status_date',
-                       'is_canceled', 'days_to_arrival', 'cancelled_last_30_days'] # Elimina la propia target también de X
-    # Asegúrate que solo intentas eliminar columnas que existen
+                       'is_canceled', 'days_to_arrival', 'cancelled_last_30_days']
     columns_to_drop = [col for col in columns_to_drop if col in df_eng.columns]
     X = df_eng.drop(columns=columns_to_drop, errors='ignore')
-    # --------------------
 
     return X, y
 
-# --- Clase de Pipeline Simplificada ---
+# --- Clase de Pipeline Modificada para Optimizar k_best ---
 class HotelBookingPipeline:
     def __init__(self, test_size=0.3, random_state=42, variance_threshold=0.001,
-                 model_type='logistic', cv_folds=5, k_best=10, outlier_columns=None):
+                 model_type='logistic', cv_folds=5, k_range=None, outlier_columns=None):
         self.test_size = test_size
         self.random_state = random_state
         self.variance_threshold = variance_threshold
         self.model_type = model_type
         self.cv_folds = cv_folds
-        self.k_best = k_best
+        # Ahora usamos un rango de k_best en lugar de un valor fijo
+        self.k_range = k_range if k_range else list(range(5, 51, 5))  # Por defecto: [5, 10, 15, 20, 25, 30, 35, 40, 45, 50]
         self.outlier_columns = outlier_columns
         self.pipeline = self._build_pipeline()
         self.best_model = None
+        self.best_k = None
         self.metrics = None
 
     def _build_pipeline(self):
@@ -227,9 +205,10 @@ class HotelBookingPipeline:
                 ('num', numeric_transformer, make_column_selector(dtype_include=np.number)),
                 ('cat', categorical_transformer, make_column_selector(dtype_include='object'))
             ],
-            remainder='drop'  # Eliminar columnas restantes que no se transforman
+            remainder='drop'
         )
 
+        # Construir la primera parte de la pipeline (hasta feature_selection)
         pipeline_steps = [
             ('feature_engineer', FeatureEngineer()),
             ('continent_mapper', ContinentMapper()),
@@ -237,18 +216,22 @@ class HotelBookingPipeline:
             ('preprocessor', preprocessor),
             ('variance_threshold', VarianceThreshold(threshold=self.variance_threshold)),
             ('smote', SMOTE(random_state=self.random_state)),
-            ('feature_selection', SelectKBest(score_func=f_classif, k=self.k_best))
+            # Incluimos SelectKBest pero el valor de k será determinado por GridSearchCV
+            ('feature_selection', SelectKBest(score_func=f_classif))
         ]
 
+        # Agregar el clasificador según el tipo seleccionado
         if self.model_type == 'logistic':
             pipeline_steps.append(('classifier', LogisticRegression(random_state=self.random_state, solver='liblinear', max_iter=2000)))
             self.param_grid = {
+                'feature_selection__k': self.k_range,  # Probar diferentes valores de k
                 'classifier__C': [0.001, 0.01, 0.1, 1, 10],
                 'classifier__penalty': ['l1', 'l2']
             }
         elif self.model_type == 'sgd':
             pipeline_steps.append(('classifier', SGDClassifier(random_state=self.random_state, loss='log_loss', max_iter=1000, tol=1e-3)))
             self.param_grid = {
+                'feature_selection__k': self.k_range,  # Probar diferentes valores de k
                 'classifier__alpha': [0.00001, 0.0001, 0.001, 0.01, 0.1],
                 'classifier__penalty': ['l2', 'elasticnet', 'none']
             }
@@ -283,6 +266,8 @@ class HotelBookingPipeline:
         grid_search.fit(X_train, y_train)
 
         self.best_model = grid_search.best_estimator_
+        self.best_k = grid_search.best_params_['feature_selection__k']  # Guardar el mejor valor de k
+
         y_pred = self.best_model.predict(X_test)
         y_pred_proba = self.best_model.predict_proba(X_test)[:, 1]
 
@@ -296,6 +281,7 @@ class HotelBookingPipeline:
         }
 
         print(f"Mejores parámetros: {grid_search.best_params_}")
+        print(f"Mejor valor de k encontrado: {self.best_k}")  # Mostrar el mejor k
         print(f"Métricas en el conjunto de prueba:")
         for metric, value in self.metrics.items():
             print(f"{metric}: {value:.4f}")
@@ -321,17 +307,18 @@ class HotelBookingPipeline:
             print(f"Error al cargar el modelo con joblib: {e}")
 
 if __name__ == '__main__':
-    bookings_file_train = 'data/bookings_train.csv'
-    hotels_file = 'data/hotels.csv'
-    model_path = 'model/model.pkl'
+    bookings_file_train = '../data/bookings_train.csv'
+    hotels_file = '../data/hotels.csv'
+    model_path = '../model/model.pkl'
 
+    # Configuración de la pipeline con un rango de valores para k_best
     pipeline = HotelBookingPipeline(
         test_size=0.25,
         random_state=42,
         variance_threshold=0.001,
         model_type='logistic',
         cv_folds=5,
-        k_best=22,
+        k_range=[5, 10, 15, 20, 25, 30, 35, 40, 45, 50],
         outlier_columns=('rate', 'stay_nights', 'total_guests')
     )
 
