@@ -1,45 +1,46 @@
 import pandas as pd
 import numpy as np
-from sklearn.model_selection import train_test_split, RandomizedSearchCV
+from sklearn.model_selection import train_test_split, RandomizedSearchCV, GroupKFold
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
 from sklearn.compose import ColumnTransformer
 from sklearn.pipeline import Pipeline
 from sklearn.impute import SimpleImputer, KNNImputer
 from sklearn.metrics import f1_score, classification_report, accuracy_score, precision_score, recall_score, roc_auc_score
 import xgboost as xgb
-from imblearn.combine import SMOTETomek
+from imblearn.over_sampling import SMOTE
+from imblearn.under_sampling import RandomUnderSampler
+from sklearn.ensemble import VotingClassifier
 import pickle
 import warnings
 import os
 
 warnings.filterwarnings('ignore')
 
-# 1. Carga de datos
 def load_data():
     """
-    Carga los datasets de hoteles y reservas
+    Carga los datasets de hoteles y reservas.
     """
     hotels_df = pd.read_csv('data/hotels.csv')
     bookings_df = pd.read_csv('data/bookings_train.csv')
     return hotels_df, bookings_df
 
-# 2. Unión de datasets
 def merge_datasets(hotels_df, bookings_df):
     """
-    Une los datasets de hoteles y reservas, eliminando hotel_id para prevenir data leakage
+    Une los datasets de hoteles y reservas, preservando hotel_id para GroupKFold.
     """
     merged_df = pd.merge(bookings_df, hotels_df, on='hotel_id', how='left')
-    merged_df = merged_df.drop('hotel_id', axis=1, errors='ignore')
 
-    # Eliminar registros con estatus 'Booked' para evitar data leakage
+    # Filtrar registros con estatus 'Booked' para evitar data leakage
     filtered_df = merged_df[~merged_df['reservation_status'].isin(['Booked', np.nan])].copy()
 
-    return filtered_df
+    # Guardamos hotel_id para GroupKFold DESPUÉS del filtrado
+    hotel_ids = filtered_df['hotel_id'].copy()
 
-# Función para mapear países a continentes
+    return filtered_df, hotel_ids
+
 def map_countries_to_continents(data, country_col='country_x', continent_col='continent_customer', unknown='Desconocido'):
     """
-    Mapea códigos de países a continentes
+    Mapea códigos de países a continentes.
     """
     data_copy = data.copy()
 
@@ -70,12 +71,11 @@ def map_countries_to_continents(data, country_col='country_x', continent_col='co
 
     return data_copy
 
-# 3. Ingeniería de características y preprocesamiento
 def preprocess_data(df):
     """
-    Realiza el preprocesamiento del dataset unificado e integra la ingeniería de características
+    Realiza un preprocesamiento simplificado del dataset enfocado en predecir
+    cancelaciones con 30 días de antelación.
     """
-    # Copia para evitar modificaciones indeseadas
     data = df.copy()
 
     # Conversión de fechas a objetos datetime
@@ -84,116 +84,68 @@ def preprocess_data(df):
         if col in data.columns:
             data[col] = pd.to_datetime(data[col])
 
-    # Crear la variable objetivo: cancelación en los últimos 30 días
-    # Solo para reservas que ya tienen un estado final (Canceled o CheckOut)
-    data['cancellation_lead_time'] = (data['arrival_date'] - data['reservation_status_date']).dt.days
-
-    # La variable target: el cliente canceló la reserva en los últimos 30 días (SÍ/NO)
+    # DEFINICIÓN DEL TARGET: Cancelaciones con al menos 30 días de antelación
+    data['days_before_arrival'] = (data['arrival_date'] - data['reservation_status_date']).dt.days
     data['target'] = ((data['reservation_status'] == 'Canceled') &
-                      (data['cancellation_lead_time'] <= 30) &
-                      (data['cancellation_lead_time'] >= 0)).astype(int)
+                      (data['days_before_arrival'] >= 30)).astype(int)
 
-    # Características temporales mejoradas
-    data['booking_month'] = data['booking_date'].dt.month
-    data['booking_day_of_week'] = data['booking_date'].dt.dayofweek
-    data['booking_day'] = data['booking_date'].dt.day
-    data['booking_quarter'] = data['booking_date'].dt.quarter
-    data['booking_weekend'] = data['booking_date'].dt.dayofweek.isin([5, 6]).astype(int)
-
-    data['arrival_month'] = data['arrival_date'].dt.month
-    data['arrival_day_of_week'] = data['arrival_date'].dt.dayofweek
-    data['arrival_day'] = data['arrival_date'].dt.day
-    data['arrival_quarter'] = data['arrival_date'].dt.quarter
-    data['is_weekend_arrival'] = data['arrival_day_of_week'].isin([4, 5]).astype(int)
-
-    # Característica de tiempos (lead time)
-    if 'arrival_date' in data.columns and 'booking_date' in data.columns:
-        data['lead_time'] = (data['arrival_date'] - data['booking_date']).dt.days
-        # Categorización de lead time
-        data['lead_time_category'] = pd.cut(
-            data['lead_time'],
-            bins=[-1, 7, 30, 90, 180, float('inf')],
-            labels=['last_minute', 'short', 'medium', 'long', 'very_long']
-        )
+    # Características temporales
+    data['lead_time'] = (data['arrival_date'] - data['booking_date']).dt.days
+    data['lead_time_category'] = pd.cut(
+        data['lead_time'],
+        bins=[-1, 7, 30, 90, 180, float('inf')],
+        labels=['last_minute', 'short', 'medium', 'long', 'very_long']
+    )
+    data['is_high_season'] = data['arrival_date'].dt.month.isin([6, 7, 8, 12]).astype(int)
+    data['is_weekend_arrival'] = data['arrival_date'].dt.dayofweek.isin([4, 5]).astype(int)
 
     # Características de precio
     data['price_per_night'] = data['rate'] / np.maximum(data['stay_nights'], 1)
     data['price_per_person'] = data['rate'] / np.maximum(data['total_guests'], 1)
+    data['total_cost'] = data['rate']
 
-    # Categorización de precios
-    data['price_category'] = pd.qcut(
-        data['price_per_night'],
-        q=5,
-        labels=['very_low', 'low', 'medium', 'high', 'very_high'],
-        duplicates='drop'
-    )
-
-    # Características de ratio y proporciones
-    data['special_requests_ratio'] = data['special_requests'] / np.maximum(data['total_guests'], 1)
-    data['is_high_season'] = data['arrival_month'].isin([6, 7, 8, 12]).astype(int)
-    data['has_special_requests'] = (data['special_requests'] > 0).astype(int)
-    data['has_many_special_requests'] = (data['special_requests'] > 1).astype(int)
-
-    # Ratio de parking solicitado
-    data['parking_ratio'] = data['required_car_parking_spaces'] / np.maximum(data['total_guests'], 1)
-    data['requested_parking'] = (data['required_car_parking_spaces'] > 0).astype(int)
-
-    # Características de activos del hotel
-    asset_cols = ['pool_and_spa', 'restaurant', 'parking']
-    present_assets = [col for col in asset_cols if col in data.columns]
-    if present_assets:
-        data['num_assets'] = data[present_assets].fillna(0).astype(int).sum(axis=1)
-    else:
-        data['num_assets'] = 0
-
-    # Característica de cliente extranjero y países
-    country_col_x = 'country_x'
-    country_col_y = 'country_y'
-    if country_col_x in data.columns and country_col_y in data.columns:
-        data['is_foreign'] = (data[country_col_x].astype(str) != data[country_col_y].astype(str)).astype(int)
-        data.loc[data[country_col_x].isna() | data[country_col_y].isna(), 'is_foreign'] = 0
-    else:
-        data['is_foreign'] = 0
-
-    # Duración de estancia
+    # Características de estancia
     data['stay_duration_category'] = pd.cut(
         data['stay_nights'],
         bins=[-1, 1, 3, 7, 14, float('inf')],
         labels=['1_night', '2-3_nights', '4-7_nights', '8-14_nights', '15+_nights']
     )
 
-    # Interacciones importantes
+    # Características de solicitudes especiales
+    data['has_special_requests'] = (data['special_requests'] > 0).astype(int)
+    data['special_requests_ratio'] = data['special_requests'] / np.maximum(data['total_guests'], 1)
+
+    # Características de localización y contexto
+    if 'country_x' in data.columns and 'country_y' in data.columns:
+        data['is_foreign'] = (data['country_x'] != data['country_y']).astype(int)
+        data.loc[data['country_x'].isna() | data['country_y'].isna(), 'is_foreign'] = 0
+
+    # Características interactivas
     data['price_length_interaction'] = data['price_per_night'] * data['stay_nights']
     data['lead_price_interaction'] = data['lead_time'] * data['price_per_night']
-    data['guests_price_interaction'] = data['total_guests'] * data['price_per_person']
 
-    # Características de temporada
-    data['is_summer'] = data['arrival_month'].isin([6, 7, 8]).astype(int)
-    data['is_winter'] = data['arrival_month'].isin([12, 1, 2]).astype(int)
-    data['is_spring'] = data['arrival_month'].isin([3, 4, 5]).astype(int)
-    data['is_autumn'] = data['arrival_month'].isin([9, 10, 11]).astype(int)
+    # Características de transporte y logística
+    data['requested_parking'] = (data['required_car_parking_spaces'] > 0).astype(int)
 
     # Eliminamos columnas que ya no son necesarias o podrían causar data leakage
-    columns_to_drop = ['reservation_status', 'cancellation_lead_time',
-                       'reservation_status_date', 'booking_date', 'arrival_date']
+    columns_to_drop = ['reservation_status', 'reservation_status_date', 'booking_date',
+                       'arrival_date', 'days_before_arrival']
     data.drop(columns=columns_to_drop, inplace=True)
 
     # Manejo de valores infinitos que pueden surgir de divisiones
-    for col in ['price_per_night', 'price_per_person', 'special_requests_ratio', 'parking_ratio',]:
-        data[col] = data[col].replace([np.inf, -np.inf], np.nan)
-        data[col] = data[col].fillna(data[col].median())
+    for col in ['price_per_night', 'price_per_person', 'special_requests_ratio']:
+        if col in data.columns:
+            data[col] = data[col].replace([np.inf, -np.inf], np.nan)
+            data[col] = data[col].fillna(data[col].median())
 
     return data
 
-# 4. División de características y definición de pipelines
 def prepare_features(data):
     """
-    Prepara las características para el modelo
+    Prepara las características para el modelo.
     """
-    # Primero aplicamos la función de mapeo de continentes
     data_with_continents = map_countries_to_continents(data)
 
-    # También mapear el país del hotel
     if 'country_y' in data_with_continents.columns:
         data_with_continents = map_countries_to_continents(
             data_with_continents,
@@ -201,26 +153,22 @@ def prepare_features(data):
             continent_col='continent_hotel'
         )
 
-    # Separamos features y target
     X = data_with_continents.drop(columns=['target'])
     y = data_with_continents['target']
 
-    # Separamos los tipos de características
     categorical_features = X.select_dtypes(include=['object', 'category']).columns.tolist()
     numerical_features = X.select_dtypes(include=['int64', 'float64']).columns.tolist()
 
-    # Definimos transformadores para cada tipo de características
     categorical_transformer = Pipeline(steps=[
-        ('imputer', SimpleImputer(strategy='constant', fill_value='missing')),
+        ('imputer', SimpleImputer(strategy='most_frequent')),
         ('onehot', OneHotEncoder(handle_unknown='ignore', sparse_output=False))
     ])
 
     numerical_transformer = Pipeline(steps=[
-        ('imputer', KNNImputer(n_neighbors=5)),  # Mejor estrategia de imputación
+        ('imputer', KNNImputer(n_neighbors=7)),
         ('scaler', StandardScaler())
     ])
 
-    # Creamos el procesador columnar
     preprocessor = ColumnTransformer(
         transformers=[
             ('num', numerical_transformer, numerical_features),
@@ -231,67 +179,106 @@ def prepare_features(data):
 
     return X, y, preprocessor
 
-# 5. Crear y evaluar el modelo XGBoost
-def create_and_evaluate_model(X_train, X_test, y_train, y_test, preprocessor):
+def find_optimal_threshold(y_true, y_pred_proba):
+    """Encuentra el umbral óptimo para maximizar F1 de forma más detallada"""
+    thresholds = np.linspace(0.2, 0.8, 100)
+    best_threshold, best_f1 = 0.5, 0
+
+    for threshold in thresholds:
+        y_pred = (y_pred_proba >= threshold).astype(int)
+        f1 = f1_score(y_true, y_pred)
+        if f1 > best_f1:
+            best_f1, best_threshold = f1, threshold
+
+    return best_threshold, best_f1
+
+def create_and_evaluate_model(X_train, X_test, y_train, y_test, preprocessor, hotel_ids_train=None):
     """
-    Crea, entrena y evalúa el modelo XGBoost
+    Crea, entrena y evalúa el modelo XGBoost con mejor manejo de overfitting.
     """
-    # Aplicamos el preprocesamiento
     preprocessor.fit(X_train)
     X_train_transformed = preprocessor.transform(X_train)
     X_test_transformed = preprocessor.transform(X_test)
 
-    # Aplicamos SMOTETomek para balancear clases (solo al conjunto de entrenamiento)
-    smote_tomek = SMOTETomek(random_state=42)
-    X_train_resampled, y_train_resampled = smote_tomek.fit_resample(X_train_transformed, y_train)
+    rus = RandomUnderSampler(sampling_strategy=0.3, random_state=42)
+    X_train_under, y_train_under = rus.fit_resample(X_train_transformed, y_train)
 
-    # Convertimos los datos a DMatrix
-    dtrain = xgb.DMatrix(X_train_resampled, label=y_train_resampled)
-    dtest = xgb.DMatrix(X_test_transformed, label=y_test)
+    smote = SMOTE(sampling_strategy=0.9, random_state=42)
+    X_train_resampled, y_train_resampled = smote.fit_resample(X_train_under, y_train_under)
 
-    # Definimos los parámetros del modelo
-    params = {
-        'objective': 'binary:logistic',
-        'eval_metric': 'logloss',
-        'tree_method': 'hist',
-        'grow_policy': 'lossguide',
-        'scale_pos_weight': 1.5,
-        'seed': 42
-    }
+    if hotel_ids_train is not None:
+        cv = GroupKFold(n_splits=5)
+        groups = hotel_ids_train
 
-    # Entrenamos el modelo con early stopping
-    evals = [(dtrain, 'train'), (dtest, 'eval')]
-    evals_result = {}
-    model = xgb.train(
-        params,
-        dtrain,
-        num_boost_round=1000,
-        evals=evals,
-        early_stopping_rounds=50,
-        evals_result=evals_result,
-        verbose_eval=False
+        xgb_model = xgb.XGBClassifier(
+            objective='binary:logistic',
+            max_depth=4,
+            min_child_weight=5,
+            gamma=0.2,
+            subsample=0.7,
+            colsample_bytree=0.7,
+            reg_alpha=0.1,
+            reg_lambda=1.0,
+            scale_pos_weight=3.0,
+            learning_rate=0.05,
+            n_estimators=300,
+            random_state=42
+        )
+
+        cv_scores = []
+        print("\nEvaluando modelo con GroupKFold por hotel_id:")
+        for train_idx, val_idx in cv.split(X_train, y_train, groups=groups):
+            X_cv_train, X_cv_val = X_train.iloc[train_idx], X_train.iloc[val_idx]
+            y_cv_train, y_cv_val = y_train.iloc[train_idx], y_train.iloc[val_idx]
+
+            X_cv_train_processed = preprocessor.transform(X_cv_train)
+            X_cv_val_processed = preprocessor.transform(X_cv_val)
+
+            rus_cv = RandomUnderSampler(sampling_strategy=0.3, random_state=42)
+            X_cv_under, y_cv_under = rus_cv.fit_resample(X_cv_train_processed, y_cv_train)
+
+            smote_cv = SMOTE(sampling_strategy=0.9, random_state=42)
+            X_cv_balanced, y_cv_balanced = smote_cv.fit_resample(X_cv_under, y_cv_under)
+
+            xgb_model.fit(X_cv_balanced, y_cv_balanced)
+
+            y_cv_proba = xgb_model.predict_proba(X_cv_val_processed)[:, 1]
+            threshold, _ = find_optimal_threshold(y_cv_val, y_cv_proba)
+            y_cv_pred = (y_cv_proba >= threshold).astype(int)
+
+            cv_f1 = f1_score(y_cv_val, y_cv_pred)
+            cv_scores.append(cv_f1)
+
+        print(f"F1 scores en CV: {cv_scores}")
+        print(f"Media F1 CV: {np.mean(cv_scores):.4f} ± {np.std(cv_scores):.4f}")
+
+    model = xgb.XGBClassifier(
+        objective='binary:logistic',
+        max_depth=4,
+        min_child_weight=5,
+        gamma=0.2,
+        subsample=0.7,
+        colsample_bytree=0.7,
+        reg_alpha=0.1,
+        reg_lambda=1.0,
+        scale_pos_weight=3.0,
+        learning_rate=0.05,
+        n_estimators=300,
+        random_state=42
     )
 
-    # Predicciones
-    y_pred_proba = model.predict(dtest)
-    y_pred = (y_pred_proba >= 0.5).astype(int)
+    # With:
+    model.fit(
+        X_train_resampled,
+        y_train_resampled,
+        eval_set=[(X_test_transformed, y_test)],
+        verbose=False,
+    )
 
-    # Ajustar el umbral de clasificación para optimizar F1
-    thresholds = np.arange(0.3, 0.7, 0.01)
-    best_threshold = 0.5
-    best_f1 = 0
-
-    for threshold in thresholds:
-        y_pred_threshold = (y_pred_proba >= threshold).astype(int)
-        f1 = f1_score(y_test, y_pred_threshold)
-        if f1 > best_f1:
-            best_f1 = f1
-            best_threshold = threshold
-
-    # Usar el mejor umbral
+    y_pred_proba = model.predict_proba(X_test_transformed)[:, 1]
+    best_threshold, best_f1 = find_optimal_threshold(y_test, y_pred_proba)
     y_pred_optimized = (y_pred_proba >= best_threshold).astype(int)
 
-    # Métricas con umbral optimizado
     metrics = {
         'Accuracy': accuracy_score(y_test, y_pred_optimized),
         'F1 Score': f1_score(y_test, y_pred_optimized),
@@ -301,93 +288,79 @@ def create_and_evaluate_model(X_train, X_test, y_train, y_test, preprocessor):
         'Best Threshold': best_threshold
     }
 
-    # Mostramos las métricas
     print("\nMétricas del modelo en el conjunto de prueba:")
     for metric_name, metric_value in metrics.items():
         print(f"{metric_name}: {metric_value:.4f}")
 
-    # Reporte de clasificación detallado
     print("\nReporte de clasificación (umbral optimizado):")
     print(classification_report(y_test, y_pred_optimized))
 
-    # Obtener y guardar las características más importantes
     feature_names = []
     if hasattr(preprocessor, 'get_feature_names_out'):
         feature_names = preprocessor.get_feature_names_out()
     else:
-        # Nombres genéricos si no se pueden obtener los nombres de características
         feature_names = [f'feature_{i}' for i in range(X_train_transformed.shape[1])]
 
-    importance_dict = model.get_score(importance_type='weight')
-    feature_importances = [importance_dict.get(f'f{i}', 0) for i in range(len(feature_names))]
+    importance_scores = model.feature_importances_
 
-    if len(feature_importances) == len(feature_names):
+    if len(importance_scores) == len(feature_names):
         feature_imp = pd.DataFrame({
             'Feature': feature_names,
-            'Importance': feature_importances
+            'Importance': importance_scores
         }).sort_values('Importance', ascending=False)
 
         print("\nTop 20 características más importantes:")
         print(feature_imp.head(20))
 
-        # Guardar las características importantes en un CSV
         os.makedirs('data', exist_ok=True)
-        feature_imp.to_csv('data/features_importance_baseline.csv', index=False)
-        print("Características importantes guardadas en 'data/features_importance_baseline.csv'")
+        feature_imp.to_csv('data/features_importance_improved.csv', index=False)
+        print("Características importantes guardadas en 'data/features_importance_improved.csv'")
 
-    # Creamos el pipeline completo para serialización
-    # Incluimos el umbral optimizado como parte del modelo
     full_pipeline = Pipeline([
         ('preprocessor', preprocessor),
         ('classifier', model)
     ])
 
-    # Guardamos el mejor umbral como atributo del pipeline
     full_pipeline.best_threshold = best_threshold
 
-    return full_pipeline, metrics, feature_imp
+    return full_pipeline, metrics
 
-# 6. Optimización de hiperparámetros
+
 def optimize_hyperparameters(X_train, y_train, preprocessor):
     """
-    Optimiza los hiperparámetros del modelo usando RandomizedSearchCV
+    Optimiza los hiperparámetros del modelo usando RandomizedSearchCV.
     """
-    # Aplicamos el preprocesamiento
-    print("Aplicando preprocesamiento para optimización...")
     preprocessor.fit(X_train)
     X_train_transformed = preprocessor.transform(X_train)
 
-    # Aplicamos SMOTETomek para balancear clases
-    print("Aplicando SMOTETomek para balancear clases...")
-    smote_tomek = SMOTETomek(random_state=42)
-    X_train_resampled, y_train_resampled = smote_tomek.fit_resample(X_train_transformed, y_train)
+    rus = RandomUnderSampler(sampling_strategy=0.3, random_state=42)
+    X_train_under, y_train_under = rus.fit_resample(X_train_transformed, y_train)
 
-    # Definimos los hiperparámetros a optimizar
+    smote = SMOTE(sampling_strategy=0.9, random_state=42)
+    X_train_resampled, y_train_resampled = smote.fit_resample(X_train_under, y_train_under)
+
     param_dist = {
-        'n_estimators': [100, 200, 300, 500],
-        'max_depth': [3, 5, 7, 9],
-        'learning_rate': [0.01, 0.05, 0.1, 0.2],
-        'subsample': [0.6, 0.7, 0.8, 0.9],
-        'colsample_bytree': [0.6, 0.7, 0.8, 0.9],
-        'min_child_weight': [1, 3, 5, 7],
-        'gamma': [0, 0.1, 0.2, 0.3],
-        'scale_pos_weight': [1, 1.5, 2, 3],
-        'reg_alpha': [0, 0.1, 0.5, 1],
-        'reg_lambda': [0, 0.1, 0.5, 1]
+        'n_estimators': [200, 300, 400, 500],
+        'max_depth': [3, 4, 5, 6],
+        'learning_rate': [0.01, 0.03, 0.05, 0.1],
+        'subsample': [0.6, 0.7, 0.8],
+        'colsample_bytree': [0.6, 0.7, 0.8],
+        'min_child_weight': [3, 5, 7],
+        'gamma': [0.1, 0.2, 0.3],
+        'scale_pos_weight': [1.5, 2.0, 3.0],
+        'reg_alpha': [0.05, 0.1, 0.5],
+        'reg_lambda': [0.5, 1.0, 1.5]
     }
 
-
-    # Creamos el modelo base para la optimización
     model = xgb.XGBClassifier(
         objective='binary:logistic',
         eval_metric='logloss',
         tree_method='hist',
         grow_policy='lossguide',
         random_state=42,
-        use_label_encoder=False  # Evitar warning en XGBoost recientes
+        use_label_encoder=False
     )
 
-    # RandomizedSearchCV para buscar los mejores hiperparámetros
     random_search = RandomizedSearchCV(
         model,
         param_distributions=param_dist,
@@ -399,7 +372,6 @@ def optimize_hyperparameters(X_train, y_train, preprocessor):
         random_state=42
     )
 
-    print("Iniciando búsqueda de hiperparámetros...")
     random_search.fit(X_train_resampled, y_train_resampled)
 
     print(f"Mejores parámetros: {random_search.best_params_}")
@@ -407,80 +379,107 @@ def optimize_hyperparameters(X_train, y_train, preprocessor):
 
     return random_search.best_estimator_
 
-# 7. Guardar el modelo para producción
-def save_model(model, filename='model/model_boost.pkl'):
+def save_model(model, filename='model/improved_model.pkl'):
     """
-    Guarda el modelo entrenado para su uso en producción
+    Guarda el modelo entrenado para su uso en producción.
     """
-    # Crear directorio si no existe
     os.makedirs(os.path.dirname(filename), exist_ok=True)
 
     with open(filename, 'wb') as file:
         pickle.dump(model, file)
     print(f"Modelo guardado como {filename}")
 
-# Función para aplicar umbral óptimo durante la predicción
-def predict_with_optimal_threshold(pipeline, X, threshold=None):
+def create_ensemble_model(X_train, X_test, y_train, y_test, preprocessor):
     """
-    Realiza predicciones usando el umbral óptimo para maximizar F1
+    Crea un ensamble de modelos XGBoost para mayor robustez.
     """
-    # Si no se especifica umbral, usar el almacenado en el pipeline
-    if threshold is None:
-        if hasattr(pipeline, 'best_threshold'):
-            threshold = pipeline.best_threshold
-        else:
-            threshold = 0.5
-
-    # Obtenemos probabilidades y aplicamos umbral
-    y_proba = pipeline.predict_proba(X)[:, 1]
-    y_pred = (y_proba >= threshold).astype(int)
-
-    return y_pred
-
-# Nueva función para evaluar el modelo optimizado correctamente
-def evaluate_optimized_model(best_model, X_train, X_test, y_train, y_test, preprocessor):
-    """
-    Evalúa el modelo optimizado con los hiperparámetros encontrados
-    """
-    print("Evaluando modelo optimizado...")
-    # Aplicamos el preprocesamiento
+    preprocessor.fit(X_train)
     X_train_transformed = preprocessor.transform(X_train)
     X_test_transformed = preprocessor.transform(X_test)
 
-    # Balanceamos clases solo en el conjunto de entrenamiento
-    smote_tomek = SMOTETomek(random_state=42)
-    X_train_resampled, y_train_resampled = smote_tomek.fit_resample(X_train_transformed, y_train)
+    rus = RandomUnderSampler(sampling_strategy=0.3, random_state=42)
+    X_train_under, y_train_under = rus.fit_resample(X_train_transformed, y_train)
 
-    # Entrenamos el modelo optimizado
-    # IMPORTANTE: XGBClassifier no acepta eval_metric en fit() en las versiones más recientes
-    # Usamos eval_set pero no eval_metric
-    eval_set = [(X_test_transformed, y_test)]
-    best_model.fit(
-        X_train_resampled,
-        y_train_resampled,
-        eval_set=eval_set,
-        verbose=False
+    smote = SMOTE(sampling_strategy=0.9, random_state=42)
+    X_train_resampled, y_train_resampled = smote.fit_resample(X_train_under, y_train_under)
+
+    xgb1 = xgb.XGBClassifier(
+        max_depth=4,
+        learning_rate=0.05,
+        n_estimators=300,
+        subsample=0.7,
+        colsample_bytree=0.7,
+        scale_pos_weight=4.0,
+        min_child_weight=3,
+        gamma=0.1,
+        reg_alpha=0.05,
+        reg_lambda=1.0,
+        random_state=42,
+        eval_metric='logloss'  # Move eval_metric here
     )
 
-    # Predecimos probabilidades
-    y_pred_proba = best_model.predict_proba(X_test_transformed)[:, 1]
+    xgb2 = xgb.XGBClassifier(
+        max_depth=3,
+        learning_rate=0.03,
+        n_estimators=400,
+        subsample=0.8,
+        colsample_bytree=0.8,
+        scale_pos_weight=2.0,
+        min_child_weight=5,
+        gamma=0.2,
+        reg_alpha=0.1,
+        reg_lambda=1.5,
+        random_state=42,
+        eval_metric='logloss'  # Move eval_metric here
+    )
 
-    # Buscamos umbral óptimo para F1
-    thresholds = np.arange(0.3, 0.7, 0.01)
-    best_threshold = 0.5
-    best_f1 = 0
+    xgb3 = xgb.XGBClassifier(
+        max_depth=5,
+        learning_rate=0.04,
+        n_estimators=350,
+        subsample=0.75,
+        colsample_bytree=0.75,
+        scale_pos_weight=3.0,
+        min_child_weight=4,
+        gamma=0.15,
+        reg_alpha=0.08,
+        reg_lambda=1.2,
+        random_state=42,
+        eval_metric='logloss'  # Move eval_metric here
+    )
 
-    for threshold in thresholds:
-        y_pred_threshold = (y_pred_proba >= threshold).astype(int)
-        f1 = f1_score(y_test, y_pred_threshold)
-        if f1 > best_f1:
-            best_f1 = f1
-            best_threshold = threshold
+    # Updated fit method calls
+    xgb1.fit(X_train_resampled, y_train_resampled,
+             eval_set=[(X_test_transformed, y_test)],
+             early_stopping_rounds=50,
+             verbose=False)
 
-    # Predicciones con umbral optimizado
+    xgb2.fit(X_train_resampled, y_train_resampled,
+             eval_set=[(X_test_transformed, y_test)],
+             early_stopping_rounds=50,
+             verbose=False)
+
+    xgb3.fit(X_train_resampled, y_train_resampled,
+             eval_set=[(X_test_transformed, y_test)],
+             early_stopping_rounds=50,
+             verbose=False)
+
+    ensemble = VotingClassifier(
+        estimators=[
+            ('xgb_recall', xgb1),
+            ('xgb_precision', xgb2),
+            ('xgb_balanced', xgb3)
+        ],
+        voting='soft',
+        weights=[1, 1, 2]
+    )
+
+    ensemble.fit(X_train_resampled, y_train_resampled)
+
+    y_pred_proba = ensemble.predict_proba(X_test_transformed)[:, 1]
+    best_threshold, best_f1 = find_optimal_threshold(y_test, y_pred_proba)
     y_pred_optimized = (y_pred_proba >= best_threshold).astype(int)
 
-    # Métricas con umbral optimizado
     metrics = {
         'Accuracy': accuracy_score(y_test, y_pred_optimized),
         'F1 Score': f1_score(y_test, y_pred_optimized),
@@ -490,83 +489,92 @@ def evaluate_optimized_model(best_model, X_train, X_test, y_train, y_test, prepr
         'Best Threshold': best_threshold
     }
 
-    # Mostramos las métricas
-    print("\nMétricas del modelo optimizado en el conjunto de prueba:")
+    print("\nMétricas del modelo ensamble:")
     for metric_name, metric_value in metrics.items():
         print(f"{metric_name}: {metric_value:.4f}")
 
-    # Reporte de clasificación detallado
-    print("\nReporte de clasificación (umbral optimizado):")
+    print("\nReporte de clasificación (ensamble):")
     print(classification_report(y_test, y_pred_optimized))
 
-    # Obtenemos las características más importantes
-    if hasattr(preprocessor, 'get_feature_names_out'):
-        feature_names = preprocessor.get_feature_names_out()
-    else:
-        feature_names = [f'feature_{i}' for i in range(X_train_transformed.shape[1])]
-
-    # Extraemos importancias de características para XGBClassifier
-    importances = best_model.feature_importances_
-
-    # Creamos DataFrame y ordenamos
-    feature_imp = pd.DataFrame({
-        'Feature': feature_names,
-        'Importance': importances
-    }).sort_values('Importance', ascending=False)
-
-    print("\nTop 20 características más importantes (modelo optimizado):")
-    print(feature_imp.head(20))
-
-    # Guardamos las características importantes en un CSV
-    os.makedirs('data', exist_ok=True)
-    feature_imp.to_csv('data/features_importance.csv', index=False)
-    print("Características importantes (modelo optimizado) guardadas en 'data/features_importance.csv'")
-
-    # Creamos el pipeline completo para serialización
-    full_pipeline = Pipeline([
+    ensemble_pipeline = Pipeline([
         ('preprocessor', preprocessor),
-        ('classifier', best_model)
+        ('classifier', ensemble)
     ])
 
-    # Guardamos el mejor umbral como atributo del pipeline
-    full_pipeline.best_threshold = best_threshold
+    ensemble_pipeline.best_threshold = best_threshold
 
-    return full_pipeline, metrics, feature_imp
+    return ensemble_pipeline, metrics
+
+def predict_cancellation(model, data):
+    """
+    Realiza predicciones con el modelo entrenado.
+
+    Parámetros:
+        model: Pipeline con preprocesador y modelo entrenado
+        data: DataFrame con los datos de reservas a predecir
+
+    Retorna:
+        DataFrame con las predicciones
+    """
+    cancellation_prob = model.predict_proba(data)[:, 1]
+    cancellation_pred = (cancellation_prob >= model.best_threshold).astype(int)
+
+    results = pd.DataFrame({
+        'cancellation_probability': cancellation_prob,
+        'cancellation_prediction': cancellation_pred
+    })
+
+    return results
 
 def main():
-    # 1. Load the data
+    """
+    Función principal que ejecuta todo el proceso de entrenamiento y evaluación.
+    """
+    print("Iniciando proceso de modelado para predicción de cancelaciones")
+
     hotels_df, bookings_df = load_data()
+    print(f"Datos cargados. Hoteles: {hotels_df.shape}, Reservas: {bookings_df.shape}")
 
-    # 2. Merge the datasets
-    merged_df = merge_datasets(hotels_df, bookings_df)
+    merged_data, hotel_ids = merge_datasets(hotels_df, bookings_df)
+    print(f"Datos unidos. Shape final: {merged_data.shape}")
 
-    # 3. Preprocess the data
-    preprocessed_data = preprocess_data(merged_df)
+    preprocessed_data = preprocess_data(merged_data)
+    print(f"Datos preprocesados. Shape: {preprocessed_data.shape}")
 
-    # 4. Prepare features and target
     X, y, preprocessor = prepare_features(preprocessed_data)
+    print(f"Características preparadas. X shape: {X.shape}, y shape: {y.shape}")
 
-    # 5. Split the data into training and test sets
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42, stratify=y)
+    class_counts = y.value_counts()
+    print(f"\nDistribución de clases:\n{class_counts}")
+    print(f"Proporción de clase positiva: {class_counts[1]/len(y):.2f}")
 
-    # 6. Create and evaluate the baseline model
-    baseline_pipeline, baseline_metrics, baseline_feature_imp = create_and_evaluate_model(
+    X_train, X_test, y_train, y_test, hotel_ids_train, hotel_ids_test = train_test_split(
+        X, y, hotel_ids, test_size=0.2, random_state=42, stratify=y
+    )
+    print(f"División completada. Train: {X_train.shape}, Test: {X_test.shape}")
+
+    model_pipeline, metrics = create_and_evaluate_model(
+        X_train, X_test, y_train, y_test, preprocessor, hotel_ids_train
+    )
+
+    do_hyperparameter_optimization = False
+    if do_hyperparameter_optimization:
+        print("\nOptimizando hiperparámetros...")
+        optimized_model = optimize_hyperparameters(X_train, y_train, preprocessor)
+        print("Optimización completada.")
+
+    ensemble_pipeline, ensemble_metrics = create_ensemble_model(
         X_train, X_test, y_train, y_test, preprocessor
     )
 
-    # 7. Optimize hyperparameters
-    best_model = optimize_hyperparameters(X_train, y_train, preprocessor)
+    save_model(model_pipeline, 'model/hotel_cancellation_model.pkl')
+    save_model(ensemble_pipeline, 'model/hotel_cancellation_ensemble.pkl')
 
-    # 8. Evaluate the optimized model
-    optimized_pipeline, optimized_metrics, optimized_feature_imp = evaluate_optimized_model(
-        best_model, X_train, X_test, y_train, y_test, preprocessor
-    )
+    print("\nComparando modelos:")
+    print(f"Modelo base - F1 Score: {metrics['F1 Score']:.4f}")
+    print(f"Ensamble    - F1 Score: {ensemble_metrics['F1 Score']:.4f}")
 
-    # 9. Save the optimized model
-    save_model(optimized_pipeline)
+    print("\nProceso completado con éxito!")
 
-    print("Model training and evaluation complete.")
-
-# Run the main function
 if __name__ == "__main__":
     main()
