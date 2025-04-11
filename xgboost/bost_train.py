@@ -53,8 +53,8 @@ class FilteredEnsemblePipeline:
 
 # Load hotel and booking data
 def load_data():
-    hotels = pd.read_csv('../data/hotels.csv')
-    bookings = pd.read_csv('../data/bookings_train.csv')
+    hotels = pd.read_csv('C:/Users/Administrador/DataspellProjects/Aprendizaje_automatico2/data/hotels.csv')
+    bookings = pd.read_csv('C:/Users/Administrador/DataspellProjects/Aprendizaje_automatico2/data/bookings_train.csv')
     return hotels, bookings
 
 # Merge hotel and booking data
@@ -286,7 +286,6 @@ def create_and_evaluate_model(X_train, X_test, y_train, y_test, preprocessor, ho
         X_train_resampled,
         y_train_resampled,
         eval_set=[(X_test_transformed, y_test)],
-        eval_metric='logloss',
         verbose=False,
     )
 
@@ -378,14 +377,12 @@ def create_ensemble_model(X_train, X_test, y_train, y_test, preprocessor):
     X_train_transformed = preprocessor.transform(X_train)
     X_test_transformed = preprocessor.transform(X_test)
 
-    # More conservative sampling
     rus = RandomUnderSampler(sampling_strategy=0.25, random_state=42)
     X_train_under, y_train_under = rus.fit_resample(X_train_transformed, y_train)
 
     smote = SMOTE(sampling_strategy=0.7, random_state=42)
     X_train_resampled, y_train_resampled = smote.fit_resample(X_train_under, y_train_under)
 
-    # Modified parameters to reduce overfitting
     xgb1 = xgb.XGBClassifier(
         max_depth=3,
         learning_rate=0.02,
@@ -398,12 +395,11 @@ def create_ensemble_model(X_train, X_test, y_train, y_test, preprocessor):
         reg_alpha=0.3,
         reg_lambda=2.0,
         random_state=42,
-        eval_metric='logloss',
-        early_stopping_rounds=20
+        eval_metric='logloss'
     )
 
     xgb2 = xgb.XGBClassifier(
-        max_depth=2,  # Reduced depth for more generalization
+        max_depth=2,
         learning_rate=0.015,
         n_estimators=350,
         subsample=0.75,
@@ -414,8 +410,7 @@ def create_ensemble_model(X_train, X_test, y_train, y_test, preprocessor):
         reg_alpha=0.4,
         reg_lambda=2.5,
         random_state=42,
-        eval_metric='logloss',
-        early_stopping_rounds=20
+        eval_metric='logloss'
     )
 
     xgb3 = xgb.XGBClassifier(
@@ -430,21 +425,12 @@ def create_ensemble_model(X_train, X_test, y_train, y_test, preprocessor):
         reg_alpha=0.35,
         reg_lambda=2.2,
         random_state=42,
-        eval_metric='logloss',
-        early_stopping_rounds=20
+        eval_metric='logloss'
     )
 
-    xgb1.fit(X_train_resampled, y_train_resampled,
-             eval_set=[(X_test_transformed, y_test)],
-             verbose=False)
-
-    xgb2.fit(X_train_resampled, y_train_resampled,
-             eval_set=[(X_test_transformed, y_test)],
-             verbose=False)
-
-    xgb3.fit(X_train_resampled, y_train_resampled,
-             eval_set=[(X_test_transformed, y_test)],
-             verbose=False)
+    xgb1.fit(X_train_resampled, y_train_resampled, verbose=False)
+    xgb2.fit(X_train_resampled, y_train_resampled, verbose=False)
+    xgb3.fit(X_train_resampled, y_train_resampled, verbose=False)
 
     feature_names = preprocessor.get_feature_names_out() if hasattr(preprocessor, 'get_feature_names_out') else [f'feature_{i}' for i in range(X_train_transformed.shape[1])]
 
@@ -453,14 +439,8 @@ def create_ensemble_model(X_train, X_test, y_train, y_test, preprocessor):
     importance3 = xgb3.feature_importances_
 
     combined_importance = np.maximum.reduce([importance1, importance2, importance3])
-    # Set a small threshold instead of zero
     importance_threshold = 0.0005
     important_feature_indices = np.where(combined_importance > importance_threshold)[0]
-    important_feature_names = [feature_names[i] for i in important_feature_indices]
-
-    print(f"\nOriginal features in ensemble: {len(feature_names)}")
-    print(f"Removed features: {len(feature_names) - len(important_feature_indices)} (importance <= {importance_threshold} in all models)")
-    print(f"Remaining features: {len(important_feature_indices)}")
 
     X_train_array = np.array(X_train_resampled)
     X_test_array = np.array(X_test_transformed)
@@ -472,34 +452,26 @@ def create_ensemble_model(X_train, X_test, y_train, y_test, preprocessor):
         max_depth=3, learning_rate=0.02, n_estimators=300,
         subsample=0.7, colsample_bytree=0.7, scale_pos_weight=4.0,
         min_child_weight=7, gamma=0.3, reg_alpha=0.3, reg_lambda=2.0,
-        random_state=42, eval_metric='logloss', early_stopping_rounds=20
+        random_state=42, eval_metric='logloss'
     )
 
     xgb2_filtered = xgb.XGBClassifier(
         max_depth=2, learning_rate=0.015, n_estimators=350,
         subsample=0.75, colsample_bytree=0.75, scale_pos_weight=1.5,
         min_child_weight=9, gamma=0.4, reg_alpha=0.4, reg_lambda=2.5,
-        random_state=42, eval_metric='logloss', early_stopping_rounds=20
+        random_state=42, eval_metric='logloss'
     )
 
     xgb3_filtered = xgb.XGBClassifier(
         max_depth=3, learning_rate=0.02, n_estimators=325,
         subsample=0.7, colsample_bytree=0.7, scale_pos_weight=2.5,
         min_child_weight=8, gamma=0.35, reg_alpha=0.35, reg_lambda=2.2,
-        random_state=42, eval_metric='logloss', early_stopping_rounds=20
+        random_state=42, eval_metric='logloss'
     )
 
-    xgb1_filtered.fit(X_train_filtered, y_train_resampled,
-                      eval_set=[(X_test_filtered, y_test)],
-                      verbose=False)
-
-    xgb2_filtered.fit(X_train_filtered, y_train_resampled,
-                      eval_set=[(X_test_filtered, y_test)],
-                      verbose=False)
-
-    xgb3_filtered.fit(X_train_filtered, y_train_resampled,
-                      eval_set=[(X_test_filtered, y_test)],
-                      verbose=False)
+    xgb1_filtered.fit(X_train_filtered, y_train_resampled, verbose=False)
+    xgb2_filtered.fit(X_train_filtered, y_train_resampled, verbose=False)
+    xgb3_filtered.fit(X_train_filtered, y_train_resampled, verbose=False)
 
     ensemble_filtered = VotingClassifier(
         estimators=[
@@ -526,33 +498,12 @@ def create_ensemble_model(X_train, X_test, y_train, y_test, preprocessor):
         'Best Threshold': best_threshold
     }
 
-    print("\nMetrics for the filtered ensemble:")
-    for metric_name, metric_value in metrics.items():
-        print(f"{metric_name}: {metric_value:.4f}")
-
-    print("\nClassification report for the ensemble (optimized threshold):")
-    print(classification_report(y_test, y_pred_optimized))
-
     filtered_ensemble_pipeline = FilteredEnsemblePipeline(
         preprocessor=preprocessor,
         ensemble=ensemble_filtered,
         important_indices=important_feature_indices,
         best_threshold=best_threshold
     )
-
-    all_importances = []
-    for name, model in [('xgb_recall', xgb1_filtered), ('xgb_precision', xgb2_filtered), ('xgb_balanced', xgb3_filtered)]:
-        importances = model.feature_importances_
-        for i, (feature, importance) in enumerate(zip(important_feature_names, importances)):
-            all_importances.append({
-                'Model': name,
-                'Feature': feature,
-                'Importance': importance
-            })
-
-    feature_imp_df = pd.DataFrame(all_importances)
-    feature_imp_df.to_csv('data/ensemble_features_importance.csv', index=False)
-    print("Ensemble feature importance saved in 'data/ensemble_features_importance.csv'")
 
     return filtered_ensemble_pipeline, metrics
 
