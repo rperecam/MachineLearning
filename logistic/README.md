@@ -4,17 +4,9 @@
 
 Este documento presenta un análisis detallado del desarrollo de un modelo de regresión logística para la predicción de cancelaciones de reservas hoteleras, con énfasis particular en las cancelaciones tardías (30 días antes de la fecha de llegada). El modelo se enmarca dentro de un sistema completo que incluye procesos de preprocesamiento, entrenamiento, evaluación y despliegue, siguiendo una arquitectura modular y escalable.
 
-## 2. Pipeline del Modelo
+## 2. Análisis Detallado del Código de Entrenamiento (train.py)
 
-![Pipeline del modelo](../png/pipeline.PNG)
-
-*Figura 1: Representación visual del pipeline de procesamiento y modelado*
-
-El pipeline completo sigue un flujo secuencial de operaciones como se muestra en la figura anterior, comenzando con la ingeniería de características y culminando con el modelo de regresión logística.
-
-## 3. Análisis Detallado del Código de Entrenamiento (train.py)
-
-### 3.1. Mapeo de Continentes (`ContinentMapper`)
+### 2.1. Mapeo de Continentes (`ContinentMapper`)
 
 ```python
 class ContinentMapper(BaseEstimator, TransformerMixin):
@@ -47,7 +39,7 @@ class ContinentMapper(BaseEstimator, TransformerMixin):
 - **Interpretabilidad**: Las diferencias geográficas a nivel de continente son más interpretables y estables.
 - **Eficiencia computacional**: Reduce la complejidad al aplicar codificación one-hot posteriormente.
 
-### 3.2. Ingeniería de Características (`FeatureEngineer`)
+### 2.2. Ingeniería de Características (`FeatureEngineer`)
 
 ```python
 class FeatureEngineer(BaseEstimator, TransformerMixin):
@@ -96,7 +88,7 @@ class FeatureEngineer(BaseEstimator, TransformerMixin):
 - **Flexibilidad**: Parametrizable para adaptarse a diferentes esquemas de datos.
 - **Robustez**: Maneja casos de columnas faltantes o valores nulos.
 
-### 3.3. Manejo de Outliers (`OutlierCapper`)
+### 2.3. Manejo de Outliers (`OutlierCapper`)
 
 ```python
 class OutlierCapper(BaseEstimator, TransformerMixin):
@@ -136,7 +128,7 @@ class OutlierCapper(BaseEstimator, TransformerMixin):
 - **Suavizado de distribuciones**: Reduce el impacto de valores extremos sin distorsionar relaciones generales.
 - **Mejora de convergencia**: Facilita el entrenamiento de modelos sensibles a outliers.
 
-### 3.4. Ingeniería de la Variable Objetivo
+### 2.4. Ingeniería de la Variable Objetivo
 
 ```python
 def engineer_target(df: pd.DataFrame) -> Tuple[Optional[pd.DataFrame], Optional[pd.Series]]:
@@ -177,7 +169,7 @@ def engineer_target(df: pd.DataFrame) -> Tuple[Optional[pd.DataFrame], Optional[
 - **Simplicidad interpretativa**: Target binario claro y accionable.
 - **Flexibilidad temporal**: El umbral de 30 días podría ajustarse según necesidades del negocio.
 
-### 3.5. Procesamiento de Datos Numéricos y Categóricos
+### 2.5. Procesamiento de Datos Numéricos y Categóricos
 
 ```python
 numeric_transformer = Pipeline(steps=[
@@ -229,11 +221,11 @@ preprocessor = ColumnTransformer(
 - **Encapsulación**: Todo el preprocesamiento se serializa con el modelo.
 - **Modularidad**: Facilidad para modificar estrategias específicas sin afectar otras partes.
 
-### 3.6. Selección de Características
+### 2.6. Selección de Características
 
 El pipeline implementa dos técnicas complementarias de selección de características:
 
-#### 3.6.1. Filtrado por Varianza
+#### 2.6.1. Filtrado por Varianza
 
 ```python
 ('variance_threshold', VarianceThreshold(threshold=self.variance_threshold))
@@ -256,7 +248,7 @@ El pipeline implementa dos técnicas complementarias de selección de caracterí
 - **Reducción de ruido**: Elimina variables con poca información discriminativa.
 - **Prevención de multicolinealidad**: Ayuda a eliminar columnas redundantes creadas en one-hot encoding.
 
-#### 3.6.2. Selección de Mejores K Características
+#### 2.6.2. Selección de Mejores K Características
 
 ```python
 ('feature_selection', SelectKBest(score_func=f_classif, k=self.k_best))
@@ -278,7 +270,7 @@ El pipeline implementa dos técnicas complementarias de selección de caracterí
 - **Mitigación de sobreajuste**: Elimina variables que podrían capturar ruido en lugar de señal.
 - **Mejora de generalización**: Se enfoca en variables con relación estadísticamente significativa.
 
-### 3.7. Manejo del Desbalanceo de Clases con SMOTE
+### 2.7. Manejo del Desbalanceo de Clases con SMOTE
 
 ```python
 ('smote', SMOTE(random_state=self.random_state))
@@ -308,7 +300,7 @@ El pipeline implementa dos técnicas complementarias de selección de caracterí
 - **Vs. ADASYN**: Más simple y generalmente suficiente como baseline.
 - **Vs. Ajuste de umbrales**: Aborda el problema en la fase de entrenamiento, no solo en la decisión final.
 
-### 3.8. Algoritmo de Clasificación y Optimización
+### 2.8. Algoritmo de Clasificación y Optimización
 
 ```python
 if self.model_type == 'logistic':
@@ -363,7 +355,7 @@ Mejores parámetros: {'classifier__C': 0.1, 'classifier__penalty': 'l2'}
 - **Calibración de probabilidades**: Produce probabilidades bien calibradas sin postprocesamiento.
 - **Flexibilidad**: Diferentes configuraciones de regularización permiten ajustar el balance sesgo-varianza.
 
-### 3.9. Evaluación del Modelo y Análisis de Métricas
+### 2.9. Evaluación del Modelo y Análisis de Métricas
 
 ```python
 self.metrics = {
@@ -429,9 +421,9 @@ pr_auc: 0.3332
 - Adecuado para dirigir acciones de prevención y mitigación, no para decisiones automáticas definitivas.
 - Las probabilidades proporcionadas permiten ajustar el umbral según la estrategia (más preventiva o más selectiva).
 
-## 4. Código de Inferencia y Despliegue (Versión Resumida)
+## 3. Código de Inferencia y Despliegue (Versión Resumida)
 
-### 4.1. Inferencia (inference.py)
+### 3.1. Inferencia (inference.py)
 
 El archivo `inference.py` implementa la lógica para aplicar el modelo entrenado a nuevos datos, con tres funciones principales:
 
@@ -441,7 +433,7 @@ El archivo `inference.py` implementa la lógica para aplicar el modelo entrenado
 
 La implementación utiliza variables de entorno para las rutas de archivos, facilitando la configuración flexible.
 
-### 4.2. Containerización (Dockerfile)
+### 3.2. Containerización (Dockerfile)
 
 El `Dockerfile` define un contenedor liviano basado en Python 3.12-slim que:
 - Instala las dependencias necesarias desde `requirements.txt`.
@@ -450,9 +442,9 @@ El `Dockerfile` define un contenedor liviano basado en Python 3.12-slim que:
 
 Esta configuración proporciona un entorno aislado y reproducible para desplegar el modelo en producción.
 
-## 5. Conclusiones y Recomendaciones
+## 4. Conclusiones y Recomendaciones
 
-### 5.1. Evaluación General del Modelo
+### 4.1. Evaluación General del Modelo
 
 **Fortalezas del modelo baseline:**
 - Capacidad predictiva moderada pero significativamente superior al azar (ROC-AUC ~0.75).
@@ -465,7 +457,7 @@ Esta configuración proporciona un entorno aislado y reproducible para desplegar
 - Valor moderado de F1-score (~0.45) reflejando el compromiso precisión-recall.
 - PR-AUC modesto (~0.33) sugiriendo dificultad en el manejo del desbalance de clases.
 
-### 5.2. Aplicaciones Prácticas
+### 4.2. Aplicaciones Prácticas
 
 El modelo en su estado actual es apropiado para:
 - **Identificación temprana de reservas de alto riesgo** para intervenciones preventivas.
@@ -473,7 +465,7 @@ El modelo en su estado actual es apropiado para:
 - **Estimación de ocupación ajustada por riesgo** para planificación operativa.
 - **Punto de partida para modelos más complejos** y específicos.
 
-### 5.3. Recomendaciones para Mejoras Futuras
+### 4.3. Recomendaciones para Mejoras Futuras
 
 1. **Refinamiento de características**:
    - Incorporar características de temporalidad (estacionalidad, día de semana).

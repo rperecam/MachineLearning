@@ -5,19 +5,18 @@ from sklearn.preprocessing import OneHotEncoder, StandardScaler
 from sklearn.compose import ColumnTransformer
 from sklearn.pipeline import Pipeline
 from sklearn.impute import SimpleImputer, KNNImputer
-from sklearn.metrics import f1_score, classification_report, accuracy_score, precision_score, recall_score, roc_auc_score
+from sklearn.metrics import f1_score, accuracy_score, precision_score, recall_score, roc_auc_score
 import xgboost as xgb
 from imblearn.over_sampling import SMOTE
 from imblearn.under_sampling import RandomUnderSampler
 from sklearn.ensemble import VotingClassifier
 import pickle
 import warnings
-import os
 
 # Ignore warnings for cleaner output
 warnings.filterwarnings('ignore')
 
-# Move the FilteredPipeline class outside of the function to make it picklable
+# Define a custom pipeline class for filtering features
 class FilteredPipeline:
     def __init__(self, preprocessor, model, important_indices, best_threshold):
         self.preprocessor = preprocessor
@@ -34,7 +33,7 @@ class FilteredPipeline:
         proba = self.predict_proba(X)[:, 1]
         return (proba >= self.best_threshold).astype(int)
 
-# Move the FilteredEnsemblePipeline class outside of the function to make it picklable
+# Define a custom ensemble pipeline class for filtering features
 class FilteredEnsemblePipeline:
     def __init__(self, preprocessor, ensemble, important_indices, best_threshold):
         self.preprocessor = preprocessor
@@ -177,10 +176,8 @@ def find_optimal_threshold(y_true, y_pred_proba):
 # Filter out zero-importance features
 def filter_zero_importance_features(model, feature_names, X_train_transformed, X_test_transformed):
     importance_scores = model.feature_importances_
-    # Set a small threshold instead of zero to further reduce features
     importance_threshold = 0.0005
     important_feature_indices = np.where(importance_scores > importance_threshold)[0]
-    important_feature_names = [feature_names[i] for i in important_feature_indices]
 
     X_train_array = np.array(X_train_transformed)
     X_test_array = np.array(X_test_transformed)
@@ -188,11 +185,7 @@ def filter_zero_importance_features(model, feature_names, X_train_transformed, X
     X_train_filtered = X_train_array[:, important_feature_indices]
     X_test_filtered = X_test_array[:, important_feature_indices]
 
-    print(f"Original features: {len(feature_names)}")
-    print(f"Removed features: {len(feature_names) - len(important_feature_indices)} (importance <= {importance_threshold})")
-    print(f"Remaining features: {len(important_feature_indices)}")
-
-    return X_train_filtered, X_test_filtered, important_feature_indices, important_feature_names
+    return X_train_filtered, X_test_filtered, important_feature_indices
 
 # Create and evaluate the XGBoost model
 def create_and_evaluate_model(X_train, X_test, y_train, y_test, preprocessor, hotel_ids_train=None):
@@ -200,38 +193,35 @@ def create_and_evaluate_model(X_train, X_test, y_train, y_test, preprocessor, ho
     X_train_transformed = preprocessor.transform(X_train)
     X_test_transformed = preprocessor.transform(X_test)
 
-    # Balance the data - more conservative undersampling to preserve data
+    # Balance the data
     rus = RandomUnderSampler(sampling_strategy=0.25, random_state=42)
     X_train_under, y_train_under = rus.fit_resample(X_train_transformed, y_train)
 
-    # Less aggressive oversampling to reduce overfitting
     smote = SMOTE(sampling_strategy=0.7, random_state=42)
     X_train_resampled, y_train_resampled = smote.fit_resample(X_train_under, y_train_under)
 
-    # Evaluate with GroupKFold
+    # Evaluate with GroupKFold if hotel_ids are provided
     if hotel_ids_train is not None:
         cv = GroupKFold(n_splits=5)
         groups = hotel_ids_train
 
-        # Updated parameters to reduce overfitting
         xgb_model = xgb.XGBClassifier(
             objective='binary:logistic',
             max_depth=3,
-            min_child_weight=7,  # Increased to reduce overfitting
-            gamma=0.4,  # Increased to enforce more conservative splits
-            subsample=0.7,  # Increased for more robustness
-            colsample_bytree=0.7,  # Increased for more robustness
-            reg_alpha=0.3,  # Increased regularization
-            reg_lambda=2.0,  # Increased regularization
+            min_child_weight=7,
+            gamma=0.4,
+            subsample=0.7,
+            colsample_bytree=0.7,
+            reg_alpha=0.3,
+            reg_lambda=2.0,
             scale_pos_weight=2.5,
-            learning_rate=0.02,  # Reduced learning rate
-            n_estimators=300,  # Increased number of trees
+            learning_rate=0.02,
+            n_estimators=300,
             random_state=42,
-            early_stopping_rounds=20  # Add early stopping
+            early_stopping_rounds=20
         )
 
         cv_scores = []
-        print("\nEvaluating model with GroupKFold by hotel_id:")
         for train_idx, val_idx in cv.split(X_train, y_train, groups=groups):
             X_cv_train, X_cv_val = X_train.iloc[train_idx], X_train.iloc[val_idx]
             y_cv_train, y_cv_val = y_train.iloc[train_idx], y_train.iloc[val_idx]
@@ -258,10 +248,7 @@ def create_and_evaluate_model(X_train, X_test, y_train, y_test, preprocessor, ho
             cv_f1 = f1_score(y_cv_val, y_cv_pred)
             cv_scores.append(cv_f1)
 
-        print(f"F1 scores in CV: {cv_scores}")
-        print(f"Mean F1 CV: {np.mean(cv_scores):.4f} ± {np.std(cv_scores):.4f}")
-
-    # Train the initial model for feature importance with updated parameters
+    # Train the initial model for feature importance
     model = xgb.XGBClassifier(
         objective='binary:logistic',
         max_depth=3,
@@ -278,10 +265,6 @@ def create_and_evaluate_model(X_train, X_test, y_train, y_test, preprocessor, ho
         early_stopping_rounds=20
     )
 
-    # Debugging: Print shapes before fitting
-    print(f"Shape of X_train_resampled: {X_train_resampled.shape}")
-    print(f"Shape of y_train_resampled: {y_train_resampled.shape}")
-
     model.fit(
         X_train_resampled,
         y_train_resampled,
@@ -292,7 +275,7 @@ def create_and_evaluate_model(X_train, X_test, y_train, y_test, preprocessor, ho
     feature_names = preprocessor.get_feature_names_out() if hasattr(preprocessor, 'get_feature_names_out') else [f'feature_{i}' for i in range(X_train_transformed.shape[1])]
 
     # Filter zero-importance features from both train_transformed and test_transformed
-    X_train_transformed_filtered, X_test_filtered, important_indices, important_features = filter_zero_importance_features(
+    X_train_transformed_filtered, X_test_filtered, important_indices = filter_zero_importance_features(
         model, feature_names, X_train_transformed, X_test_transformed
     )
 
@@ -317,12 +300,8 @@ def create_and_evaluate_model(X_train, X_test, y_train, y_test, preprocessor, ho
         early_stopping_rounds=20
     )
 
-    # Debugging: Print shapes before fitting the filtered model
-    print(f"Shape of X_train_resampled_filtered: {X_train_resampled_filtered.shape}")
-    print(f"Shape of y_train_resampled: {y_train_resampled.shape}")
-
     filtered_model.fit(
-        X_train_resampled_filtered,  # Use filtered AND resampled data
+        X_train_resampled_filtered,
         y_train_resampled,
         eval_set=[(X_test_filtered, y_test)],
         verbose=False,
@@ -340,27 +319,6 @@ def create_and_evaluate_model(X_train, X_test, y_train, y_test, preprocessor, ho
         'ROC AUC': roc_auc_score(y_test, y_pred_proba),
         'Best Threshold': best_threshold
     }
-
-    print("\nMetrics for the filtered model (without low-importance features):")
-    for metric_name, metric_value in metrics.items():
-        print(f"{metric_name}: {metric_value:.4f}")
-
-    print("\nClassification report (optimized threshold):")
-    print(classification_report(y_test, y_pred_optimized))
-
-    importance_scores = filtered_model.feature_importances_
-
-    feature_imp = pd.DataFrame({
-        'Feature': important_features,
-        'Importance': importance_scores
-    }).sort_values('Importance', ascending=False)
-
-    print("\nTop 20 most important features:")
-    print(feature_imp.head(20))
-
-    os.makedirs('../data', exist_ok=True)
-    feature_imp.to_csv('data/features_importance_improved.csv', index=False)
-    print("Important features saved in 'data/features_importance_improved.csv'")
 
     filtered_pipeline = FilteredPipeline(
         preprocessor=preprocessor,
@@ -527,40 +485,40 @@ def main():
 
     print(f"Hotels: {hotels.shape}, Bookings: {bookings.shape}")
 
-    print("\nMerging datasets and preprocessing...")
+    print("Merging datasets and preprocessing...")
     merged, hotel_ids = merge_data(hotels, bookings)
 
     print(f"Preprocessed data: {merged.shape}")
 
-    print("\nPreprocessing features...")
+    print("Preprocessing features...")
     processed_data = preprocess_data(merged)
 
     print(f"Data with features: {processed_data.shape}")
 
-    print("\nPreparing features for the model...")
+    print("Preparing features for the model...")
     X, y, preprocessor = prepare_features(processed_data)
 
     print(f"X: {X.shape}, y: {y.shape}")
     print(f"Class distribution: {y.value_counts(normalize=True)}")
 
-    print("\nSplitting data into train and test sets...")
+    print("Splitting data into train and test sets...")
     X_train, X_test, y_train, y_test, hotel_ids_train, hotel_ids_test = train_test_split(
         X, y, hotel_ids, test_size=0.2, random_state=42, stratify=y
     )
 
     print(f"X_train: {X_train.shape}, X_test: {X_test.shape}")
 
-    print("\nCreating and evaluating XGBoost model...")
+    print("Creating and evaluating XGBoost model...")
     xgb_pipeline, xgb_metrics = create_and_evaluate_model(
         X_train, X_test, y_train, y_test, preprocessor, hotel_ids_train
     )
 
-    print("\nCreating and evaluating ensemble model...")
+    print("Creating and evaluating ensemble model...")
     ensemble_pipeline, ensemble_metrics = create_ensemble_model(
         X_train, X_test, y_train, y_test, preprocessor
     )
 
-    print("\nModel comparison:")
+    print("Model comparison:")
     models_comparison = pd.DataFrame({
         'XGBoost': list(xgb_metrics.values()),
         'Ensemble': list(ensemble_metrics.values())
@@ -571,11 +529,9 @@ def main():
     best_model = xgb_pipeline if xgb_metrics['F1 Score'] > ensemble_metrics['F1 Score'] else ensemble_pipeline
     best_model_name = "XGBoost" if xgb_metrics['F1 Score'] > ensemble_metrics['F1 Score'] else "Ensemble"
 
-    print(f"\nBest model: {best_model_name}")
+    print(f"Best model: {best_model_name}")
 
-    print(f"\nBest model: {best_model_name}")
-
-    save_model(best_model, f'models/hotel_cancellation_model_{best_model_name.lower()}.pkl')
+    save_model(best_model, f'models/model_{best_model_name.lower()}.pkl')
     print("Model training and evaluation complete.")
 
 if __name__ == "__main__":
