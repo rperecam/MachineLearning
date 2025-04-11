@@ -162,7 +162,8 @@ def prepare_features(data):
 
 # Find the optimal threshold for F1 score
 def find_optimal_threshold(y_true, y_pred_proba):
-    thresholds = np.linspace(0.2, 0.8, 100)
+    # Más granularidad en el rango de umbrales
+    thresholds = np.linspace(0.1, 0.9, 200)
     best_threshold, best_f1 = 0.5, 0
 
     for threshold in thresholds:
@@ -173,11 +174,18 @@ def find_optimal_threshold(y_true, y_pred_proba):
 
     return best_threshold, best_f1
 
-# Filter out zero-importance features
+# Filter out zero-importance features with un umbral adaptativo
 def filter_zero_importance_features(model, feature_names, X_train_transformed, X_test_transformed):
     importance_scores = model.feature_importances_
-    importance_threshold = 0.0005
+
+    # Usando percentil para seleccionar características
+    importance_threshold = np.percentile(importance_scores, 15)  # Mantiene el 85% superior
     important_feature_indices = np.where(importance_scores > importance_threshold)[0]
+
+    # Asegurar que mantenemos al menos un número mínimo de características
+    min_features = max(10, int(X_train_transformed.shape[1] * 0.5))
+    if len(important_feature_indices) < min_features:
+        important_feature_indices = np.argsort(importance_scores)[-min_features:]
 
     X_train_array = np.array(X_train_transformed)
     X_test_array = np.array(X_test_transformed)
@@ -193,11 +201,11 @@ def create_and_evaluate_model(X_train, X_test, y_train, y_test, preprocessor, ho
     X_train_transformed = preprocessor.transform(X_train)
     X_test_transformed = preprocessor.transform(X_test)
 
-    # Balance the data
-    rus = RandomUnderSampler(sampling_strategy=0.25, random_state=42)
+    # Balance the data - adjusted sampling strategies
+    rus = RandomUnderSampler(sampling_strategy=0.30, random_state=42)  # Ajustado de 0.25
     X_train_under, y_train_under = rus.fit_resample(X_train_transformed, y_train)
 
-    smote = SMOTE(sampling_strategy=0.7, random_state=42)
+    smote = SMOTE(sampling_strategy=0.65, random_state=42, k_neighbors=5)  # Ajustado de 0.7
     X_train_resampled, y_train_resampled = smote.fit_resample(X_train_under, y_train_under)
 
     # Evaluate with GroupKFold if hotel_ids are provided
@@ -205,20 +213,20 @@ def create_and_evaluate_model(X_train, X_test, y_train, y_test, preprocessor, ho
         cv = GroupKFold(n_splits=5)
         groups = hotel_ids_train
 
+        # Parámetros optimizados para generalización
         xgb_model = xgb.XGBClassifier(
             objective='binary:logistic',
-            max_depth=3,
-            min_child_weight=7,
-            gamma=0.4,
-            subsample=0.7,
-            colsample_bytree=0.7,
-            reg_alpha=0.3,
-            reg_lambda=2.0,
-            scale_pos_weight=2.5,
-            learning_rate=0.02,
-            n_estimators=300,
-            random_state=42,
-            early_stopping_rounds=20
+            max_depth=4,                # Incrementado para capturar relaciones complejas
+            min_child_weight=6,         # Ligeramente reducido para balancear regularización
+            gamma=0.25,                 # Reducido para permitir más splits
+            subsample=0.6,              # Reducido para combatir sobreajuste
+            colsample_bytree=0.6,       # Reducido para mayor diversidad
+            reg_alpha=0.6,              # Incrementado regularización L1
+            reg_lambda=2.5,             # Incrementado regularización L2
+            scale_pos_weight=1.8,       # Ajustado para balancear clases
+            learning_rate=0.01,         # Tasa de aprendizaje reducida
+            n_estimators=450,           # Más árboles para mejor convergencia
+            random_state=42
         )
 
         cv_scores = []
@@ -229,10 +237,10 @@ def create_and_evaluate_model(X_train, X_test, y_train, y_test, preprocessor, ho
             X_cv_train_processed = preprocessor.transform(X_cv_train)
             X_cv_val_processed = preprocessor.transform(X_cv_val)
 
-            rus_cv = RandomUnderSampler(sampling_strategy=0.25, random_state=42)
+            rus_cv = RandomUnderSampler(sampling_strategy=0.30, random_state=42)
             X_cv_under, y_cv_under = rus_cv.fit_resample(X_cv_train_processed, y_cv_train)
 
-            smote_cv = SMOTE(sampling_strategy=0.7, random_state=42)
+            smote_cv = SMOTE(sampling_strategy=0.65, random_state=42, k_neighbors=5)
             X_cv_balanced, y_cv_balanced = smote_cv.fit_resample(X_cv_under, y_cv_under)
 
             xgb_model.fit(
@@ -251,18 +259,17 @@ def create_and_evaluate_model(X_train, X_test, y_train, y_test, preprocessor, ho
     # Train the initial model for feature importance
     model = xgb.XGBClassifier(
         objective='binary:logistic',
-        max_depth=3,
-        min_child_weight=7,
-        gamma=0.4,
-        subsample=0.7,
-        colsample_bytree=0.7,
-        reg_alpha=0.3,
-        reg_lambda=2.0,
-        scale_pos_weight=2.5,
-        learning_rate=0.02,
-        n_estimators=300,
-        random_state=42,
-        early_stopping_rounds=20
+        max_depth=4,
+        min_child_weight=6,
+        gamma=0.25,
+        subsample=0.6,
+        colsample_bytree=0.6,
+        reg_alpha=0.6,
+        reg_lambda=2.5,
+        scale_pos_weight=1.8,
+        learning_rate=0.01,
+        n_estimators=450,
+        random_state=42
     )
 
     model.fit(
@@ -283,21 +290,20 @@ def create_and_evaluate_model(X_train, X_test, y_train, y_test, preprocessor, ho
     X_train_resampled_array = np.array(X_train_resampled)
     X_train_resampled_filtered = X_train_resampled_array[:, important_indices]
 
-    # Create a more conservative model for filtered features
+    # Create a model specifically for filtered features
     filtered_model = xgb.XGBClassifier(
         objective='binary:logistic',
-        max_depth=3,
-        min_child_weight=7,
-        gamma=0.4,
-        subsample=0.7,
-        colsample_bytree=0.7,
-        reg_alpha=0.3,
-        reg_lambda=2.0,
-        scale_pos_weight=2.5,
-        learning_rate=0.02,
-        n_estimators=300,
-        random_state=42,
-        early_stopping_rounds=20
+        max_depth=4,
+        min_child_weight=6,
+        gamma=0.25,
+        subsample=0.6,
+        colsample_bytree=0.6,
+        reg_alpha=0.6,
+        reg_lambda=2.5,
+        scale_pos_weight=1.8,
+        learning_rate=0.01,
+        n_estimators=450,
+        random_state=42
     )
 
     filtered_model.fit(
@@ -335,55 +341,54 @@ def create_ensemble_model(X_train, X_test, y_train, y_test, preprocessor):
     X_train_transformed = preprocessor.transform(X_train)
     X_test_transformed = preprocessor.transform(X_test)
 
-    rus = RandomUnderSampler(sampling_strategy=0.25, random_state=42)
+    # Balance the data - ligeramente ajustados para mejorar generalización
+    rus = RandomUnderSampler(sampling_strategy=0.30, random_state=42)
     X_train_under, y_train_under = rus.fit_resample(X_train_transformed, y_train)
 
-    smote = SMOTE(sampling_strategy=0.7, random_state=42)
+    smote = SMOTE(sampling_strategy=0.65, random_state=42, k_neighbors=5)
     X_train_resampled, y_train_resampled = smote.fit_resample(X_train_under, y_train_under)
 
+    # Modelos más diversos para mejorar la generalización
     xgb1 = xgb.XGBClassifier(
-        max_depth=3,
-        learning_rate=0.02,
-        n_estimators=300,
-        subsample=0.7,
-        colsample_bytree=0.7,
-        scale_pos_weight=4.0,
-        min_child_weight=7,
-        gamma=0.3,
-        reg_alpha=0.3,
-        reg_lambda=2.0,
-        random_state=42,
-        eval_metric='logloss'
+        max_depth=5,                # Modelo complejo para maximizar recall
+        learning_rate=0.01,
+        n_estimators=400,
+        subsample=0.55,             # Submuestreo más agresivo contra sobreajuste
+        colsample_bytree=0.55,      # Submuestreo de características más agresivo
+        scale_pos_weight=2.5,       # Mayor peso a positivos para recall
+        min_child_weight=5,
+        gamma=0.2,                  # Bajo gamma para permitir árboles complejos
+        reg_alpha=0.7,              # Alta regularización L1 para esparcidad
+        reg_lambda=1.5,
+        random_state=42
     )
 
     xgb2 = xgb.XGBClassifier(
-        max_depth=2,
-        learning_rate=0.015,
-        n_estimators=350,
-        subsample=0.75,
-        colsample_bytree=0.75,
-        scale_pos_weight=1.5,
-        min_child_weight=9,
-        gamma=0.4,
-        reg_alpha=0.4,
-        reg_lambda=2.5,
-        random_state=42,
-        eval_metric='logloss'
+        max_depth=3,                # Modelo simple para maximizar precisión
+        learning_rate=0.008,        # Tasa de aprendizaje muy baja para generalización
+        n_estimators=600,           # Muchos árboles simples
+        subsample=0.8,              # Menor varianza
+        colsample_bytree=0.8,
+        scale_pos_weight=1.2,       # Más equilibrado para precisión
+        min_child_weight=9,         # Alta regularización
+        gamma=0.5,                  # Alto gamma para simplicidad
+        reg_alpha=0.8,
+        reg_lambda=3.0,
+        random_state=42
     )
 
     xgb3 = xgb.XGBClassifier(
-        max_depth=3,
-        learning_rate=0.02,
-        n_estimators=325,
-        subsample=0.7,
-        colsample_bytree=0.7,
-        scale_pos_weight=2.5,
-        min_child_weight=8,
+        max_depth=4,                # Modelo equilibrado
+        learning_rate=0.01,
+        n_estimators=500,
+        subsample=0.65,
+        colsample_bytree=0.65,
+        scale_pos_weight=1.8,       # Equilibrio entre recall y precisión
+        min_child_weight=6,
         gamma=0.35,
-        reg_alpha=0.35,
+        reg_alpha=0.6,
         reg_lambda=2.2,
-        random_state=42,
-        eval_metric='logloss'
+        random_state=42
     )
 
     xgb1.fit(X_train_resampled, y_train_resampled, verbose=False)
@@ -396,9 +401,17 @@ def create_ensemble_model(X_train, X_test, y_train, y_test, preprocessor):
     importance2 = xgb2.feature_importances_
     importance3 = xgb3.feature_importances_
 
-    combined_importance = np.maximum.reduce([importance1, importance2, importance3])
-    importance_threshold = 0.0005
+    # Ponderación que favorece ligeramente el modelo equilibrado
+    combined_importance = (0.3 * importance1 + 0.3 * importance2 + 0.4 * importance3)
+
+    # Usando percentil para umbral de importancia
+    importance_threshold = np.percentile(combined_importance, 15)
     important_feature_indices = np.where(combined_importance > importance_threshold)[0]
+
+    # Garantizar un número mínimo de características
+    min_features = max(10, int(X_train_transformed.shape[1] * 0.5))
+    if len(important_feature_indices) < min_features:
+        important_feature_indices = np.argsort(combined_importance)[-min_features:]
 
     X_train_array = np.array(X_train_resampled)
     X_test_array = np.array(X_test_transformed)
@@ -406,31 +419,33 @@ def create_ensemble_model(X_train, X_test, y_train, y_test, preprocessor):
     X_train_filtered = X_train_array[:, important_feature_indices]
     X_test_filtered = X_test_array[:, important_feature_indices]
 
+    # Reentrenar modelos con características filtradas
     xgb1_filtered = xgb.XGBClassifier(
-        max_depth=3, learning_rate=0.02, n_estimators=300,
-        subsample=0.7, colsample_bytree=0.7, scale_pos_weight=4.0,
-        min_child_weight=7, gamma=0.3, reg_alpha=0.3, reg_lambda=2.0,
-        random_state=42, eval_metric='logloss'
+        max_depth=5, learning_rate=0.01, n_estimators=400,
+        subsample=0.55, colsample_bytree=0.55, scale_pos_weight=2.5,
+        min_child_weight=5, gamma=0.2, reg_alpha=0.7, reg_lambda=1.5,
+        random_state=42
     )
 
     xgb2_filtered = xgb.XGBClassifier(
-        max_depth=2, learning_rate=0.015, n_estimators=350,
-        subsample=0.75, colsample_bytree=0.75, scale_pos_weight=1.5,
-        min_child_weight=9, gamma=0.4, reg_alpha=0.4, reg_lambda=2.5,
-        random_state=42, eval_metric='logloss'
+        max_depth=3, learning_rate=0.008, n_estimators=600,
+        subsample=0.8, colsample_bytree=0.8, scale_pos_weight=1.2,
+        min_child_weight=9, gamma=0.5, reg_alpha=0.8, reg_lambda=3.0,
+        random_state=42
     )
 
     xgb3_filtered = xgb.XGBClassifier(
-        max_depth=3, learning_rate=0.02, n_estimators=325,
-        subsample=0.7, colsample_bytree=0.7, scale_pos_weight=2.5,
-        min_child_weight=8, gamma=0.35, reg_alpha=0.35, reg_lambda=2.2,
-        random_state=42, eval_metric='logloss'
+        max_depth=4, learning_rate=0.01, n_estimators=500,
+        subsample=0.65, colsample_bytree=0.65, scale_pos_weight=1.8,
+        min_child_weight=6, gamma=0.35, reg_alpha=0.6, reg_lambda=2.2,
+        random_state=42
     )
 
     xgb1_filtered.fit(X_train_filtered, y_train_resampled, verbose=False)
     xgb2_filtered.fit(X_train_filtered, y_train_resampled, verbose=False)
     xgb3_filtered.fit(X_train_filtered, y_train_resampled, verbose=False)
 
+    # Pesos ajustados para favorecer el modelo balanceado
     ensemble_filtered = VotingClassifier(
         estimators=[
             ('xgb_recall', xgb1_filtered),
@@ -438,7 +453,7 @@ def create_ensemble_model(X_train, X_test, y_train, y_test, preprocessor):
             ('xgb_balanced', xgb3_filtered)
         ],
         voting='soft',
-        weights=[1, 1, 2]
+        weights=[1.0, 1.0, 1.5]  # Mayor peso al modelo equilibrado
     )
 
     ensemble_filtered.fit(X_train_filtered, y_train_resampled)
@@ -502,8 +517,9 @@ def main():
     print(f"Class distribution: {y.value_counts(normalize=True)}")
 
     print("Splitting data into train and test sets...")
+    # Ajustado a 0.3 como solicitado
     X_train, X_test, y_train, y_test, hotel_ids_train, hotel_ids_test = train_test_split(
-        X, y, hotel_ids, test_size=0.2, random_state=42, stratify=y
+        X, y, hotel_ids, test_size=0.3, random_state=42, stratify=y
     )
 
     print(f"X_train: {X_train.shape}, X_test: {X_test.shape}")
