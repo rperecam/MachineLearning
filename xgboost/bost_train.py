@@ -17,10 +17,44 @@ import os
 # Ignore warnings for cleaner output
 warnings.filterwarnings('ignore')
 
+# Move the FilteredPipeline class outside of the function to make it picklable
+class FilteredPipeline:
+    def __init__(self, preprocessor, model, important_indices, best_threshold):
+        self.preprocessor = preprocessor
+        self.model = model
+        self.important_indices = important_indices
+        self.best_threshold = best_threshold
+
+    def predict_proba(self, X):
+        X_transformed = self.preprocessor.transform(X)
+        X_filtered = X_transformed[:, self.important_indices]
+        return self.model.predict_proba(X_filtered)
+
+    def predict(self, X):
+        proba = self.predict_proba(X)[:, 1]
+        return (proba >= self.best_threshold).astype(int)
+
+# Move the FilteredEnsemblePipeline class outside of the function to make it picklable
+class FilteredEnsemblePipeline:
+    def __init__(self, preprocessor, ensemble, important_indices, best_threshold):
+        self.preprocessor = preprocessor
+        self.ensemble = ensemble
+        self.important_indices = important_indices
+        self.best_threshold = best_threshold
+
+    def predict_proba(self, X):
+        X_transformed = self.preprocessor.transform(X)
+        X_filtered = X_transformed[:, self.important_indices]
+        return self.ensemble.predict_proba(X_filtered)
+
+    def predict(self, X):
+        proba = self.predict_proba(X)[:, 1]
+        return (proba >= self.best_threshold).astype(int)
+
 # Load hotel and booking data
 def load_data():
-    hotels = pd.read_csv('data/hotels.csv')
-    bookings = pd.read_csv('data/bookings_train.csv')
+    hotels = pd.read_csv('../data/hotels.csv')
+    bookings = pd.read_csv('../data/bookings_train.csv')
     return hotels, bookings
 
 # Merge hotel and booking data
@@ -50,6 +84,11 @@ def preprocess_data(data):
     data['is_high_season'] = data['arrival_date'].dt.month.isin([6, 7, 8, 12]).astype(int)
     data['is_weekend_arrival'] = data['arrival_date'].dt.dayofweek.isin([4, 5]).astype(int)
 
+    # Adding more features for seasonality
+    data['arrival_month'] = data['arrival_date'].dt.month
+    data['arrival_dayofweek'] = data['arrival_date'].dt.dayofweek
+    data['booking_month'] = data['booking_date'].dt.month
+
     # Extract price features
     data['price_per_night'] = data['rate'] / np.maximum(data['stay_nights'], 1)
     data['price_per_person'] = data['rate'] / np.maximum(data['total_guests'], 1)
@@ -71,6 +110,10 @@ def preprocess_data(data):
     data['price_length_interaction'] = data['price_per_night'] * data['stay_nights']
     data['lead_price_interaction'] = data['lead_time'] * data['price_per_night']
 
+    # New feature: Price deviation from average by hotel
+    hotel_avg_price = data.groupby('hotel_id')['price_per_night'].transform('mean')
+    data['price_deviation'] = (data['price_per_night'] - hotel_avg_price) / hotel_avg_price
+
     # Extract transport features
     data['requested_parking'] = (data['required_car_parking_spaces'] > 0).astype(int)
 
@@ -79,7 +122,7 @@ def preprocess_data(data):
     data.drop(columns=columns_to_drop, inplace=True)
 
     # Handle infinite and null values in numerical features
-    for col in ['price_per_night', 'price_per_person', 'special_requests_ratio']:
+    for col in ['price_per_night', 'price_per_person', 'special_requests_ratio', 'price_deviation']:
         if col in data.columns:
             data[col] = data[col].replace([np.inf, -np.inf], np.nan)
             data[col] = data[col].fillna(data[col].median())
@@ -134,7 +177,9 @@ def find_optimal_threshold(y_true, y_pred_proba):
 # Filter out zero-importance features
 def filter_zero_importance_features(model, feature_names, X_train_transformed, X_test_transformed):
     importance_scores = model.feature_importances_
-    important_feature_indices = np.where(importance_scores > 0)[0]
+    # Set a small threshold instead of zero to further reduce features
+    importance_threshold = 0.0005
+    important_feature_indices = np.where(importance_scores > importance_threshold)[0]
     important_feature_names = [feature_names[i] for i in important_feature_indices]
 
     X_train_array = np.array(X_train_transformed)
@@ -144,7 +189,7 @@ def filter_zero_importance_features(model, feature_names, X_train_transformed, X
     X_test_filtered = X_test_array[:, important_feature_indices]
 
     print(f"Original features: {len(feature_names)}")
-    print(f"Removed features: {len(feature_names) - len(important_feature_indices)} (importance = 0)")
+    print(f"Removed features: {len(feature_names) - len(important_feature_indices)} (importance <= {importance_threshold})")
     print(f"Remaining features: {len(important_feature_indices)}")
 
     return X_train_filtered, X_test_filtered, important_feature_indices, important_feature_names
@@ -155,11 +200,12 @@ def create_and_evaluate_model(X_train, X_test, y_train, y_test, preprocessor, ho
     X_train_transformed = preprocessor.transform(X_train)
     X_test_transformed = preprocessor.transform(X_test)
 
-    # Balance the data
-    rus = RandomUnderSampler(sampling_strategy=0.3, random_state=42)
+    # Balance the data - more conservative undersampling to preserve data
+    rus = RandomUnderSampler(sampling_strategy=0.25, random_state=42)
     X_train_under, y_train_under = rus.fit_resample(X_train_transformed, y_train)
 
-    smote = SMOTE(sampling_strategy=0.9, random_state=42)
+    # Less aggressive oversampling to reduce overfitting
+    smote = SMOTE(sampling_strategy=0.7, random_state=42)
     X_train_resampled, y_train_resampled = smote.fit_resample(X_train_under, y_train_under)
 
     # Evaluate with GroupKFold
@@ -167,19 +213,21 @@ def create_and_evaluate_model(X_train, X_test, y_train, y_test, preprocessor, ho
         cv = GroupKFold(n_splits=5)
         groups = hotel_ids_train
 
+        # Updated parameters to reduce overfitting
         xgb_model = xgb.XGBClassifier(
             objective='binary:logistic',
             max_depth=3,
-            min_child_weight=6,
-            gamma=0.3,
-            subsample=0.6,
-            colsample_bytree=0.6,
-            reg_alpha=0.2,
-            reg_lambda=1.5,
+            min_child_weight=7,  # Increased to reduce overfitting
+            gamma=0.4,  # Increased to enforce more conservative splits
+            subsample=0.7,  # Increased for more robustness
+            colsample_bytree=0.7,  # Increased for more robustness
+            reg_alpha=0.3,  # Increased regularization
+            reg_lambda=2.0,  # Increased regularization
             scale_pos_weight=2.5,
-            learning_rate=0.03,
-            n_estimators=250,
-            random_state=42
+            learning_rate=0.02,  # Reduced learning rate
+            n_estimators=300,  # Increased number of trees
+            random_state=42,
+            early_stopping_rounds=20  # Add early stopping
         )
 
         cv_scores = []
@@ -191,13 +239,17 @@ def create_and_evaluate_model(X_train, X_test, y_train, y_test, preprocessor, ho
             X_cv_train_processed = preprocessor.transform(X_cv_train)
             X_cv_val_processed = preprocessor.transform(X_cv_val)
 
-            rus_cv = RandomUnderSampler(sampling_strategy=0.3, random_state=42)
+            rus_cv = RandomUnderSampler(sampling_strategy=0.25, random_state=42)
             X_cv_under, y_cv_under = rus_cv.fit_resample(X_cv_train_processed, y_cv_train)
 
-            smote_cv = SMOTE(sampling_strategy=0.9, random_state=42)
+            smote_cv = SMOTE(sampling_strategy=0.7, random_state=42)
             X_cv_balanced, y_cv_balanced = smote_cv.fit_resample(X_cv_under, y_cv_under)
 
-            xgb_model.fit(X_cv_balanced, y_cv_balanced)
+            xgb_model.fit(
+                X_cv_balanced, y_cv_balanced,
+                eval_set=[(X_cv_val_processed, y_cv_val)],
+                verbose=False
+            )
 
             y_cv_proba = xgb_model.predict_proba(X_cv_val_processed)[:, 1]
             threshold, _ = find_optimal_threshold(y_cv_val, y_cv_proba)
@@ -209,20 +261,21 @@ def create_and_evaluate_model(X_train, X_test, y_train, y_test, preprocessor, ho
         print(f"F1 scores in CV: {cv_scores}")
         print(f"Mean F1 CV: {np.mean(cv_scores):.4f} ± {np.std(cv_scores):.4f}")
 
-    # Train the initial model for feature importance
+    # Train the initial model for feature importance with updated parameters
     model = xgb.XGBClassifier(
         objective='binary:logistic',
         max_depth=3,
-        min_child_weight=6,
-        gamma=0.3,
-        subsample=0.6,
-        colsample_bytree=0.6,
-        reg_alpha=0.2,
-        reg_lambda=1.5,
+        min_child_weight=7,
+        gamma=0.4,
+        subsample=0.7,
+        colsample_bytree=0.7,
+        reg_alpha=0.3,
+        reg_lambda=2.0,
         scale_pos_weight=2.5,
-        learning_rate=0.03,
-        n_estimators=250,
-        random_state=42
+        learning_rate=0.02,
+        n_estimators=300,
+        random_state=42,
+        early_stopping_rounds=20
     )
 
     # Debugging: Print shapes before fitting
@@ -233,6 +286,7 @@ def create_and_evaluate_model(X_train, X_test, y_train, y_test, preprocessor, ho
         X_train_resampled,
         y_train_resampled,
         eval_set=[(X_test_transformed, y_test)],
+        eval_metric='logloss',
         verbose=False,
     )
 
@@ -247,19 +301,21 @@ def create_and_evaluate_model(X_train, X_test, y_train, y_test, preprocessor, ho
     X_train_resampled_array = np.array(X_train_resampled)
     X_train_resampled_filtered = X_train_resampled_array[:, important_indices]
 
+    # Create a more conservative model for filtered features
     filtered_model = xgb.XGBClassifier(
         objective='binary:logistic',
         max_depth=3,
-        min_child_weight=6,
-        gamma=0.3,
-        subsample=0.6,
-        colsample_bytree=0.6,
-        reg_alpha=0.2,
-        reg_lambda=1.5,
+        min_child_weight=7,
+        gamma=0.4,
+        subsample=0.7,
+        colsample_bytree=0.7,
+        reg_alpha=0.3,
+        reg_lambda=2.0,
         scale_pos_weight=2.5,
-        learning_rate=0.03,
-        n_estimators=250,
-        random_state=42
+        learning_rate=0.02,
+        n_estimators=300,
+        random_state=42,
+        early_stopping_rounds=20
     )
 
     # Debugging: Print shapes before fitting the filtered model
@@ -286,7 +342,7 @@ def create_and_evaluate_model(X_train, X_test, y_train, y_test, preprocessor, ho
         'Best Threshold': best_threshold
     }
 
-    print("\nMetrics for the filtered model (without zero-importance features):")
+    print("\nMetrics for the filtered model (without low-importance features):")
     for metric_name, metric_value in metrics.items():
         print(f"{metric_name}: {metric_value:.4f}")
 
@@ -303,25 +359,9 @@ def create_and_evaluate_model(X_train, X_test, y_train, y_test, preprocessor, ho
     print("\nTop 20 most important features:")
     print(feature_imp.head(20))
 
-    os.makedirs('data', exist_ok=True)
+    os.makedirs('../data', exist_ok=True)
     feature_imp.to_csv('data/features_importance_improved.csv', index=False)
     print("Important features saved in 'data/features_importance_improved.csv'")
-
-    class FilteredPipeline:
-        def __init__(self, preprocessor, model, important_indices, best_threshold):
-            self.preprocessor = preprocessor
-            self.model = model
-            self.important_indices = important_indices
-            self.best_threshold = best_threshold
-
-        def predict_proba(self, X):
-            X_transformed = self.preprocessor.transform(X)
-            X_filtered = X_transformed[:, self.important_indices]
-            return self.model.predict_proba(X_filtered)
-
-        def predict(self, X):
-            proba = self.predict_proba(X)[:, 1]
-            return (proba >= self.best_threshold).astype(int)
 
     filtered_pipeline = FilteredPipeline(
         preprocessor=preprocessor,
@@ -338,55 +378,60 @@ def create_ensemble_model(X_train, X_test, y_train, y_test, preprocessor):
     X_train_transformed = preprocessor.transform(X_train)
     X_test_transformed = preprocessor.transform(X_test)
 
-    rus = RandomUnderSampler(sampling_strategy=0.3, random_state=42)
+    # More conservative sampling
+    rus = RandomUnderSampler(sampling_strategy=0.25, random_state=42)
     X_train_under, y_train_under = rus.fit_resample(X_train_transformed, y_train)
 
-    smote = SMOTE(sampling_strategy=0.9, random_state=42)
+    smote = SMOTE(sampling_strategy=0.7, random_state=42)
     X_train_resampled, y_train_resampled = smote.fit_resample(X_train_under, y_train_under)
 
+    # Modified parameters to reduce overfitting
     xgb1 = xgb.XGBClassifier(
         max_depth=3,
-        learning_rate=0.03,
-        n_estimators=250,
-        subsample=0.6,
-        colsample_bytree=0.6,
-        scale_pos_weight=4.0,
-        min_child_weight=6,
-        gamma=0.2,
-        reg_alpha=0.2,
-        reg_lambda=1.5,
-        random_state=42,
-        eval_metric='logloss'
-    )
-
-    xgb2 = xgb.XGBClassifier(
-        max_depth=2,
         learning_rate=0.02,
         n_estimators=300,
         subsample=0.7,
         colsample_bytree=0.7,
-        scale_pos_weight=1.5,
-        min_child_weight=8,
+        scale_pos_weight=4.0,
+        min_child_weight=7,
         gamma=0.3,
         reg_alpha=0.3,
         reg_lambda=2.0,
         random_state=42,
-        eval_metric='logloss'
+        eval_metric='logloss',
+        early_stopping_rounds=20
+    )
+
+    xgb2 = xgb.XGBClassifier(
+        max_depth=2,  # Reduced depth for more generalization
+        learning_rate=0.015,
+        n_estimators=350,
+        subsample=0.75,
+        colsample_bytree=0.75,
+        scale_pos_weight=1.5,
+        min_child_weight=9,
+        gamma=0.4,
+        reg_alpha=0.4,
+        reg_lambda=2.5,
+        random_state=42,
+        eval_metric='logloss',
+        early_stopping_rounds=20
     )
 
     xgb3 = xgb.XGBClassifier(
         max_depth=3,
-        learning_rate=0.03,
-        n_estimators=275,
-        subsample=0.65,
-        colsample_bytree=0.65,
+        learning_rate=0.02,
+        n_estimators=325,
+        subsample=0.7,
+        colsample_bytree=0.7,
         scale_pos_weight=2.5,
-        min_child_weight=7,
-        gamma=0.25,
-        reg_alpha=0.25,
-        reg_lambda=1.8,
+        min_child_weight=8,
+        gamma=0.35,
+        reg_alpha=0.35,
+        reg_lambda=2.2,
         random_state=42,
-        eval_metric='logloss'
+        eval_metric='logloss',
+        early_stopping_rounds=20
     )
 
     xgb1.fit(X_train_resampled, y_train_resampled,
@@ -408,11 +453,13 @@ def create_ensemble_model(X_train, X_test, y_train, y_test, preprocessor):
     importance3 = xgb3.feature_importances_
 
     combined_importance = np.maximum.reduce([importance1, importance2, importance3])
-    important_feature_indices = np.where(combined_importance > 0)[0]
+    # Set a small threshold instead of zero
+    importance_threshold = 0.0005
+    important_feature_indices = np.where(combined_importance > importance_threshold)[0]
     important_feature_names = [feature_names[i] for i in important_feature_indices]
 
     print(f"\nOriginal features in ensemble: {len(feature_names)}")
-    print(f"Removed features: {len(feature_names) - len(important_feature_indices)} (importance = 0 in all models)")
+    print(f"Removed features: {len(feature_names) - len(important_feature_indices)} (importance <= {importance_threshold} in all models)")
     print(f"Remaining features: {len(important_feature_indices)}")
 
     X_train_array = np.array(X_train_resampled)
@@ -422,24 +469,24 @@ def create_ensemble_model(X_train, X_test, y_train, y_test, preprocessor):
     X_test_filtered = X_test_array[:, important_feature_indices]
 
     xgb1_filtered = xgb.XGBClassifier(
-        max_depth=3, learning_rate=0.03, n_estimators=250,
-        subsample=0.6, colsample_bytree=0.6, scale_pos_weight=4.0,
-        min_child_weight=6, gamma=0.2, reg_alpha=0.2, reg_lambda=1.5,
-        random_state=42, eval_metric='logloss'
+        max_depth=3, learning_rate=0.02, n_estimators=300,
+        subsample=0.7, colsample_bytree=0.7, scale_pos_weight=4.0,
+        min_child_weight=7, gamma=0.3, reg_alpha=0.3, reg_lambda=2.0,
+        random_state=42, eval_metric='logloss', early_stopping_rounds=20
     )
 
     xgb2_filtered = xgb.XGBClassifier(
-        max_depth=2, learning_rate=0.02, n_estimators=300,
-        subsample=0.7, colsample_bytree=0.7, scale_pos_weight=1.5,
-        min_child_weight=8, gamma=0.3, reg_alpha=0.3, reg_lambda=2.0,
-        random_state=42, eval_metric='logloss'
+        max_depth=2, learning_rate=0.015, n_estimators=350,
+        subsample=0.75, colsample_bytree=0.75, scale_pos_weight=1.5,
+        min_child_weight=9, gamma=0.4, reg_alpha=0.4, reg_lambda=2.5,
+        random_state=42, eval_metric='logloss', early_stopping_rounds=20
     )
 
     xgb3_filtered = xgb.XGBClassifier(
-        max_depth=3, learning_rate=0.03, n_estimators=275,
-        subsample=0.65, colsample_bytree=0.65, scale_pos_weight=2.5,
-        min_child_weight=7, gamma=0.25, reg_alpha=0.25, reg_lambda=1.8,
-        random_state=42, eval_metric='logloss'
+        max_depth=3, learning_rate=0.02, n_estimators=325,
+        subsample=0.7, colsample_bytree=0.7, scale_pos_weight=2.5,
+        min_child_weight=8, gamma=0.35, reg_alpha=0.35, reg_lambda=2.2,
+        random_state=42, eval_metric='logloss', early_stopping_rounds=20
     )
 
     xgb1_filtered.fit(X_train_filtered, y_train_resampled,
@@ -485,22 +532,6 @@ def create_ensemble_model(X_train, X_test, y_train, y_test, preprocessor):
 
     print("\nClassification report for the ensemble (optimized threshold):")
     print(classification_report(y_test, y_pred_optimized))
-
-    class FilteredEnsemblePipeline:
-        def __init__(self, preprocessor, ensemble, important_indices, best_threshold):
-            self.preprocessor = preprocessor
-            self.ensemble = ensemble
-            self.important_indices = important_indices
-            self.best_threshold = best_threshold
-
-        def predict_proba(self, X):
-            X_transformed = self.preprocessor.transform(X)
-            X_filtered = X_transformed[:, self.important_indices]
-            return self.ensemble.predict_proba(X_filtered)
-
-        def predict(self, X):
-            proba = self.predict_proba(X)[:, 1]
-            return (proba >= self.best_threshold).astype(int)
 
     filtered_ensemble_pipeline = FilteredEnsemblePipeline(
         preprocessor=preprocessor,
@@ -591,12 +622,10 @@ def main():
 
     print(f"\nBest model: {best_model_name}")
 
-    save_model(best_model, f'model/best_cancellation_model_{best_model_name.lower()}.pkl')
+    print(f"\nBest model: {best_model_name}")
 
-    print("\nProcess completed successfully!")
-
-    return best_model
+    save_model(best_model, f'models/hotel_cancellation_model_{best_model_name.lower()}.pkl')
+    print("Model training and evaluation complete.")
 
 if __name__ == "__main__":
-    os.makedirs('model', exist_ok=True)
-    model = main()
+    main()
