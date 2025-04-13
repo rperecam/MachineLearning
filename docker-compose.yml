@@ -1,10 +1,9 @@
-version: '3.8'
-
 services:
-  xgboost-gpu:
+  xgboost-training:
     build:
-      context: xgboost
+      context: .
       dockerfile: xgboost/Dockerfile
+    image: xgboost-gpu
     volumes:
       - ./models:/app/models
     deploy:
@@ -12,5 +11,5 @@ services:
         reservations:
           devices:
             - driver: nvidia
-              count: 1
+              count: all
               capabilities: [gpu]

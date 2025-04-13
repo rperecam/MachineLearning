@@ -1,18 +1,20 @@
 import pandas as pd
 import numpy as np
-from sklearn.model_selection import train_test_split, GroupKFold
+from sklearn.model_selection import train_test_split, GroupKFold, RandomizedSearchCV
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
 from sklearn.compose import ColumnTransformer
 from sklearn.pipeline import Pipeline
 from sklearn.impute import SimpleImputer, KNNImputer
-from sklearn.metrics import f1_score, accuracy_score, precision_score, recall_score, roc_auc_score
+from sklearn.metrics import f1_score, accuracy_score, precision_score, recall_score, roc_auc_score, make_scorer
 import xgboost as xgb
 from imblearn.over_sampling import SMOTE
 from imblearn.under_sampling import RandomUnderSampler
-from sklearn.ensemble import VotingClassifier
 import pickle
 import warnings
 import os
+from scipy.stats import uniform, randint
+import concurrent.futures
+import multiprocessing
 
 # Ignore warnings for cleaner output
 warnings.filterwarnings('ignore')
@@ -29,23 +31,6 @@ class FilteredPipeline:
         X_transformed = self.preprocessor.transform(X)
         X_filtered = X_transformed[:, self.important_indices]
         return self.model.predict_proba(X_filtered)
-
-    def predict(self, X):
-        proba = self.predict_proba(X)[:, 1]
-        return (proba >= self.best_threshold).astype(int)
-
-# Define a custom ensemble pipeline class for filtering features
-class FilteredEnsemblePipeline:
-    def __init__(self, preprocessor, ensemble, important_indices, best_threshold):
-        self.preprocessor = preprocessor
-        self.ensemble = ensemble
-        self.important_indices = important_indices
-        self.best_threshold = best_threshold
-
-    def predict_proba(self, X):
-        X_transformed = self.preprocessor.transform(X)
-        X_filtered = X_transformed[:, self.important_indices]
-        return self.ensemble.predict_proba(X_filtered)
 
     def predict(self, X):
         proba = self.predict_proba(X)[:, 1]
@@ -196,134 +181,209 @@ def filter_zero_importance_features(model, feature_names, X_train_transformed, X
 
     return X_train_filtered, X_test_filtered, important_feature_indices
 
-# Create and evaluate the XGBoost model with GPU support
-def create_and_evaluate_model(X_train, X_test, y_train, y_test, preprocessor, hotel_ids_train=None):
+# Function to train a model with specified parameters on specific GPU
+def train_model_on_gpu(param_set, X_train, y_train, X_eval, y_eval, gpu_id):
+    # Set specific GPU device
+    param_set = param_set.copy()
+    param_set.update({
+        'tree_method': 'gpu_hist',
+        'gpu_id': gpu_id,
+        'objective': 'binary:logistic',
+        'random_state': 42
+    })
+
+    # Train model
+    model = xgb.XGBClassifier(**param_set)
+    model.fit(
+        X_train, y_train,
+        eval_set=[(X_eval, y_eval)],
+        verbose=False
+    )
+
+    # Predict and calculate F1 score
+    y_pred_proba = model.predict_proba(X_eval)[:, 1]
+    best_threshold, best_f1 = find_optimal_threshold(y_eval, y_pred_proba)
+
+    return {
+        'params': param_set,
+        'model': model,
+        'f1_score': best_f1,
+        'threshold': best_threshold
+    }
+
+# Perform custom parallel search using both CPU and GPU
+def custom_parallel_search(X_train, X_test, y_train, y_test, preprocessor, num_iterations=30):
+    print("Starting parallelized GPU/CPU search to find the best XGBoost parameters...")
+
+    # Preprocess the data
     preprocessor.fit(X_train)
     X_train_transformed = preprocessor.transform(X_train)
     X_test_transformed = preprocessor.transform(X_test)
 
-    # Balance the data - adjusted sampling strategies
+    # Balance the data
     rus = RandomUnderSampler(sampling_strategy=0.30, random_state=42)
     X_train_under, y_train_under = rus.fit_resample(X_train_transformed, y_train)
 
     smote = SMOTE(sampling_strategy=0.65, random_state=42, k_neighbors=5)
     X_train_resampled, y_train_resampled = smote.fit_resample(X_train_under, y_train_under)
 
-    # Evaluate with GroupKFold if hotel_ids are provided
-    if hotel_ids_train is not None:
-        cv = GroupKFold(n_splits=5)
-        groups = hotel_ids_train
-
-        # Parameters optimized for generalization (with GPU)
-        xgb_model = xgb.XGBClassifier(
-            objective='binary:logistic',
-            max_depth=4,
-            min_child_weight=6,
-            gamma=0.25,
-            subsample=0.6,
-            colsample_bytree=0.6,
-            reg_alpha=0.6,
-            reg_lambda=2.5,
-            scale_pos_weight=1.8,
-            learning_rate=0.01,
-            n_estimators=450,
-            random_state=42,
-            tree_method='gpu_hist',  # Enable GPU acceleration
-            gpu_id=0                 # Use first GPU
-        )
-
-        cv_scores = []
-        for train_idx, val_idx in cv.split(X_train, y_train, groups=groups):
-            X_cv_train, X_cv_val = X_train.iloc[train_idx], X_train.iloc[val_idx]
-            y_cv_train, y_cv_val = y_train.iloc[train_idx], y_train.iloc[val_idx]
-
-            X_cv_train_processed = preprocessor.transform(X_cv_train)
-            X_cv_val_processed = preprocessor.transform(X_cv_val)
-
-            rus_cv = RandomUnderSampler(sampling_strategy=0.30, random_state=42)
-            X_cv_under, y_cv_under = rus_cv.fit_resample(X_cv_train_processed, y_cv_train)
-
-            smote_cv = SMOTE(sampling_strategy=0.65, random_state=42, k_neighbors=5)
-            X_cv_balanced, y_cv_balanced = smote_cv.fit_resample(X_cv_under, y_cv_under)
-
-            xgb_model.fit(
-                X_cv_balanced, y_cv_balanced,
-                eval_set=[(X_cv_val_processed, y_cv_val)],
-                verbose=False
-            )
-
-            y_cv_proba = xgb_model.predict_proba(X_cv_val_processed)[:, 1]
-            threshold, _ = find_optimal_threshold(y_cv_val, y_cv_proba)
-            y_cv_pred = (y_cv_proba >= threshold).astype(int)
-
-            cv_f1 = f1_score(y_cv_val, y_cv_pred)
-            cv_scores.append(cv_f1)
-
-    # Train the initial model for feature importance (with GPU)
-    model = xgb.XGBClassifier(
+    # Train initial model for feature importance
+    init_model = xgb.XGBClassifier(
         objective='binary:logistic',
-        max_depth=4,
-        min_child_weight=6,
-        gamma=0.25,
-        subsample=0.6,
-        colsample_bytree=0.6,
-        reg_alpha=0.6,
-        reg_lambda=2.5,
-        scale_pos_weight=1.8,
-        learning_rate=0.01,
-        n_estimators=450,
-        random_state=42,
         tree_method='gpu_hist',  # Enable GPU acceleration
-        gpu_id=0                 # Use first GPU
+        gpu_id=0,                # Use first GPU
+        random_state=42
     )
 
-    model.fit(
-        X_train_resampled,
-        y_train_resampled,
-        eval_set=[(X_test_transformed, y_test)],
-        verbose=False,
-    )
+    init_model.fit(X_train_resampled, y_train_resampled)
 
+    # Filter features based on importance
     feature_names = preprocessor.get_feature_names_out() if hasattr(preprocessor, 'get_feature_names_out') else [f'feature_{i}' for i in range(X_train_transformed.shape[1])]
-
-    # Filter zero-importance features from both train_transformed and test_transformed
-    X_train_transformed_filtered, X_test_filtered, important_indices = filter_zero_importance_features(
-        model, feature_names, X_train_transformed, X_test_transformed
+    X_train_filtered, X_test_filtered, important_indices = filter_zero_importance_features(
+        init_model, feature_names, X_train_resampled, X_test_transformed
     )
 
-    # Apply the same filter to the resampled data
-    X_train_resampled_array = np.array(X_train_resampled)
-    X_train_resampled_filtered = X_train_resampled_array[:, important_indices]
+    # Define parameters focused on combating overfitting
+    param_dist = {
+        'max_depth': randint(2, 6),  # Lower depths to prevent overfitting
+        'min_child_weight': randint(3, 10),  # Higher values prevent overfitting
+        'gamma': uniform(0.1, 0.9),  # Higher values make algorithm more conservative
+        'subsample': uniform(0.5, 0.4),  # Subsample ratio of training data
+        'colsample_bytree': uniform(0.5, 0.4),  # Subsample ratio of columns
+        'reg_alpha': uniform(0.3, 1.7),  # L1 regularization
+        'reg_lambda': uniform(1.0, 4.0),  # L2 regularization
+        'learning_rate': uniform(0.005, 0.095),  # Lower learning rates
+        'n_estimators': randint(300, 700),  # Number of boosting rounds
+        'scale_pos_weight': uniform(1.0, 3.0)  # Balance positive and negative weights
+    }
 
-    # Create a model specifically for filtered features (with GPU)
-    filtered_model = xgb.XGBClassifier(
-        objective='binary:logistic',
-        max_depth=4,
-        min_child_weight=6,
-        gamma=0.25,
-        subsample=0.6,
-        colsample_bytree=0.6,
-        reg_alpha=0.6,
-        reg_lambda=2.5,
-        scale_pos_weight=1.8,
-        learning_rate=0.01,
-        n_estimators=450,
-        random_state=42,
-        tree_method='gpu_hist',  # Enable GPU acceleration
-        gpu_id=0                 # Use first GPU
-    )
+    # Generate random parameter sets
+    param_sets = []
+    for _ in range(num_iterations):
+        params = {
+            'max_depth': int(randint.rvs(2, 6)),
+            'min_child_weight': int(randint.rvs(3, 10)),
+            'gamma': float(uniform.rvs(0.1, 0.9)),
+            'subsample': float(uniform.rvs(0.5, 0.4)),
+            'colsample_bytree': float(uniform.rvs(0.5, 0.4)),
+            'reg_alpha': float(uniform.rvs(0.3, 1.7)),
+            'reg_lambda': float(uniform.rvs(1.0, 4.0)),
+            'learning_rate': float(uniform.rvs(0.005, 0.095)),
+            'n_estimators': int(randint.rvs(300, 700)),
+            'scale_pos_weight': float(uniform.rvs(1.0, 3.0))
+        }
+        param_sets.append(params)
 
-    filtered_model.fit(
-        X_train_resampled_filtered,
+    # Check available GPUs and CPU cores
+    try:
+        num_gpus = len(os.popen('nvidia-smi -L').read().strip().split('\n'))
+    except:
+        num_gpus = 1  # Default to 1 if cannot detect
+
+    num_cpu_cores = multiprocessing.cpu_count()
+    print(f"Detected {num_gpus} GPUs and {num_cpu_cores} CPU cores")
+
+    # Distribute workload between GPU and CPU
+    gpu_tasks = []
+    cpu_tasks = []
+
+    # Assign more tasks to GPUs but ensure CPU is also utilized
+    gpu_task_ratio = 0.7  # 70% tasks on GPU, 30% on CPU
+    gpu_tasks_count = int(len(param_sets) * gpu_task_ratio)
+
+    for i, params in enumerate(param_sets):
+        if i < gpu_tasks_count:
+            # Distribute across available GPUs
+            gpu_id = i % num_gpus
+            gpu_tasks.append((params, X_train_filtered, y_train_resampled, X_test_filtered, y_test, gpu_id))
+        else:
+            # CPU tasks
+            cpu_tasks.append((params, X_train_filtered, y_train_resampled, X_test_filtered, y_test))
+
+    results = []
+
+    # Process GPU tasks
+    print(f"Processing {len(gpu_tasks)} tasks on GPU(s)...")
+    with concurrent.futures.ThreadPoolExecutor(max_workers=num_gpus) as executor:
+        future_to_task = {
+            executor.submit(train_model_on_gpu, *task): task for task in gpu_tasks
+        }
+        for future in concurrent.futures.as_completed(future_to_task):
+            try:
+                result = future.result()
+                results.append(result)
+                print(f"GPU task completed with F1: {result['f1_score']:.4f}")
+            except Exception as e:
+                print(f"GPU task failed: {e}")
+
+    # Process CPU tasks with CPU-optimized XGBoost
+    print(f"Processing {len(cpu_tasks)} tasks on CPU cores...")
+
+    def train_model_on_cpu(param_set, X_train, y_train, X_eval, y_eval):
+        param_set = param_set.copy()
+        param_set.update({
+            'tree_method': 'hist',  # Use histogram method for CPU
+            'objective': 'binary:logistic',
+            'random_state': 42,
+            'n_jobs': max(1, num_cpu_cores // 4)  # Use multiple cores but don't saturate CPU
+        })
+
+        model = xgb.XGBClassifier(**param_set)
+        model.fit(X_train, y_train, eval_set=[(X_eval, y_eval)], verbose=False)
+
+        y_pred_proba = model.predict_proba(X_eval)[:, 1]
+        best_threshold, best_f1 = find_optimal_threshold(y_eval, y_pred_proba)
+
+        return {
+            'params': param_set,
+            'model': model,
+            'f1_score': best_f1,
+            'threshold': best_threshold
+        }
+
+    with concurrent.futures.ProcessPoolExecutor(max_workers=max(1, num_cpu_cores // 4)) as executor:
+        future_to_task = {
+            executor.submit(train_model_on_cpu, *task[:-1]): task for task in cpu_tasks
+        }
+        for future in concurrent.futures.as_completed(future_to_task):
+            try:
+                result = future.result()
+                results.append(result)
+                print(f"CPU task completed with F1: {result['f1_score']:.4f}")
+            except Exception as e:
+                print(f"CPU task failed: {e}")
+
+    # Find best result
+    best_result = max(results, key=lambda x: x['f1_score'])
+
+    print("Best Parameters Found: ", best_result['params'])
+    print(f"Best F1 Score: {best_result['f1_score']:.4f}")
+
+    # Create the final best model with the found parameters
+    final_params = best_result['params'].copy()
+
+    # Create model with best parameters but ensure it uses GPU for final training
+    if 'tree_method' in final_params:
+        final_params['tree_method'] = 'gpu_hist'
+    if 'gpu_id' not in final_params:
+        final_params['gpu_id'] = 0
+
+    best_model = xgb.XGBClassifier(**final_params)
+
+    # Train final model
+    best_model.fit(
+        X_train_filtered,
         y_train_resampled,
         eval_set=[(X_test_filtered, y_test)],
-        verbose=False,
+        verbose=False
     )
 
-    y_pred_proba = filtered_model.predict_proba(X_test_filtered)[:, 1]
+    # Evaluate final model
+    y_pred_proba = best_model.predict_proba(X_test_filtered)[:, 1]
     best_threshold, best_f1 = find_optimal_threshold(y_test, y_pred_proba)
     y_pred_optimized = (y_pred_proba >= best_threshold).astype(int)
 
+    # Calculate metrics
     metrics = {
         'Accuracy': accuracy_score(y_test, y_pred_optimized),
         'F1 Score': f1_score(y_test, y_pred_optimized),
@@ -333,165 +393,15 @@ def create_and_evaluate_model(X_train, X_test, y_train, y_test, preprocessor, ho
         'Best Threshold': best_threshold
     }
 
+    # Create filtered pipeline with the best model
     filtered_pipeline = FilteredPipeline(
         preprocessor=preprocessor,
-        model=filtered_model,
+        model=best_model,
         important_indices=important_indices,
         best_threshold=best_threshold
     )
 
-    return filtered_pipeline, metrics
-
-# Create an ensemble model for robustness with GPU support
-def create_ensemble_model(X_train, X_test, y_train, y_test, preprocessor):
-    preprocessor.fit(X_train)
-    X_train_transformed = preprocessor.transform(X_train)
-    X_test_transformed = preprocessor.transform(X_test)
-
-    # Balance the data - slightly adjusted for better generalization
-    rus = RandomUnderSampler(sampling_strategy=0.30, random_state=42)
-    X_train_under, y_train_under = rus.fit_resample(X_train_transformed, y_train)
-
-    smote = SMOTE(sampling_strategy=0.65, random_state=42, k_neighbors=5)
-    X_train_resampled, y_train_resampled = smote.fit_resample(X_train_under, y_train_under)
-
-    # More diverse models for better generalization (with GPU)
-    xgb1 = xgb.XGBClassifier(
-        max_depth=5,
-        learning_rate=0.01,
-        n_estimators=400,
-        subsample=0.55,
-        colsample_bytree=0.55,
-        scale_pos_weight=2.5,
-        min_child_weight=5,
-        gamma=0.2,
-        reg_alpha=0.7,
-        reg_lambda=1.5,
-        random_state=42,
-        tree_method='gpu_hist',  # Enable GPU acceleration
-        gpu_id=0                 # Use first GPU
-    )
-
-    xgb2 = xgb.XGBClassifier(
-        max_depth=3,
-        learning_rate=0.008,
-        n_estimators=600,
-        subsample=0.8,
-        colsample_bytree=0.8,
-        scale_pos_weight=1.2,
-        min_child_weight=9,
-        gamma=0.5,
-        reg_alpha=0.8,
-        reg_lambda=3.0,
-        random_state=42,
-        tree_method='gpu_hist',  # Enable GPU acceleration
-        gpu_id=0                 # Use first GPU
-    )
-
-    xgb3 = xgb.XGBClassifier(
-        max_depth=4,
-        learning_rate=0.01,
-        n_estimators=500,
-        subsample=0.65,
-        colsample_bytree=0.65,
-        scale_pos_weight=1.8,
-        min_child_weight=6,
-        gamma=0.35,
-        reg_alpha=0.6,
-        reg_lambda=2.2,
-        random_state=42,
-        tree_method='gpu_hist',  # Enable GPU acceleration
-        gpu_id=0                 # Use first GPU
-    )
-
-    xgb1.fit(X_train_resampled, y_train_resampled, verbose=False)
-    xgb2.fit(X_train_resampled, y_train_resampled, verbose=False)
-    xgb3.fit(X_train_resampled, y_train_resampled, verbose=False)
-
-    feature_names = preprocessor.get_feature_names_out() if hasattr(preprocessor, 'get_feature_names_out') else [f'feature_{i}' for i in range(X_train_transformed.shape[1])]
-
-    importance1 = xgb1.feature_importances_
-    importance2 = xgb2.feature_importances_
-    importance3 = xgb3.feature_importances_
-
-    # Weighting that slightly favors the balanced model
-    combined_importance = (0.3 * importance1 + 0.3 * importance2 + 0.4 * importance3)
-
-    # Using percentile for importance threshold
-    importance_threshold = np.percentile(combined_importance, 15)
-    important_feature_indices = np.where(combined_importance > importance_threshold)[0]
-
-    # Guarantee a minimum number of features
-    min_features = max(10, int(X_train_transformed.shape[1] * 0.5))
-    if len(important_feature_indices) < min_features:
-        important_feature_indices = np.argsort(combined_importance)[-min_features:]
-
-    X_train_array = np.array(X_train_resampled)
-    X_test_array = np.array(X_test_transformed)
-
-    X_train_filtered = X_train_array[:, important_feature_indices]
-    X_test_filtered = X_test_array[:, important_feature_indices]
-
-    # Retrain models with filtered features (with GPU)
-    xgb1_filtered = xgb.XGBClassifier(
-        max_depth=5, learning_rate=0.01, n_estimators=400,
-        subsample=0.55, colsample_bytree=0.55, scale_pos_weight=2.5,
-        min_child_weight=5, gamma=0.2, reg_alpha=0.7, reg_lambda=1.5,
-        random_state=42, tree_method='gpu_hist', gpu_id=0
-    )
-
-    xgb2_filtered = xgb.XGBClassifier(
-        max_depth=3, learning_rate=0.008, n_estimators=600,
-        subsample=0.8, colsample_bytree=0.8, scale_pos_weight=1.2,
-        min_child_weight=9, gamma=0.5, reg_alpha=0.8, reg_lambda=3.0,
-        random_state=42, tree_method='gpu_hist', gpu_id=0
-    )
-
-    xgb3_filtered = xgb.XGBClassifier(
-        max_depth=4, learning_rate=0.01, n_estimators=500,
-        subsample=0.65, colsample_bytree=0.65, scale_pos_weight=1.8,
-        min_child_weight=6, gamma=0.35, reg_alpha=0.6, reg_lambda=2.2,
-        random_state=42, tree_method='gpu_hist', gpu_id=0
-    )
-
-    xgb1_filtered.fit(X_train_filtered, y_train_resampled, verbose=False)
-    xgb2_filtered.fit(X_train_filtered, y_train_resampled, verbose=False)
-    xgb3_filtered.fit(X_train_filtered, y_train_resampled, verbose=False)
-
-    # Adjusted weights to favor the balanced model
-    ensemble_filtered = VotingClassifier(
-        estimators=[
-            ('xgb_recall', xgb1_filtered),
-            ('xgb_precision', xgb2_filtered),
-            ('xgb_balanced', xgb3_filtered)
-        ],
-        voting='soft',
-        weights=[1.0, 1.0, 1.5]  # Greater weight to the balanced model
-    )
-
-    ensemble_filtered.fit(X_train_filtered, y_train_resampled)
-
-    y_pred_proba = ensemble_filtered.predict_proba(X_test_filtered)[:, 1]
-    best_threshold, best_f1 = find_optimal_threshold(y_test, y_pred_proba)
-    y_pred_optimized = (y_pred_proba >= best_threshold).astype(int)
-
-    metrics = {
-        'Accuracy': accuracy_score(y_test, y_pred_optimized),
-        'F1 Score': f1_score(y_test, y_pred_optimized),
-        'Precision': precision_score(y_test, y_pred_optimized),
-        'Recall': recall_score(y_test, y_pred_optimized),
-        'ROC AUC': roc_auc_score(y_test, y_pred_proba),
-        'Best Threshold': best_threshold
-    }
-
-    filtered_ensemble_pipeline = FilteredEnsemblePipeline(
-        preprocessor=preprocessor,
-        ensemble=ensemble_filtered,
-        important_indices=important_feature_indices,
-        best_threshold=best_threshold
-    )
-
-    return filtered_ensemble_pipeline, metrics
+    return filtered_pipeline, metrics, final_params
 
 # Save the trained model to a file
 def save_model(model, filename):
@@ -538,30 +448,20 @@ def main():
 
     print(f"X_train: {X_train.shape}, X_test: {X_test.shape}")
 
-    print("Creating and evaluating XGBoost model with GPU acceleration...")
-    xgb_pipeline, xgb_metrics = create_and_evaluate_model(
-        X_train, X_test, y_train, y_test, preprocessor, hotel_ids_train
+    print("Finding best XGBoost model with hybrid GPU-CPU optimization...")
+    best_model, best_metrics, best_params = custom_parallel_search(
+        X_train, X_test, y_train, y_test, preprocessor, num_iterations=40
     )
 
-    print("Creating and evaluating ensemble model with GPU acceleration...")
-    ensemble_pipeline, ensemble_metrics = create_ensemble_model(
-        X_train, X_test, y_train, y_test, preprocessor
-    )
+    print("Model metrics:")
+    for metric, value in best_metrics.items():
+        print(f"{metric}: {value}")
 
-    print("Model comparison:")
-    models_comparison = pd.DataFrame({
-        'XGBoost': list(xgb_metrics.values()),
-        'Ensemble': list(ensemble_metrics.values())
-    }, index=list(xgb_metrics.keys()))
+    print("\nBest parameters:")
+    for param, value in best_params.items():
+        print(f"{param}: {value}")
 
-    print(models_comparison)
-
-    best_model = xgb_pipeline if xgb_metrics['F1 Score'] > ensemble_metrics['F1 Score'] else ensemble_pipeline
-    best_model_name = "XGBoost" if xgb_metrics['F1 Score'] > ensemble_metrics['F1 Score'] else "Ensemble"
-
-    print(f"Best model: {best_model_name}")
-
-    models_path = '/app/models/model_{}.pkl'.format(best_model_name.lower())
+    models_path = '/app/models/xgboost_hybrid_optimized_best.pkl'
     save_model(best_model, models_path)
     print("Model training and evaluation complete.")
 
