@@ -1,11 +1,11 @@
 import pandas as pd
 import numpy as np
-from sklearn.model_selection import train_test_split, GroupKFold, RandomizedSearchCV
+from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
 from sklearn.compose import ColumnTransformer
 from sklearn.pipeline import Pipeline
 from sklearn.impute import SimpleImputer, KNNImputer
-from sklearn.metrics import f1_score, accuracy_score, precision_score, recall_score, roc_auc_score, make_scorer
+from sklearn.metrics import f1_score, accuracy_score, precision_score, recall_score, roc_auc_score
 import xgboost as xgb
 from imblearn.over_sampling import SMOTE
 from imblearn.under_sampling import RandomUnderSampler
@@ -16,11 +16,12 @@ from scipy.stats import uniform, randint
 import concurrent.futures
 import multiprocessing
 import time
+import cupy as cp
 
 # Ignorar advertencias para una salida más limpia
 warnings.filterwarnings('ignore')
 
-# Definir una clase de pipeline personalizada para filtrar características
+# Definir clase de pipeline personalizada para filtrar características
 class FilteredPipeline:
     def __init__(self, preprocessor, model, important_indices, best_threshold):
         self.preprocessor = preprocessor
@@ -39,19 +40,18 @@ class FilteredPipeline:
 
 # Cargar datos de hoteles y reservas
 def load_data():
-    # Usar rutas relativas al directorio raíz del proyecto
     hotels = pd.read_csv('/app/data/hotels.csv')
     bookings = pd.read_csv('/app/data/bookings_train.csv')
     return hotels, bookings
 
-# Combinar datos de hoteles y reservas
+# Fusionar datos de hoteles y reservas
 def merge_data(hotels, bookings):
     merged = pd.merge(bookings, hotels, on='hotel_id', how='left')
     filtered = merged[~merged['reservation_status'].isin(['Booked', np.nan])].copy()
     hotel_ids = filtered['hotel_id'].copy()
     return filtered, hotel_ids
 
-# Preprocesar datos para la predicción de cancelaciones
+# Preprocesar datos para predecir cancelaciones
 def preprocess_data(data):
     data = data.copy()
 
@@ -61,7 +61,7 @@ def preprocess_data(data):
         if col in data.columns:
             data[col] = pd.to_datetime(data[col])
 
-    # Definir el objetivo: Cancelaciones con al menos 30 días de antelación
+    # Definir objetivo: Cancelaciones con al menos 30 días de anticipación
     data['days_before_arrival'] = (data['arrival_date'] - data['reservation_status_date']).dt.days
     data['target'] = ((data['reservation_status'] == 'Canceled') & (data['days_before_arrival'] >= 30)).astype(int)
 
@@ -70,8 +70,6 @@ def preprocess_data(data):
     data['lead_time_category'] = pd.cut(data['lead_time'], bins=[-1, 7, 30, 90, 180, float('inf')], labels=['last_minute', 'short', 'medium', 'long', 'very_long'])
     data['is_high_season'] = data['arrival_date'].dt.month.isin([6, 7, 8, 12]).astype(int)
     data['is_weekend_arrival'] = data['arrival_date'].dt.dayofweek.isin([4, 5]).astype(int)
-
-    # Añadir más características para la estacionalidad
     data['arrival_month'] = data['arrival_date'].dt.month
     data['arrival_dayofweek'] = data['arrival_date'].dt.dayofweek
     data['booking_month'] = data['booking_date'].dt.month
@@ -81,7 +79,7 @@ def preprocess_data(data):
     data['price_per_person'] = data['rate'] / np.maximum(data['total_guests'], 1)
     data['total_cost'] = data['rate']
 
-    # Extraer características de duración de la estancia
+    # Extraer características de duración de estancia
     data['stay_duration_category'] = pd.cut(data['stay_nights'], bins=[-1, 1, 3, 7, 14, float('inf')], labels=['1_night', '2-3_nights', '4-7_nights', '8-14_nights', '15+_nights'])
 
     # Extraer características de solicitudes especiales
@@ -97,14 +95,14 @@ def preprocess_data(data):
     data['price_length_interaction'] = data['price_per_night'] * data['stay_nights']
     data['lead_price_interaction'] = data['lead_time'] * data['price_per_night']
 
-    # Nueva característica: Desviación del precio promedio por hotel
+    # Nueva característica: Desviación de precio del promedio del hotel
     hotel_avg_price = data.groupby('hotel_id')['price_per_night'].transform('mean')
     data['price_deviation'] = (data['price_per_night'] - hotel_avg_price) / hotel_avg_price
 
     # Extraer características de transporte
     data['requested_parking'] = (data['required_car_parking_spaces'] > 0).astype(int)
 
-    # Eliminar columnas que puedan causar fugas de datos
+    # Eliminar columnas que pueden causar filtración de datos
     columns_to_drop = ['reservation_status', 'reservation_status_date', 'booking_date', 'arrival_date', 'days_before_arrival']
     data.drop(columns=columns_to_drop, inplace=True)
 
@@ -148,7 +146,7 @@ def prepare_features(data):
 
     return X, y, preprocessor
 
-# Encontrar el umbral óptimo para el F1 score
+# Encontrar umbral óptimo para la puntuación F1
 def find_optimal_threshold(y_true, y_pred_proba):
     thresholds = np.linspace(0.1, 0.9, 200)
     best_threshold, best_f1 = 0.5, 0
@@ -161,7 +159,7 @@ def find_optimal_threshold(y_true, y_pred_proba):
 
     return best_threshold, best_f1
 
-# Filtrar características de importancia cero con un umbral adaptativo
+# Filtrar características de importancia cero con umbral adaptativo
 def filter_zero_importance_features(model, feature_names, X_train_transformed, X_test_transformed):
     importance_scores = model.feature_importances_
 
@@ -169,7 +167,7 @@ def filter_zero_importance_features(model, feature_names, X_train_transformed, X
     importance_threshold = np.percentile(importance_scores, 15)  # Mantener el top 85%
     important_feature_indices = np.where(importance_scores > importance_threshold)[0]
 
-    # Asegurarse de mantener al menos un número mínimo de características
+    # Asegurar mantener al menos un número mínimo de características
     min_features = max(10, int(X_train_transformed.shape[1] * 0.5))
     if len(important_feature_indices) < min_features:
         important_feature_indices = np.argsort(importance_scores)[-min_features:]
@@ -182,33 +180,58 @@ def filter_zero_importance_features(model, feature_names, X_train_transformed, X
 
     return X_train_filtered, X_test_filtered, important_feature_indices
 
-# Función para entrenar un modelo con parámetros específicos en una GPU específica
+# Inicializar GPU para XGBoost
+def initialize_gpu_for_xgboost():
+    # Verificar si hay GPU disponible
+    try:
+        gpu_info = os.popen('nvidia-smi').read()
+        print("GPU detectada correctamente:")
+        print(gpu_info.split('\n')[0])
+        print(gpu_info.split('\n')[1])
+        return True
+    except Exception as e:
+        print(f"Error al inicializar GPU: {e}")
+        return False
+
+# Entrenar modelo en GPU con parámetros corregidos
 def train_model_on_gpu(param_set, X_train, y_train, X_eval, y_eval, gpu_id):
-    # Establecer dispositivo GPU específico
     param_set = param_set.copy()
 
     # Eliminar gpu_id si existe en param_set
     if 'gpu_id' in param_set:
         del param_set['gpu_id']
 
-    # Usar sintaxis actualizada de XGBoost GPU (usar device='cuda' en lugar de tree_method='gpu_hist')
+    # Configurar XGBoost para GPU
     param_set.update({
         'tree_method': 'hist',
-        'device': f'cuda:{gpu_id}',  # Usar formato correcto para device
+        'device': 'cuda',
         'objective': 'binary:logistic',
         'random_state': 42
     })
 
-    # Entrenar modelo
-    model = xgb.XGBClassifier(**param_set)
-    model.fit(
-        X_train, y_train,
-        eval_set=[(X_eval, y_eval)],
-        verbose=False
+    # Crear objetos DMatrix para entrenamiento más rápido
+    dtrain = xgb.DMatrix(X_train, y_train)
+    deval = xgb.DMatrix(X_eval, y_eval)
+
+    # Entrenar modelo usando API nativa que es más eficiente en GPU
+    watchlist = [(dtrain, 'train'), (deval, 'eval')]
+    num_rounds = param_set.pop('n_estimators', 1000)
+
+    # Entrenar el modelo
+    bst = xgb.train(
+        param_set,
+        dtrain,
+        num_rounds,
+        evals=watchlist,
+        verbose_eval=False
     )
 
-    # Predecir y calcular F1 score
-    y_pred_proba = model.predict_proba(X_eval)[:, 1]
+    # Crear un wrapper XGBClassifier para consistencia con el resto del código
+    model = xgb.XGBClassifier()
+    model._Booster = bst
+
+    # Predecir y calcular puntuación F1
+    y_pred_proba = bst.predict(deval)
     best_threshold, best_f1 = find_optimal_threshold(y_eval, y_pred_proba)
 
     return {
@@ -218,21 +241,40 @@ def train_model_on_gpu(param_set, X_train, y_train, X_eval, y_eval, gpu_id):
         'threshold': best_threshold
     }
 
-# Entrenar modelo en CPU - definido a nivel de módulo para hacerlo serializable para ProcessPoolExecutor
+# Entrenar modelo en CPU
 def train_model_on_cpu(param_set, X_train, y_train, X_eval, y_eval):
     param_set = param_set.copy()
     param_set.update({
         'tree_method': 'hist',
-        'device': 'cpu',
+        'device': 'cpu',  # Establecer dispositivo explícitamente a CPU
         'objective': 'binary:logistic',
         'random_state': 42,
-        'n_jobs': -1     # Usar múltiples núcleos pero no saturar la CPU
+        'n_jobs': -1  # Usar todos los núcleos de CPU disponibles
     })
 
-    model = xgb.XGBClassifier(**param_set)
-    model.fit(X_train, y_train, eval_set=[(X_eval, y_eval)], verbose=False)
+    # Crear objetos DMatrix para entrenamiento más rápido
+    dtrain = xgb.DMatrix(X_train, y_train)
+    deval = xgb.DMatrix(X_eval, y_eval)
 
-    y_pred_proba = model.predict_proba(X_eval)[:, 1]
+    # Entrenar modelo usando API nativa
+    watchlist = [(dtrain, 'train'), (deval, 'eval')]
+    num_rounds = param_set.pop('n_estimators', 1000)
+
+    # Entrenar el modelo
+    bst = xgb.train(
+        param_set,
+        dtrain,
+        num_rounds,
+        evals=watchlist,
+        verbose_eval=False
+    )
+
+    # Crear un wrapper XGBClassifier para consistencia
+    model = xgb.XGBClassifier()
+    model._Booster = bst
+
+    # Predecir y calcular puntuación F1
+    y_pred_proba = bst.predict(deval)
     best_threshold, best_f1 = find_optimal_threshold(y_eval, y_pred_proba)
 
     return {
@@ -242,42 +284,59 @@ def train_model_on_cpu(param_set, X_train, y_train, X_eval, y_eval):
         'threshold': best_threshold
     }
 
-# Realizar búsqueda paralela personalizada usando tanto CPU como GPU
+# Búsqueda paralela personalizada usando GPU principalmente
 def custom_parallel_search(X_train, X_test, y_train, y_test, preprocessor, num_iterations=60):
-    print("Iniciando búsqueda paralelizada de GPU/CPU para encontrar los mejores parámetros de XGBoost...")
+    print("Iniciando búsqueda paralela de GPU/CPU para los mejores parámetros XGBoost...")
     start_time = time.time()
 
-    # Preprocesar los datos
+    # Comprobar disponibilidad de GPU
+    has_gpu = initialize_gpu_for_xgboost()
+    if not has_gpu:
+        print("ADVERTENCIA: GPU no detectada o mal configurada. Usando solo CPU.")
+
+    # Preprocesar datos (usando CPU)
+    print("Preprocesando datos (utilizando CPU)...")
     preprocessor.fit(X_train)
     X_train_transformed = preprocessor.transform(X_train)
     X_test_transformed = preprocessor.transform(X_test)
 
-    # Equilibrar los datos
+    # Balancear datos (usando CPU)
+    print("Balanceando dataset (utilizando CPU)...")
     rus = RandomUnderSampler(sampling_strategy=0.30, random_state=42)
     X_train_under, y_train_under = rus.fit_resample(X_train_transformed, y_train)
 
     smote = SMOTE(sampling_strategy=0.65, random_state=42, k_neighbors=5)
     X_train_resampled, y_train_resampled = smote.fit_resample(X_train_under, y_train_under)
 
-    # Entrenar modelo inicial para importancia de características
-    init_model = xgb.XGBClassifier(
-        objective='binary:logistic',
-        tree_method='hist',
-        device='cuda:0',  # Especificar correctamente el dispositivo
-        random_state=42
-    )
+    # Entrenar modelo inicial para importancia de características (usando CPU)
+    print("Entrenando modelo inicial para selección de características (utilizando CPU)...")
+    init_params = {
+        'objective': 'binary:logistic',
+        'tree_method': 'hist',
+        'device': 'cpu',
+        'random_state': 42,
+        'n_jobs': -1
+    }
 
-    init_model.fit(X_train_resampled, y_train_resampled)
+    # Usar DMatrix para mejor rendimiento
+    dtrain = xgb.DMatrix(X_train_resampled, y_train_resampled)
+    init_bst = xgb.train(init_params, dtrain, num_boost_round=100)
 
-    # Filtrar características basadas en importancia
+    # Convertir a XGBClassifier para compatibilidad
+    init_model = xgb.XGBClassifier()
+    init_model._Booster = init_bst
+
+    # Filtrar características basadas en importancia (usando CPU)
+    print("Filtrando características basadas en importancia (utilizando CPU)...")
     feature_names = preprocessor.get_feature_names_out() if hasattr(preprocessor, 'get_feature_names_out') else [f'feature_{i}' for i in range(X_train_transformed.shape[1])]
     X_train_filtered, X_test_filtered, important_indices = filter_zero_importance_features(
         init_model, feature_names, X_train_resampled, X_test_transformed
     )
 
-    # Definir rangos de búsqueda más específicos basados en los mejores parámetros encontrados
-    # Los mejores parámetros encontrados fueron:
-    best_found = {
+    print(f"Seleccionadas {len(important_indices)} características importantes de {X_train_transformed.shape[1]}")
+
+    # Valores óptimos encontrados previamente como referencia
+    best_ref = {
         'max_depth': 7,
         'min_child_weight': 1,
         'gamma': 0.485,
@@ -290,136 +349,160 @@ def custom_parallel_search(X_train, X_test, y_train, y_test, preprocessor, num_i
         'scale_pos_weight': 4.596
     }
 
-    # Definir parámetros de búsqueda más específicos alrededor de los mejores valores encontrados
+    # Definir rangos de búsqueda amplios alrededor de los valores óptimos
     param_dist = {
-        'max_depth': randint(5, 9),  # Centrado alrededor de 7
-        'min_child_weight': randint(1, 3),  # Centrado alrededor de 1
-        'gamma': uniform(0.35, 0.3),  # Rango 0.35-0.65, centrado alrededor de 0.485
-        'subsample': uniform(0.85, 0.1),  # Rango 0.85-0.95, centrado alrededor de 0.909
-        'colsample_bytree': uniform(0.45, 0.12),  # Rango 0.45-0.57, centrado alrededor de 0.508
-        'reg_alpha': uniform(0.4, 0.35),  # Rango 0.4-0.75, centrado alrededor de 0.566
-        'reg_lambda': uniform(3.4, 1.0),  # Rango 3.4-4.4, centrado alrededor de 3.866
-        'learning_rate': uniform(0.1, 0.05),  # Rango 0.1-0.15, centrado alrededor de 0.125
-        'n_estimators': randint(700, 940),  # Rango 700-940, centrado alrededor de 818
-        'scale_pos_weight': uniform(4.0, 1.2)  # Rango 4.0-5.2, centrado alrededor de 4.596
+        'max_depth': (best_ref['max_depth'] - 3, best_ref['max_depth'] + 3),  # rango 4-10
+        'min_child_weight': (best_ref['min_child_weight'] - 1, best_ref['min_child_weight'] + 3),  # rango 0-4
+        'gamma': (best_ref['gamma'] - 0.3, best_ref['gamma'] + 0.3),  # rango 0.185-0.785
+        'subsample': (best_ref['subsample'] - 0.2, best_ref['subsample'] + 0.09),  # rango 0.709-0.999
+        'colsample_bytree': (best_ref['colsample_bytree'] - 0.2, best_ref['colsample_bytree'] + 0.2),  # rango 0.308-0.708
+        'reg_alpha': (best_ref['reg_alpha'] - 0.4, best_ref['reg_alpha'] + 0.4),  # rango 0.166-0.966
+        'reg_lambda': (best_ref['reg_lambda'] - 2, best_ref['reg_lambda'] + 2),  # rango 1.866-5.866
+        'learning_rate': (best_ref['learning_rate'] - 0.075, best_ref['learning_rate'] + 0.075),  # rango 0.05-0.2
+        'n_estimators': (best_ref['n_estimators'] - 300, best_ref['n_estimators'] + 300),  # rango 518-1118
+        'scale_pos_weight': (best_ref['scale_pos_weight'] - 2, best_ref['scale_pos_weight'] + 2)  # rango 2.596-6.596
     }
 
-    # Generar conjuntos de parámetros aleatorios
+    # Generar conjuntos de parámetros aleatorios dentro de los rangos definidos
     param_sets = []
     for _ in range(num_iterations):
         params = {
-            'max_depth': int(randint.rvs(5, 9)),
-            'min_child_weight': int(randint.rvs(1, 3)),
-            'gamma': float(uniform.rvs(0.35, 0.3)),
-            'subsample': float(uniform.rvs(0.85, 0.1)),
-            'colsample_bytree': float(uniform.rvs(0.45, 0.12)),
-            'reg_alpha': float(uniform.rvs(0.4, 0.35)),
-            'reg_lambda': float(uniform.rvs(3.4, 1.0)),
-            'learning_rate': float(uniform.rvs(0.1, 0.05)),
-            'n_estimators': int(randint.rvs(700, 940)),
-            'scale_pos_weight': float(uniform.rvs(4.0, 1.2))
+            'max_depth': int(np.random.randint(param_dist['max_depth'][0], param_dist['max_depth'][1] + 1)),
+            'min_child_weight': int(np.random.randint(param_dist['min_child_weight'][0], param_dist['min_child_weight'][1] + 1)),
+            'gamma': float(np.random.uniform(param_dist['gamma'][0], param_dist['gamma'][1])),
+            'subsample': float(np.random.uniform(param_dist['subsample'][0], min(param_dist['subsample'][1], 1.0))),  # No mayor que 1
+            'colsample_bytree': float(np.random.uniform(param_dist['colsample_bytree'][0], min(param_dist['colsample_bytree'][1], 1.0))),  # No mayor que 1
+            'reg_alpha': float(np.random.uniform(max(0, param_dist['reg_alpha'][0]), param_dist['reg_alpha'][1])),  # No menor que 0
+            'reg_lambda': float(np.random.uniform(max(0, param_dist['reg_lambda'][0]), param_dist['reg_lambda'][1])),  # No menor que 0
+            'learning_rate': float(np.random.uniform(max(0.01, param_dist['learning_rate'][0]), param_dist['learning_rate'][1])),  # No menor que 0.01
+            'n_estimators': int(np.random.randint(max(100, param_dist['n_estimators'][0]), param_dist['n_estimators'][1] + 1)),  # No menor que 100
+            'scale_pos_weight': float(np.random.uniform(max(1, param_dist['scale_pos_weight'][0]), param_dist['scale_pos_weight'][1]))  # No menor que 1
         }
         param_sets.append(params)
 
-    # Verificar GPUs y núcleos de CPU disponibles
+    # Comprobar GPUs y núcleos de CPU disponibles
     try:
         num_gpus = len(os.popen('nvidia-smi -L').read().strip().split('\n'))
     except:
-        num_gpus = 1  # Por defecto a 1 si no se puede detectar
+        num_gpus = 0  # Por defecto 0 si no se detecta
 
     num_cpu_cores = multiprocessing.cpu_count()
     print(f"Detectadas {num_gpus} GPUs y {num_cpu_cores} núcleos de CPU")
 
-    # Distribuir carga de trabajo entre GPU y CPU
-    gpu_tasks = []
-    cpu_tasks = []
+    # Si no se detecta GPU, ejecutar todo en CPU
+    if num_gpus == 0:
+        print("No se detectaron GPUs, ejecutando todas las tareas en CPU")
+        gpu_tasks = []
+        cpu_tasks = param_sets
+    else:
+        # Asignar la mayoría de las tareas a GPU para maximizar su uso
+        gpu_task_ratio = 1.0  # 100% de tareas en GPU cuando esté disponible
+        gpu_tasks_count = int(len(param_sets) * gpu_task_ratio)
 
-    # Asignar más tareas a las GPUs pero asegurarse de que la CPU también se utilice
-    gpu_task_ratio = 0.8  # 80% de tareas en GPU, 20% en CPU para un procesamiento más rápido
-    gpu_tasks_count = int(len(param_sets) * gpu_task_ratio)
+        gpu_tasks = []
+        cpu_tasks = []
 
-    for i, params in enumerate(param_sets):
-        if i < gpu_tasks_count:
-            # Distribuir entre las GPUs disponibles
-            gpu_id = i % num_gpus
-            gpu_tasks.append((params, X_train_filtered, y_train_resampled, X_test_filtered, y_test, gpu_id))
-        else:
-            # Tareas de CPU
-            cpu_tasks.append((params, X_train_filtered, y_train_resampled, X_test_filtered, y_test))
+        for i, params in enumerate(param_sets):
+            if i < gpu_tasks_count:
+                # Distribuir entre GPUs disponibles
+                gpu_id = i % num_gpus
+                gpu_tasks.append((params, X_train_filtered, y_train_resampled, X_test_filtered, y_test, gpu_id))
+            else:
+                # Tareas de CPU
+                cpu_tasks.append((params, X_train_filtered, y_train_resampled, X_test_filtered, y_test))
 
     results = []
 
     # Procesar tareas de GPU
-    print(f"Procesando {len(gpu_tasks)} tareas en GPU(s)...")
-    with concurrent.futures.ThreadPoolExecutor(max_workers=num_gpus) as executor:
-        future_to_task = {
-            executor.submit(train_model_on_gpu, *task): task for task in gpu_tasks
-        }
-        for future in concurrent.futures.as_completed(future_to_task):
+    if gpu_tasks:
+        print(f"Procesando {len(gpu_tasks)} tareas en GPU(s)...")
+        with concurrent.futures.ThreadPoolExecutor(max_workers=num_gpus) as executor:
+            future_to_task = {
+                executor.submit(train_model_on_gpu, *task): task for task in gpu_tasks
+            }
+            for future in concurrent.futures.as_completed(future_to_task):
+                try:
+                    result = future.result()
+                    results.append(result)
+                    print(f"Tarea GPU completada con F1: {result['f1_score']:.4f}")
+                except Exception as e:
+                    print(f"Tarea GPU falló: {e}")
+
+    # Procesar tareas de CPU secuencialmente para evitar problemas de memoria
+    if cpu_tasks:
+        print(f"Procesando {len(cpu_tasks)} tareas en núcleos de CPU...")
+        for task in cpu_tasks:
             try:
-                result = future.result()
+                result = train_model_on_cpu(*task)
                 results.append(result)
-                print(f"Tarea de GPU completada con F1: {result['f1_score']:.4f}")
+                print(f"Tarea CPU completada con F1: {result['f1_score']:.4f}")
             except Exception as e:
-                print(f"Tarea de GPU fallida: {e}")
+                print(f"Tarea CPU falló: {e}")
 
-    # Procesar tareas de CPU secuencialmente si hay problemas con el procesamiento paralelo
-    print(f"Procesando {len(cpu_tasks)} tareas en núcleos de CPU...")
-    for task in cpu_tasks:
-        try:
-            result = train_model_on_cpu(*task)
-            results.append(result)
-            print(f"Tarea de CPU completada con F1: {result['f1_score']:.4f}")
-        except Exception as e:
-            print(f"Tarea de CPU fallida: {e}")
+    # Encontrar mejor resultado
+    if not results:
+        raise Exception("¡No hubo ejecuciones exitosas de entrenamiento de modelos!")
 
-    # Encontrar el mejor resultado
     best_result = max(results, key=lambda x: x['f1_score'])
 
-    print("Mejores Parámetros Encontrados: ", best_result['params'])
-    print(f"Mejor F1 Score: {best_result['f1_score']:.4f}")
+    print("Mejores parámetros encontrados: ", best_result['params'])
+    print(f"Mejor puntuación F1: {best_result['f1_score']:.4f}")
 
-    # Crear el modelo final con los parámetros encontrados
+    # Crear modelo final con los mejores parámetros
     final_params = best_result['params'].copy()
 
-    # CORRECCIÓN: No usar 'gpu_id' cuando ya se especifica 'device'
-    # Asegurarse de que solo se usa 'device' para especificar GPU
+    # Limpiar parámetros para el modelo final
     if 'gpu_id' in final_params:
-        del final_params['gpu_id']  # Eliminar gpu_id si existe
+        gpu_id = final_params.pop('gpu_id')
+    else:
+        gpu_id = 0
 
-    # Asegurar que se especifica correctamente el device
-    if 'device' not in final_params or not final_params['device'].startswith('cuda:'):
-        final_params['device'] = 'cuda:0'  # Usar la primera GPU por defecto
-
-    if 'tree_method' not in final_params:
-        final_params['tree_method'] = 'hist'
+    # Establecer parámetros adecuados para GPU/CPU para el modelo final
+    if has_gpu:
+        final_params.update({
+            'tree_method': 'hist',
+            'device': 'cuda'
+        })
+    else:
+        final_params.update({
+            'tree_method': 'hist',
+            'device': 'cpu'
+        })
 
     print("Parámetros finales para el mejor modelo:", final_params)
 
-    # Crear modelo con los mejores parámetros
-    best_model = xgb.XGBClassifier(**final_params)
+    # Entrenar modelo final usando DMatrix para mejor rendimiento
+    dtrain_final = xgb.DMatrix(X_train_filtered, y_train_resampled)
+    dtest_final = xgb.DMatrix(X_test_filtered, y_test)
 
-    # Entrenar modelo final
-    best_model.fit(
-        X_train_filtered,
-        y_train_resampled,
-        eval_set=[(X_test_filtered, y_test)],
-        verbose=False
+    watchlist = [(dtrain_final, 'train'), (dtest_final, 'eval')]
+    num_rounds = final_params.pop('n_estimators', 1000)
+
+    best_bst = xgb.train(
+        final_params,
+        dtrain_final,
+        num_rounds,
+        evals=watchlist,
+        verbose_eval=False
     )
 
+    # Crear modelo wrapper
+    best_model = xgb.XGBClassifier()
+    best_model._Booster = best_bst
+
     # Evaluar modelo final
-    y_pred_proba = best_model.predict_proba(X_test_filtered)[:, 1]
+    y_pred_proba = best_bst.predict(dtest_final)
     best_threshold, best_f1 = find_optimal_threshold(y_test, y_pred_proba)
     y_pred_optimized = (y_pred_proba >= best_threshold).astype(int)
 
     # Calcular métricas
     metrics = {
-        'Accuracy': accuracy_score(y_test, y_pred_optimized),
-        'F1 Score': f1_score(y_test, y_pred_optimized),
-        'Precision': precision_score(y_test, y_pred_optimized),
-        'Recall': recall_score(y_test, y_pred_optimized),
-        'ROC AUC': roc_auc_score(y_test, y_pred_proba),
-        'Best Threshold': best_threshold
+        'Exactitud': accuracy_score(y_test, y_pred_optimized),
+        'Puntuación F1': f1_score(y_test, y_pred_optimized),
+        'Precisión': precision_score(y_test, y_pred_optimized),
+        'Recuperación': recall_score(y_test, y_pred_optimized),
+        'AUC ROC': roc_auc_score(y_test, y_pred_proba),
+        'Mejor Umbral': best_threshold
     }
 
     # Crear pipeline filtrado con el mejor modelo
@@ -430,13 +513,13 @@ def custom_parallel_search(X_train, X_test, y_train, y_test, preprocessor, num_i
         best_threshold=best_threshold
     )
 
-    # Mostrar tiempo total tomado
+    # Mostrar tiempo total empleado
     end_time = time.time()
     print(f"Tiempo total de optimización: {(end_time - start_time)/60:.2f} minutos")
 
     return filtered_pipeline, metrics, final_params
 
-# Guardar el modelo entrenado en un archivo
+# Guardar modelo entrenado en archivo
 def save_model(model, filename):
     # Crear directorio de modelos si no existe
     os.makedirs(os.path.dirname(filename), exist_ok=True)
@@ -444,14 +527,14 @@ def save_model(model, filename):
         pickle.dump(model, f)
     print(f"Modelo guardado en '{filename}'")
 
-# Cargar un modelo guardado desde un archivo
+# Cargar modelo guardado desde archivo
 def load_model(filename):
     with open(filename, 'rb') as f:
         model = pickle.load(f)
     print(f"Modelo cargado desde '{filename}'")
     return model
 
-# Función principal para ejecutar el flujo de trabajo completo del modelo
+# Función principal para ejecutar flujo completo del modelo
 def main():
     print("Cargando datos...")
     hotels, bookings = load_data()
@@ -481,7 +564,7 @@ def main():
 
     print(f"X_train: {X_train.shape}, X_test: {X_test.shape}")
 
-    print("Encontrando el mejor modelo XGBoost con optimización híbrida GPU-CPU...")
+    print("Buscando el mejor modelo XGBoost con optimización GPU-CPU...")
     best_model, best_metrics, best_params = custom_parallel_search(
         X_train, X_test, y_train, y_test, preprocessor, num_iterations=60
     )
@@ -494,9 +577,9 @@ def main():
     for param, value in best_params.items():
         print(f"{param}: {value}")
 
-    models_path = '/app/models/xgboost_hybrid_optimized_best.pkl'
+    models_path = '/app/models/xgboost_gpu_optimized_best.pkl'
     save_model(best_model, models_path)
-    print("Entrenamiento y evaluación del modelo completos.")
+    print("Entrenamiento y evaluación del modelo completados.")
 
 if __name__ == "__main__":
     main()
