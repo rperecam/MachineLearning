@@ -12,7 +12,6 @@ from imblearn.under_sampling import RandomUnderSampler
 import pickle
 import warnings
 import os
-from scipy.stats import uniform, randint
 import concurrent.futures
 import multiprocessing
 import time
@@ -148,7 +147,7 @@ def prepare_features(data):
 
 # Encontrar umbral óptimo para la puntuación F1
 def find_optimal_threshold(y_true, y_pred_proba):
-    thresholds = np.linspace(0.1, 0.9, 200)
+    thresholds = np.linspace(0.1, 0.9, 400)  # Aumentar el rango del umbral
     best_threshold, best_f1 = 0.5, 0
 
     for threshold in thresholds:
@@ -285,7 +284,7 @@ def train_model_on_cpu(param_set, X_train, y_train, X_eval, y_eval):
     }
 
 # Búsqueda paralela personalizada usando GPU principalmente
-def custom_parallel_search(X_train, X_test, y_train, y_test, preprocessor, num_iterations=60):
+def custom_parallel_search(X_train, X_test, y_train, y_test, preprocessor, num_iterations=100):
     print("Iniciando búsqueda paralela de GPU/CPU para los mejores parámetros XGBoost...")
     start_time = time.time()
 
@@ -337,30 +336,30 @@ def custom_parallel_search(X_train, X_test, y_train, y_test, preprocessor, num_i
 
     # Valores óptimos encontrados previamente como referencia
     best_ref = {
-        'max_depth': 7,
+        'max_depth': 10,
         'min_child_weight': 1,
-        'gamma': 0.485,
-        'subsample': 0.909,
-        'colsample_bytree': 0.508,
-        'reg_alpha': 0.566,
-        'reg_lambda': 3.866,
-        'learning_rate': 0.125,
+        'gamma': 0.437,
+        'subsample': 0.805,
+        'colsample_bytree': 0.538,
+        'reg_alpha': 0.765,
+        'reg_lambda': 3.645,
+        'learning_rate': 0.090,
         'n_estimators': 818,
-        'scale_pos_weight': 4.596
+        'scale_pos_weight': 6.139
     }
 
     # Definir rangos de búsqueda amplios alrededor de los valores óptimos
     param_dist = {
-        'max_depth': (best_ref['max_depth'] - 3, best_ref['max_depth'] + 3),  # rango 4-10
-        'min_child_weight': (best_ref['min_child_weight'] - 1, best_ref['min_child_weight'] + 3),  # rango 0-4
-        'gamma': (best_ref['gamma'] - 0.3, best_ref['gamma'] + 0.3),  # rango 0.185-0.785
-        'subsample': (best_ref['subsample'] - 0.2, best_ref['subsample'] + 0.09),  # rango 0.709-0.999
-        'colsample_bytree': (best_ref['colsample_bytree'] - 0.2, best_ref['colsample_bytree'] + 0.2),  # rango 0.308-0.708
-        'reg_alpha': (best_ref['reg_alpha'] - 0.4, best_ref['reg_alpha'] + 0.4),  # rango 0.166-0.966
-        'reg_lambda': (best_ref['reg_lambda'] - 2, best_ref['reg_lambda'] + 2),  # rango 1.866-5.866
-        'learning_rate': (best_ref['learning_rate'] - 0.075, best_ref['learning_rate'] + 0.075),  # rango 0.05-0.2
-        'n_estimators': (best_ref['n_estimators'] - 300, best_ref['n_estimators'] + 300),  # rango 518-1118
-        'scale_pos_weight': (best_ref['scale_pos_weight'] - 2, best_ref['scale_pos_weight'] + 2)  # rango 2.596-6.596
+        'max_depth': (best_ref['max_depth'] - 5, best_ref['max_depth'] + 5),  # rango 5-15
+        'min_child_weight': (best_ref['min_child_weight'] - 2, best_ref['min_child_weight'] + 5),  # rango -1-6
+        'gamma': (best_ref['gamma'] - 0.5, best_ref['gamma'] + 0.5),  # rango -0.063-0.937
+        'subsample': (best_ref['subsample'] - 0.3, best_ref['subsample'] + 0.1),  # rango 0.505-0.905
+        'colsample_bytree': (best_ref['colsample_bytree'] - 0.3, best_ref['colsample_bytree'] + 0.3),  # rango 0.238-0.838
+        'reg_alpha': (best_ref['reg_alpha'] - 0.6, best_ref['reg_alpha'] + 0.6),  # rango 0.165-1.365
+        'reg_lambda': (best_ref['reg_lambda'] - 3, best_ref['reg_lambda'] + 3),  # rango 0.645-6.645
+        'learning_rate': (best_ref['learning_rate'] - 0.1, best_ref['learning_rate'] + 0.1),  # rango -0.01-0.19
+        'n_estimators': (best_ref['n_estimators'] - 500, best_ref['n_estimators'] + 500),  # rango 318-1318
+        'scale_pos_weight': (best_ref['scale_pos_weight'] - 3, best_ref['scale_pos_weight'] + 3)  # rango 3.139-9.139
     }
 
     # Generar conjuntos de parámetros aleatorios dentro de los rangos definidos
@@ -566,7 +565,7 @@ def main():
 
     print("Buscando el mejor modelo XGBoost con optimización GPU-CPU...")
     best_model, best_metrics, best_params = custom_parallel_search(
-        X_train, X_test, y_train, y_test, preprocessor, num_iterations=60
+        X_train, X_test, y_train, y_test, preprocessor, num_iterations=100
     )
 
     print("Métricas del modelo:")
@@ -577,7 +576,7 @@ def main():
     for param, value in best_params.items():
         print(f"{param}: {value}")
 
-    models_path = '/app/models/xgboost_gpu_optimized_best.pkl'
+    models_path = '/app/models/xgboost_model.pkl'
     save_model(best_model, models_path)
     print("Entrenamiento y evaluación del modelo completados.")
 
