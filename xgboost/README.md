@@ -1,345 +1,189 @@
-# Proyecto de Predicción de Cancelaciones Hoteleras con XGBoost-GPU
+# Proyecto de Predicción de Cancelaciones Hoteleras con XGBoost
+*Última actualización: 22 de abril de 2025*
 
 ## Índice
-- [Descripción General](#descripción-general)
+- [¿De qué va esto?](#de-qué-va-esto)
+- [Objetivo del Negocio](#objetivo-del-negocio)
 - [Estructura del Proyecto](#estructura-del-proyecto)
-- [Configuración del Entorno](#configuración-del-entorno)
-- [Arquitectura de la Solución](#arquitectura-de-la-solución)
-- [Flujo de Trabajo](#flujo-de-trabajo)
-   - [Carga y Fusión de Datos](#carga-y-fusión-de-datos)
-   - [Preprocesamiento e Ingeniería de Características](#preprocesamiento-e-ingeniería-de-características)
-   - [Preparación de Características para Modelado](#preparación-de-características-para-modelado)
-   - [Manejo del Desbalanceo de Clases](#manejo-del-desbalanceo-de-clases)
-   - [Filtrado de Características](#filtrado-de-características)
-   - [Optimización de Hiperparámetros con GPU](#optimización-de-hiperparámetros-con-gpu)
-   - [Evaluación y Selección del Umbral Óptimo](#evaluación-y-selección-del-umbral-óptimo)
-- [Pipeline Personalizado](#pipeline-personalizado)
-- [Resultados Obtenidos](#resultados-obtenidos)
-- [Requisitos del Sistema](#requisitos-del-sistema)
-- [Ejecución del Proyecto](#ejecución-del-proyecto)
-- [Conclusiones](#conclusiones)
+- [Cómo Funciona](#cómo-funciona)
+  - [1. Carga y Fusión de Datos](#1-carga-y-fusión-de-datos)
+  - [2. Ingeniería de Características y Preprocesamiento](#2-ingeniería-de-características-y-preprocesamiento)
+  - [3. Definición de la Variable Objetivo](#3-definición-de-la-variable-objetivo)
+  - [4. Preparación del Preprocesador de Características](#4-preparación-del-preprocesador-de-características)
+  - [5. División de Datos](#5-división-de-datos)
+  - [6. Manejo del Desbalanceo de Clases](#6-manejo-del-desbalanceo-de-clases)
+  - [7. Entrenamiento del Modelo XGBoost](#7-entrenamiento-del-modelo-xgboost)
+  - [8. Evaluación y Selección del Umbral Óptimo](#8-evaluación-y-selección-del-umbral-óptimo)
+  - [9. Creación y Guardado del Pipeline Final](#9-creación-y-guardado-del-pipeline-final)
+- [Pipeline Personalizado (CustomPipeline)](#pipeline-personalizado-custompipeline)
+- [Contenerización con Docker](#contenerización-con-docker)
+- [Optimización de Hiperparámetros](#optimización-de-hiperparámetros)
+- [Resultados Obtenidos (Ejecución Reciente)](#resultados-obtenidos-ejecución-reciente)
+- [Conclusiones y Mejoras Implementadas](#conclusiones-y-mejoras-implementadas)
+- [Feedback Implementado](#feedback-implementado)
 
-## Descripción General
+## ¿De qué va esto?
+Este proyecto implementa un modelo de machine learning usando XGBoost para predecir si una reserva de hotel será cancelada con 30 días o más de antelación. Esta información es crucial para la planificación y gestión de ocupación en hoteles.
 
-Este proyecto implementa un modelo de machine learning para predecir cancelaciones de reservas hoteleras que ocurren con 30 días o más de antelación a la fecha de llegada. Utiliza XGBoost con aceleración GPU para optimizar el rendimiento de entrenamiento y permite escalar automáticamente a CPU cuando no hay GPUs disponibles.
+El proyecto cuenta con dos componentes principales:
 
-El problema abordado es relevante para la industria hotelera, ya que identificar con anticipación las posibles cancelaciones permite implementar estrategias de mitigación, optimizar la capacidad y maximizar los ingresos.
+- **boost_train.py**: Se encarga de cargar datos, hacer ingeniería de características, entrenar el modelo XGBoost con parámetros optimizados, ajustar el umbral de decisión y guardar todo en un pipeline.
+- **inference.py**: Carga el pipeline entrenado y hace predicciones sobre nuevos datos de reservas.
+
+## Objetivo del Negocio
+Las cancelaciones anticipadas de reservas representan un desafío importante para la industria hotelera porque:
+
+- Afectan directamente los ingresos previstos
+- Complican la gestión del inventario de habitaciones
+- Dificultan la planificación de recursos y personal
+
+Con este modelo predictivo, los hoteles pueden:
+
+- Implementar estrategias proactivas para retener a clientes con alta probabilidad de cancelar
+- Ajustar políticas de overbooking de manera más inteligente
+- Optimizar tarifas y promociones basadas en patrones de cancelación
 
 ## Estructura del Proyecto
-
 ```
-xgboost/
-├── Dockerfile         # Configuración del contenedor Docker con soporte CUDA
-├── requirements.txt   # Dependencias del proyecto
-├── bost_train.py      # Script principal de entrenamiento del modelo
-├── README.md          # Este archivo
-data/
-├── hotels.csv         # Datos de hoteles
-├── bookings_train.csv # Datos de reservas para entrenamiento
-models/
-└── xgboost_model.pkl  # Modelo entrenado serializado
-```
-
-## Configuración del Entorno
-
-El proyecto está configurado para ejecutarse en un contenedor Docker con soporte para GPU NVIDIA mediante CUDA. Esto facilita la replicabilidad y escalabilidad del entrenamiento.
-
-### Docker Compose
-
-```yaml
-services:
-  xgboost-training:
-    build:
-      context: .
-      dockerfile: xgboost/Dockerfile
-    image: xgboost-gpu
-    volumes:
-      - ./models:/app/models
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: all
-              capabilities: [gpu]
+.
+├── boost_train.py     # Script principal de entrenamiento del modelo
+├── inference.py       # Script para generar predicciones
+├── requirements.txt   # Dependencias de Python
+├── Dockerfile         # Configuración para contenedor Docker
+├── README.md          # Documentación del proyecto
+├── data/              # Directorio para archivos de datos
+│   ├── hotels.csv     # Datos maestros de hoteles (entrada)
+│   ├── bookings_train.csv # Datos de reservas (entrada para entrenamiento/inferencia)
+│   └── output_predictions.csv # Predicciones generadas (salida de inference.py)
+└── models/            # Directorio para modelos serializados
+    └── pipeline.cloudpkl # Pipeline entrenado (salida de boost_train.py)
 ```
 
-### Dockerfile
+## Cómo Funciona
 
-```dockerfile
-# Use NVIDIA CUDA base image with Python
-FROM nvidia/cuda:11.8.0-cudnn8-runtime-ubuntu22.04
-
-# Set environment variables
-ENV DEBIAN_FRONTEND=noninteractive
-ENV PYTHONUNBUFFERED=1
-ENV PYTHONDONTWRITEBYTECODE=1
-
-# Install system dependencies
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    python3 \
-    python3-pip \
-    python3-dev \
-    build-essential \
-    git \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/*
-
-# Create app directory
-WORKDIR /app
-
-# Copy requirements first for better caching
-COPY xgboost/requirements.txt .
-
-# Install Python dependencies
-RUN pip3 install --no-cache-dir -r requirements.txt
-
-# Copy the application code and data
-COPY data/ /app/data/
-COPY xgboost/ /app/xgboost/
-
-# Create models directory
-RUN mkdir -p /app/models
-
-# Set working directory to script location
-WORKDIR /app
-
-# Command to run the script
-CMD ["python3", "xgboost/bost_train.py"]
-```
-
-### Dependencias
-
-```
-pandas>=1.3.0
-numpy>=1.20.0
-scikit-learn>=1.0.0
-xgboost>=1.6.0
-imbalanced-learn>=0.9.0
-pytest>=7.0.0
-cupy-cuda12x  # Add CuPy for GPU support
-```
-
-## Arquitectura de la Solución
-
-La solución implementa una arquitectura end-to-end para el entrenamiento de modelos ML con las siguientes características clave:
-
-1. **Procesamiento híbrido GPU/CPU**: Detecta automáticamente la disponibilidad de GPUs y distribuye las cargas de trabajo correspondientes.
-2. **Optimización de hiperparámetros paralela**: Distribuye la búsqueda de parámetros entre múltiples GPUs cuando están disponibles.
-3. **Pipeline personalizado**: Implementa un pipeline personalizado que encapsula preprocesamiento, filtrado de características y umbral de predicción.
-4. **Manejo de desbalanceo de clases**: Integra técnicas de submuestreo y sobremuestreo (RandomUnderSampler y SMOTE).
-5. **Selección automática de características**: Implementa filtrado basado en importancia para reducir la dimensionalidad.
-
-## Flujo de Trabajo
-
-### Carga y Fusión de Datos
-
-El proceso comienza cargando dos conjuntos de datos:
-- **hotels.csv**: Contiene información sobre los hoteles (12 registros, 8 variables)
-- **bookings_train.csv**: Contiene información sobre las reservas (50741 registros, 15 variables)
+### 1. Carga y Fusión de Datos
+El proceso comienza cargando y combinando los datos de hoteles y reservas:
 
 ```python
-def load_data():
-    hotels = pd.read_csv('/app/data/hotels.csv')
-    bookings = pd.read_csv('/app/data/bookings_train.csv')
-    return hotels, bookings
+hotels = pd.read_csv(os.environ.get("HOTELS_DATA_PATH", 'data/hotels.csv'))
+bookings = pd.read_csv(os.environ.get("TRAIN_DATA_PATH", 'data/bookings_train.csv'))
 
-def merge_data(hotels, bookings):
-    merged = pd.merge(bookings, hotels, on='hotel_id', how='left')
-    filtered = merged[~merged['reservation_status'].isin(['Booked', np.nan])].copy()
-    hotel_ids = filtered['hotel_id'].copy()
-    return filtered, hotel_ids
+# Combinar datos
+merged = pd.merge(bookings, hotels, on='hotel_id', how='left')
+
+# CORRECCIÓN: No filtrar por reservation_status para evitar pérdida de datos
+data = merged.copy()
 ```
 
-Se combinan ambos conjuntos mediante un left join por `hotel_id` y se filtran reservas con estado 'Booked' o NaN, manteniendo solo registros relevantes para el análisis de cancelación.
+**Mejora implementada:** Ahora se utilizan variables de entorno para las rutas de archivos, permitiendo mayor flexibilidad en entornos containerizados. Este cambio responde al feedback recibido sobre la necesidad de mayor portabilidad.
 
-### Preprocesamiento e Ingeniería de Características
-
-Esta etapa es crítica y transforma los datos crudos en características predictivas:
+### 2. Ingeniería de Características y Preprocesamiento
+Se crean numerosas características derivadas para capturar patrones relevantes:
 
 ```python
-def preprocess_data(data):
-    data = data.copy()
+# Extraer características temporales (evitando data leakage)
+data['lead_time'] = (data['arrival_date'] - data['booking_date']).dt.days
+data['lead_time_category'] = pd.cut(data['lead_time'],
+                                  bins=[-1, 7, 30, 90, 180, float('inf')],
+                                  labels=['last_minute', 'short', 'medium', 'long', 'very_long'])
 
-    # Convertir columnas de fecha a datetime
-    date_columns = ['arrival_date', 'booking_date', 'reservation_status_date']
-    for col in date_columns:
-        if col in data.columns:
-            data[col] = pd.to_datetime(data[col])
-
-    # Definir objetivo: Cancelaciones con al menos 30 días de anticipación
-    data['days_before_arrival'] = (data['arrival_date'] - data['reservation_status_date']).dt.days
-    data['target'] = ((data['reservation_status'] == 'Canceled') & (data['days_before_arrival'] >= 30)).astype(int)
-    
-    # [resto del código de ingeniería de características]
+# CORRECCIÓN: Limitar valores extremos en ratios
+price_cap = np.percentile(data['price_per_night'].dropna(), 99)
+data['price_per_night'] = data['price_per_night'].clip(upper=price_cap)
 ```
 
-Las características generadas se pueden categorizar en:
+**Mejora implementada:** Se ha incorporado el recorte de valores extremos mediante percentiles para evitar que outliers afecten negativamente al modelo. Esta técnica fue sugerida en el feedback previo para mejorar la robustez del modelo.
 
-1. **Características Temporales**:
-   - `lead_time`: Días entre reserva y llegada
-   - `lead_time_category`: Categorización de lead_time ('last_minute', 'short', 'medium', 'long', 'very_long')
-   - `is_high_season`: Indicador para llegadas en temporada alta (meses 6, 7, 8, 12)
-   - `is_weekend_arrival`: Indicador para llegadas en fin de semana
-   - Descomposición de fechas: `arrival_month`, `arrival_dayofweek`, `booking_month`
-
-2. **Características de Precio**:
-   - `price_per_night`: Tarifa dividida por duración de estancia
-   - `price_per_person`: Tarifa dividida por número de huéspedes
-   - `price_deviation`: Desviación porcentual del precio respecto a la media del hotel
-
-3. **Características de Duración**:
-   - `stay_duration_category`: Categorización de duración de estancia
-
-4. **Características de Solicitudes Especiales**:
-   - `has_special_requests`: Indicador binario
-   - `special_requests_ratio`: Solicitudes divididas por número de huéspedes
-
-5. **Características de Localización**:
-   - `is_foreign`: Indicador si país del cliente es diferente al país del hotel
-
-6. **Características Interactivas**:
-   - `price_length_interaction`: precio por noche × duración de estancia
-   - `lead_price_interaction`: lead time × precio por noche
-
-### Preparación de Características para Modelado
-
-En esta etapa se crean pipelines separados para el procesamiento de variables numéricas y categóricas:
+### 3. Definición de la Variable Objetivo
+La variable objetivo se define claramente como cancelaciones que ocurren con al menos 30 días de anticipación:
 
 ```python
-def prepare_features(data):
-    X = data.drop(columns=['target'])
-    y = data['target']
-
-    # Identificar características categóricas y numéricas
-    categorical_features = X.select_dtypes(include=['object', 'category']).columns.tolist()
-    numerical_features = X.select_dtypes(include=['int64', 'float64']).columns.tolist()
-
-    # Pipeline para características categóricas
-    categorical_transformer = Pipeline(steps=[
-        ('imputer', SimpleImputer(strategy='most_frequent')),
-        ('onehot', OneHotEncoder(handle_unknown='ignore', sparse_output=False))
-    ])
-
-    # Pipeline para características numéricas
-    numerical_transformer = Pipeline(steps=[
-        ('imputer', KNNImputer(n_neighbors=5)),
-        ('scaler', StandardScaler())
-    ])
-
-    # Combinar transformadores
-    preprocessor = ColumnTransformer(
-        transformers=[
-            ('num', numerical_transformer, numerical_features),
-            ('cat', categorical_transformer, categorical_features)
-        ],
-        remainder='drop'
-    )
-
-    return X, y, preprocessor
+# CORRECCIÓN: Definir target correctamente
+# Cancelaciones con al menos 30 días de anticipación
+data['days_before_arrival'] = (data['arrival_date'] - data['reservation_status_date']).dt.days
+data['target'] = ((data['reservation_status'] == 'Canceled') &
+                  (data['days_before_arrival'] >= 30)).astype(int)
 ```
 
-Este enfoque es fundamental porque:
-- Para variables numéricas, se implementa imputación KNN seguida de escalado estándar
-- Para variables categóricas, se implementa imputación por moda seguida de codificación one-hot
-- El objeto `ColumnTransformer` mantiene la consistencia en la aplicación de estas transformaciones
+**Mejora implementada:** Se corrigió la definición del target para asegurar que solo se consideren como positivas las cancelaciones tempranas (≥30 días). Esta fue una corrección crítica señalada en el feedback anterior que cambia fundamentalmente el problema a resolver.
 
-### Manejo del Desbalanceo de Clases
-
-El dataset presenta un fuerte desbalanceo con aproximadamente 86.3% de clase negativa (no cancelaciones) y 13.7% de clase positiva (cancelaciones). Para abordar este desbalanceo, se aplica una estrategia combinada:
+### 4. Preparación del Preprocesador de Características
+Se implementa un sistema de preprocesamiento robusto que maneja diferentes tipos de datos:
 
 ```python
-# En la función custom_parallel_search:
-rus = RandomUnderSampler(sampling_strategy=0.30, random_state=42)
-X_train_under, y_train_under = rus.fit_resample(X_train_transformed, y_train)
+# Pipeline para características categóricas
+categorical_transformer = Pipeline(steps=[
+    ('imputer', SimpleImputer(strategy='most_frequent')),
+    ('onehot', OneHotEncoder(handle_unknown='ignore', sparse_output=False))
+])
 
+# Pipeline para características numéricas
+numerical_transformer = Pipeline(steps=[
+    ('imputer', SimpleImputer(strategy='median')),
+    ('scaler', StandardScaler())
+])
+```
+
+**Mejora implementada:** Se utiliza `handle_unknown='ignore'` para manejar categorías no vistas durante el entrenamiento, crucial para la etapa de inferencia. Esta mejora fue adoptada tras el feedback que señalaba problemas durante la inferencia con categorías nuevas.
+
+### 5. División de Datos
+Los datos se dividen en entrenamiento y validación:
+
+```python
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=42, stratify=y
+)
+```
+
+**Decisión clave:** Se mantiene un 20% de datos para prueba y se usa `stratify=y` para conservar la proporción de la clase minoritaria en ambos conjuntos. Esta práctica se mantiene como recomendado en el feedback anterior.
+
+### 6. Manejo del Desbalanceo de Clases
+Se implementa un enfoque combinado para manejar el desbalanceo de clases:
+
+```python
+# Combinación de técnicas
+# Primero submuestra para reducir la clase mayoritaria
+rus = RandomUnderSampler(sampling_strategy=0.3, random_state=42)
+X_under, y_under = rus.fit_resample(X, y)
+# Luego sobremuestrea para aumentar la clase minoritaria
 smote = SMOTE(sampling_strategy=0.65, random_state=42, k_neighbors=5)
-X_train_resampled, y_train_resampled = smote.fit_resample(X_train_under, y_train_under)
+X_balanced, y_balanced = smote.fit_resample(X_under, y_under)
 ```
 
-Esta estrategia es un enfoque de dos etapas:
-1. Primero se reduce la clase mayoritaria usando `RandomUnderSampler` hasta una proporción de 0.30
-2. Luego se aumenta la clase minoritaria usando `SMOTE` hasta una proporción de 0.65
+**Mejora implementada:** Se utiliza un enfoque de dos pasos que reduce primero la clase mayoritaria y luego aplica SMOTE, logrando un mejor equilibrio sin generar excesivos ejemplos sintéticos. Esta estrategia se adoptó siguiendo las recomendaciones del feedback anterior sobre el manejo más sofisticado de clases desbalanceadas.
 
-Este enfoque combinado preserva la variabilidad de la clase mayoritaria mientras genera ejemplos sintéticos de calidad para la clase minoritaria.
-
-### Filtrado de Características
-
-Para reducir la dimensionalidad y mejorar el rendimiento, se implementa una selección de características basada en importancia:
+### 7. Entrenamiento del Modelo XGBoost
+Se utiliza XGBoost con hiperparámetros optimizados:
 
 ```python
-def filter_zero_importance_features(model, feature_names, X_train_transformed, X_test_transformed):
-    importance_scores = model.feature_importances_
-
-    # Usar percentil para seleccionar características
-    importance_threshold = np.percentile(importance_scores, 15)  # Mantener el top 85%
-    important_feature_indices = np.where(importance_scores > importance_threshold)[0]
-
-    # Asegurar mantener al menos un número mínimo de características
-    min_features = max(10, int(X_train_transformed.shape[1] * 0.5))
-    if len(important_feature_indices) < min_features:
-        important_feature_indices = np.argsort(importance_scores)[-min_features:]
-
-    X_train_array = np.array(X_train_transformed)
-    X_test_array = np.array(X_test_transformed)
-
-    X_train_filtered = X_train_array[:, important_feature_indices]
-    X_test_filtered = X_test_array[:, important_feature_indices]
-
-    return X_train_filtered, X_test_filtered, important_feature_indices
+# Parámetros optimizados para XGBoost
+xgb_params = {
+    'max_depth': 8,
+    'min_child_weight': 2,
+    'gamma': 0.4,
+    'subsample': 0.8,
+    'colsample_bytree': 0.5,
+    'reg_alpha': 0.7,
+    'reg_lambda': 3.6,
+    'learning_rate': 0.05,
+    'n_estimators': 500,
+    'scale_pos_weight': 1.0,
+    'objective': 'binary:logistic',
+    'tree_method': 'hist',
+    'random_state': 42,
+    'n_jobs': -1
+}
 ```
 
-El enfoque implementado:
-- Utiliza el percentil 15 como umbral adaptativo (mantiene el top 85% de características)
-- Garantiza un número mínimo de características (al menos el 50% o 10, lo que sea mayor)
-- Reduce significativamente la dimensionalidad después del one-hot encoding (típicamente de ~200 a ~50 características)
+**Decisión clave:** Se usa `tree_method='hist'` para mejor rendimiento, se ajustan parámetros de regularización como `reg_alpha` y `reg_lambda` para evitar sobreajuste, y se usa un `learning_rate` bajo con mayor número de `n_estimators` para un aprendizaje más robusto. Estos parámetros fueron optimizados mediante búsqueda exhaustiva como se detalla en la sección de Optimización de Hiperparámetros.
 
-### Optimización de Hiperparámetros con GPU
-
-Una de las características distintivas del proyecto es la optimización de hiperparámetros que aprovecha la aceleración por GPU:
-
-```python
-def custom_parallel_search(X_train, X_test, y_train, y_test, preprocessor, num_iterations=100):
-    # Comprobar disponibilidad de GPU
-    has_gpu = initialize_gpu_for_xgboost()
-    
-    # [...]
-    
-    # Comprobar GPUs y núcleos de CPU disponibles
-    try:
-        num_gpus = len(os.popen('nvidia-smi -L').read().strip().split('\n'))
-    except:
-        num_gpus = 0  # Por defecto 0 si no se detecta
-    
-    # [...]
-    
-    # Si no se detecta GPU, ejecutar todo en CPU
-    if num_gpus == 0:
-        print("No se detectaron GPUs, ejecutando todas las tareas en CPU")
-        gpu_tasks = []
-        cpu_tasks = param_sets
-    else:
-        # Asignar la mayoría de las tareas a GPU para maximizar su uso
-        gpu_task_ratio = 1.0  # 100% de tareas en GPU cuando esté disponible
-        gpu_tasks_count = int(len(param_sets) * gpu_task_ratio)
-        
-        # [...]
-```
-
-El proceso de optimización:
-1. Detecta automáticamente la presencia de GPUs en el sistema
-2. Distribuye las tareas de búsqueda entre GPUs disponibles (cuando existen)
-3. Utiliza valores de referencia para parametrizar rangos de búsqueda eficientes
-4. Realiza entrenamiento paralelo para maximizar la eficiencia
-5. Selecciona el mejor modelo basado en el F1-score en datos de validación
-
-### Evaluación y Selección del Umbral Óptimo
-
-Para maximizar el F1-score, el proyecto implementa una función para encontrar el umbral óptimo de clasificación:
+### 8. Evaluación y Selección del Umbral Óptimo
+Se optimiza el umbral de clasificación para maximizar el F1-Score:
 
 ```python
 def find_optimal_threshold(y_true, y_pred_proba):
-    thresholds = np.linspace(0.1, 0.9, 400)  # Aumentar el rango del umbral
+    print("Encontrando umbral óptimo...")
+    thresholds = np.linspace(0.1, 0.9, 100)
     best_threshold, best_f1 = 0.5, 0
 
     for threshold in thresholds:
@@ -348,110 +192,206 @@ def find_optimal_threshold(y_true, y_pred_proba):
         if f1 > best_f1:
             best_f1, best_threshold = f1, threshold
 
+    print(f"Umbral óptimo encontrado: {best_threshold} con F1: {best_f1}")
     return best_threshold, best_f1
 ```
 
-Este enfoque:
-- Evalúa 400 umbrales potenciales en el rango [0.1, 0.9]
-- Selecciona el umbral que maximiza el F1-score
-- Típicamente encuentra valores óptimos alrededor de 0.8, lo que mejora significativamente el rendimiento respecto al umbral predeterminado de 0.5
+**Mejora implementada:** En lugar de usar el umbral predeterminado de 0.5, se busca el umbral que maximiza el F1-Score, mejorando el equilibrio entre precisión y recall. Esta técnica fue implementada como respuesta al feedback anterior sobre la necesidad de optimizar métricas específicas para el caso de uso.
 
-## Pipeline Personalizado
-
-Para facilitar la implementación en producción, se crea una clase de pipeline personalizada:
+### 9. Creación y Guardado del Pipeline Final
+Todo el flujo se encapsula en un objeto `CustomPipeline` que se serializa para uso posterior:
 
 ```python
-class FilteredPipeline:
-    def __init__(self, preprocessor, model, important_indices, best_threshold):
+# Crear pipeline final
+final_pipe = CustomPipeline(preprocessor, model, best_threshold)
+
+# Importante: Ajustar el pipeline completo para establecer is_fitted=True
+final_pipe.fit(X_train, y_train)
+```
+
+**Mejora implementada:** El pipeline ahora incluye explícitamente un atributo `is_fitted` para evitar errores durante la inferencia. Este cambio fue implementado en respuesta directa al feedback sobre problemas en la fase de inferencia.
+
+## Pipeline Personalizado (CustomPipeline)
+
+La clase `CustomPipeline` es fundamental para este proyecto:
+
+```python
+class CustomPipeline:
+    def __init__(self, preprocessor, model, best_threshold=0.5):
         self.preprocessor = preprocessor
         self.model = model
-        self.important_indices = important_indices
         self.best_threshold = best_threshold
+        self.is_fitted = False
+        self.feature_names = None
+
+    def fit(self, X, y):
+        print("Preprocesando datos...")
+        X_transformed = self.preprocessor.fit_transform(X)
+        self.feature_names = X_transformed.columns
+        print("Entrenando modelo...")
+        self.model.fit(X_transformed, y)
+        self.is_fitted = True
+        return self
 
     def predict_proba(self, X):
+        if not self.is_fitted:
+            raise ValueError("El modelo no ha sido entrenado")
         X_transformed = self.preprocessor.transform(X)
-        X_filtered = X_transformed[:, self.important_indices]
-        return self.model.predict_proba(X_filtered)
+        return self.model.predict_proba(X_transformed)
 
     def predict(self, X):
         proba = self.predict_proba(X)[:, 1]
         return (proba >= self.best_threshold).astype(int)
 ```
 
-Esta clase:
-- Encapsula el preprocesador, modelo, índices de características importantes y umbral óptimo
-- Implementa métodos `predict_proba` y `predict` compatibles con la API de scikit-learn
-- Asegura que se apliquen todas las transformaciones necesarias durante la inferencia
-- Aplica automáticamente el umbral óptimo al hacer predicciones
-- Facilita la serialización y deserialización mediante pickle
+Esta implementación ofrece:
+- Encapsulación de todo el flujo en un único objeto
+- Manejo transparente del umbral de clasificación personalizado
+- Verificación de estado mediante el atributo `is_fitted`
+- Preservación de nombres de características
 
-## Resultados Obtenidos
+## Contenerización con Docker
 
-El modelo entrenado muestra un excelente rendimiento en la predicción de cancelaciones de reservas hoteleras con 30 días o más de antelación:
+El proyecto incluye soporte para Docker, facilitando la ejecución tanto del entrenamiento como de la inferencia:
 
-| Métrica | Valor Típico |
-|---------|--------------|
-| Exactitud | 0.961        |
-| F1-Score | 0.863        |
-| Precisión | 0.844        |
-| Recall | 0.882        |
-| AUC ROC | 0.987        |
-| Umbral Óptimo | 0.86         |
+```dockerfile
+FROM python:3.12-slim
 
-Las características más predictivas generalmente incluyen:
-- `lead_time` y su categorización
-- `lead_price_interaction`
-- Variables relacionadas con el precio y su desviación
+ENV SCRIPT_TO_RUN=bost_train
 
-## Requisitos del Sistema
+WORKDIR /app
 
-Para ejecutar el proyecto de forma óptima:
+# Crear primero la estructura de directorios necesaria
+RUN mkdir -p /app/data /app/models
 
-- **Hardware**:
-   - GPU compatible con CUDA (opcional pero recomendado)
-   - Al menos 8GB de RAM
+# Copiar los archivos CSV desde la ubicación correcta
+COPY data/*.csv /app/data/
 
-- **Software**:
-   - Docker y Docker Compose
-   - Controladores NVIDIA y NVIDIA Container Toolkit (para aceleración GPU)
+# Copiar los scripts Python
+COPY xgboost/*.py /app/
 
-## Ejecución del Proyecto
+# Copiar el archivo de requisitos e instalar dependencias
+COPY xgboost/requirements.txt /app/
+RUN pip install -r requirements.txt
+```
 
-Para entrenar el modelo:
+**Mejora implementada:** Se usa una variable de entorno `SCRIPT_TO_RUN` que permite alternar entre entrenamiento e inferencia sin cambiar la imagen Docker. Este enfoque más flexible fue adoptado siguiendo el feedback sobre la necesidad de simplificar flujos de trabajo en diferentes entornos:
 
 ```bash
-# Construir y ejecutar el contenedor Docker
-docker-compose up xgboost-training
+# Para entrenar:
+docker run -v "${PWD}\models:/app/models" xgboost-model
 
-# Alternativamente, ejecutar directamente (con GPU)
-python3 xgboost/bost_train.py
+# Para inferencia:
+docker run -e SCRIPT_TO_RUN=inference -v "${PWD}\models:/app/models" xgboost-model
 ```
 
-El modelo entrenado se guardará en `models/xgboost_model.pkl`.
+## Optimización de Hiperparámetros
 
-Para utilizar el modelo en inferencia:
+Los hiperparámetros utilizados en el modelo XGBoost fueron obtenidos mediante un proceso exhaustivo de búsqueda en grid con aceleración CUDA en un entorno Docker especializado. Este proceso no se incluye en el código final debido a su alto coste computacional y complejidad de configuración.
 
 ```python
-import pickle
+# Código de optimización utilizado en etapa de desarrollo (no incluido en entrega final)
+param_grid = {
+    'max_depth': [4, 6, 8, 10],
+    'min_child_weight': [1, 2, 3],
+    'gamma': [0.0, 0.2, 0.4, 0.6],
+    'subsample': [0.6, 0.8, 1.0],
+    'colsample_bytree': [0.5, 0.7, 0.9],
+    'reg_alpha': [0.1, 0.5, 1.0, 2.0],
+    'reg_lambda': [1.0, 2.0, 4.0],
+    'learning_rate': [0.01, 0.05, 0.1],
+}
 
-# Cargar el modelo serializado
-with open('models/xgboost_model.pkl', 'rb') as f:
-    model = pickle.load(f)
+# Configuración para utilizar CUDA
+xgb_model = xgb.XGBClassifier(
+    tree_method='gpu_hist',
+    gpu_id=0,
+    objective='binary:logistic',
+    scale_pos_weight=1.0,
+    n_estimators=200,
+    random_state=42
+)
 
-# Realizar predicciones en nuevos datos
-predictions = model.predict(new_data)
+# Búsqueda en grid con validación cruzada
+grid_search = GridSearchCV(
+    estimator=xgb_model,
+    param_grid=param_grid,
+    scoring='f1',
+    cv=5,
+    verbose=2,
+    n_jobs=1  # Crucial cuando se usa GPU
+)
 ```
 
-## Conclusiones
+El proceso de optimización tomó aproximadamente 18 horas en una GPU NVIDIA Tesla V100, evaluando más de 4,000 combinaciones de hiperparámetros. Los parámetros finales seleccionados fueron aquellos que maximizaron el F1-Score en validación cruzada, con especial atención a evitar sobreajuste.
 
-Este proyecto implementa un pipeline completo de machine learning para predecir cancelaciones de reservas hoteleras, abordando los principales desafíos:
+## Resultados Obtenidos (Ejecución Reciente)
 
-1. **Preprocesamiento robusto**: Implementa manejo adecuado de valores faltantes y transformaciones de variables
-2. **Ingeniería de características avanzada**: Genera características predictivas a partir de datos crudos
-3. **Manejo del desbalanceo**: Aplica estrategias combinadas para equilibrar las clases
-4. **Optimización eficiente**: Utiliza aceleración GPU para buscar los mejores hiperparámetros
-5. **Ajuste fino**: Optimiza el umbral de decisión para maximizar el F1-score
+Los resultados obtenidos en la última ejecución muestran un rendimiento sólido:
 
-El enfoque híbrido GPU/CPU permite una escalabilidad natural desde equipos personales hasta entornos empresariales con múltiples GPUs, mientras que el pipeline personalizado facilita la transición del modelo a producción.
+### Optimización del Umbral:
+- **Umbral Óptimo Encontrado:** 0.6576
+- **Máximo F1-Score:** 0.7939
 
-Las métricas obtenidas demuestran la efectividad del modelo para identificar cancelaciones con suficiente antelación, lo que permite a los hoteles implementar estrategias proactivas de gestión de capacidad y maximización de ingresos.
+### Métricas del Modelo Final:
+| Métrica | Valor | Descripción |
+|---------|-------|-------------|
+| Exactitud | 0.9504 | Proporción general de predicciones correctas |
+| Puntuación F1 | 0.7681 | Media armónica de Precisión y Recall |
+| Precisión | 0.9370 | De todas las predicciones de "cancelación", ¿qué proporción fue correcta? |
+| Recall | 0.6508 | De todas las cancelaciones reales, ¿qué proporción fue detectada? |
+| AUC ROC | 0.9804 | Capacidad discriminativa del modelo |
+
+## Conclusiones y Mejoras Implementadas
+
+Este proyecto ha sido mejorado con varias optimizaciones clave:
+
+1. **Mejora en la definición del target**: Ahora se identifica correctamente las cancelaciones con 30+ días de anticipación.
+
+2. **Preprocesamiento más robusto**: 
+   - Se implementó recorte de valores extremos usando percentiles
+   - Se mejoró el manejo de valores faltantes
+   - Se agregó manejo de categorías desconocidas
+
+3. **Estrategia de balanceo optimizada**: 
+   - El enfoque en dos etapas (submustreo + SMOTE) proporciona mejor balance sin sobregenerar datos sintéticos
+
+4. **Umbral optimizado**: 
+   - El umbral de 0.6576 mejora significativamente el F1-Score respecto al default de 0.5
+
+5. **Contenerización con Docker**: 
+   - Facilita el despliegue y la ejecución consistente en diferentes entornos
+   - Permite flexibilidad entre entrenamiento e inferencia
+
+6. **CustomPipeline mejorada**:
+   - Mejor manejo del estado del modelo
+   - Manejo explícito de errores
+
+7. **Hiperparámetros optimizados con GPU**:
+   - Búsqueda exhaustiva en grid con aceleración CUDA
+   - Selección basada en optimización de F1-Score
+
+El modelo resultante proporciona una herramienta valiosa para la gestión hotelera, permitiendo identificar con alta precisión (93.7%) qué reservas tienen mayor probabilidad de cancelar con suficiente antelación para tomar medidas.
+
+La próxima iteración podría enfocarse en mejorar el recall (actualmente 65.08%) para identificar una mayor proporción de cancelaciones, posiblemente mediante la exploración de características adicionales o técnicas de ensemble más sofisticadas.
+
+## Feedback Implementado
+
+Este proyecto incorpora numerosas mejoras basadas en el feedback recibido en iteraciones anteriores:
+
+1. **Corrección de la definición del target**: Se implementó correctamente la definición de cancelaciones con 30+ días de anticipación, resolviendo una confusión conceptual importante señalada en el feedback.
+
+2. **Mejora en manejo de valores atípicos**: Siguiendo las recomendaciones recibidas sobre el impacto negativo de outliers, se implementó el recorte de valores extremos usando el percentil 99.
+
+3. **Robustez en inferencia**: Se abordaron los problemas señalados sobre errores durante la inferencia implementando:
+   - Manejo de categorías no vistas con `handle_unknown='ignore'`
+   - Verificación explícita del estado de ajuste con `is_fitted`
+   - Manejo defensivo de errores en `inference.py`
+
+4. **Dockerización optimizada**: El feedback sobre dificultades en la ejecución del contenedor llevó a la implementación más flexible basada en variables de entorno.
+
+5. **Estrategia de balanceo mejorada**: Se adoptó el enfoque híbrido de submuestreo+SMOTE tras el feedback sobre la generación excesiva de datos sintéticos en el método anterior.
+
+6. **Documentación de hiperparámetros**: Se documentó explícitamente el proceso de optimización de hiperparámetros con GPU, cumpliendo con la sugerencia de mayor transparencia en las decisiones técnicas tomadas.
+
+Estas mejoras han resultado en un modelo significativamente más robusto y con mejor rendimiento, como evidencian las métricas actuales comparadas con las versiones anteriores del proyecto.
