@@ -7,11 +7,20 @@ from sklearn import set_config
 set_config(transform_output="pandas")
 
 def get_X():
+    """
+    Carga y preprocesa los datos para inferencia.
 
-    #df = pd.read_csv(os.environ["INFERENCE_DATA_PATH"])
+    Returns:
+        DataFrame con características preparadas
+    """
+    print("Cargando datos de inferencia...")
+    # Usar las variables de entorno para cargar los datos
+    df = pd.read_csv(os.environ.get("INFERENCE_DATA_PATH", "data/bookings_train.csv"))
+    hotels = pd.read_csv(os.environ.get("HOTELS_DATA_PATH", "data/hotels.csv"))
 
-    # Cargar datos de entrada localmente
-    df = pd.read_csv("data/bookings_train.csv")
+    # Combinar datos
+    merged = pd.merge(df, hotels, on='hotel_id', how='left')
+    df = merged.copy()
 
     # Convertir columnas de fecha a datetime
     date_columns = ['arrival_date', 'booking_date', 'reservation_status_date']
@@ -67,17 +76,29 @@ def get_X():
     if 'required_car_parking_spaces' in df.columns:
         df['requested_parking'] = (df['required_car_parking_spaces'] > 0).astype(int)
 
+    # Manejar valores infinitos y nulos en características numéricas
+    for col in ['price_per_night', 'price_per_person', 'special_requests_ratio', 'booking_lead_ratio']:
+        if col in df.columns:
+            df[col] = df[col].replace([np.inf, -np.inf], np.nan)
+
+    print("Datos preprocesados para inferencia.")
     return df
 
 def get_pipeline():
+    """
+    Carga el pipeline entrenado desde la ruta definida en variables de entorno.
 
-    # Cargar el pipeline desde un archivo local
-    with open("models/xgboost_model.pkl", mode="rb") as f:
+    Returns:
+        Pipeline entrenada
+    """
+    print("Cargando el pipeline entrenado...")
+    # Usar la variable de entorno para la ruta del modelo
+    model_path = os.environ.get("MODEL_PATH", "models/xgboost_model.pkl")
+
+    with open(model_path, mode="rb") as f:
         pipe = cloudpickle.load(f)
 
-    #with open(os.environ["MODEL_PATH"], mode="rb") as f:
-        #pipe = cloudpickle.load(f)
-
+    print("Pipeline cargado.")
     return pipe
 
 def get_predictions(pipe, X):
@@ -91,31 +112,40 @@ def get_predictions(pipe, X):
     Returns:
         Series con predicciones 0/1
     """
-    # Detectar qué tipo de pipeline estamos usando
-    if hasattr(pipe, 'predict'):
-        # Nuestra CustomPipeline tiene método predict
-        predictions = pipe.predict(X)
-    else:
-        # Fallback a formas alternativas
-        try:
+    print("Realizando predicciones...")
+    try:
+        # Intentar usar el pipeline directamente
+        if hasattr(pipe, 'predict'):
+            # Si es CustomPipeline, forzar is_fitted=True si es necesario
+            if hasattr(pipe, 'is_fitted'):
+                pipe.is_fitted = True
+            predictions = pipe.predict(X)
+        else:
             # Si es un pipeline estándar
             predictions = pipe.predict(X)
-        except:
-            try:
-                # Si es un diccionario o estructura con modelo
-                if hasattr(pipe, 'model'):
-                    X_processed = pipe.preprocessor.transform(X)
-                    predictions = pipe.model.predict(X_processed)
-                else:
-                    raise ValueError("Estructura de pipeline no reconocida")
-            except:
-                raise ValueError("No se pudieron generar predicciones con el modelo")
+    except Exception as e:
+        print(f"Error usando el método predict: {e}")
+        try:
+            # Intento alternativo con preprocessor y model directamente
+            if hasattr(pipe, 'preprocessor') and hasattr(pipe, 'model'):
+                X_processed = pipe.preprocessor.transform(X)
+                probas = pipe.model.predict_proba(X_processed)[:, 1]
+                threshold = getattr(pipe, 'best_threshold', 0.5)
+                predictions = (probas >= threshold).astype(int)
+            else:
+                raise ValueError("No se pudo acceder a los componentes del pipeline")
+        except Exception as e:
+            print(f"Error en aproximación alternativa: {e}")
+            raise ValueError("No se pudieron generar predicciones con el modelo")
 
     # Asegurarnos de devolver Series con el formato correcto
     if isinstance(predictions, np.ndarray):
-        return pd.Series(predictions, index=X.index, name='prediction')
+        predictions = pd.Series(predictions, index=X.index, name='prediction')
     else:
-        return predictions.rename('prediction')
+        predictions = predictions.rename('prediction')
+
+    print("Predicciones realizadas.")
+    return predictions
 
 if __name__ == "__main__":
     # Cargar datos
@@ -128,4 +158,6 @@ if __name__ == "__main__":
     preds = get_predictions(pipe, X)
 
     # NO CAMBIAR LA RUTA DE SALIDA NI EL FORMATO. UNA ÚNICA COLUMNA CON LAS PREDICCIONES 0/1
-    preds.to_csv("output_predictions.csv", header=True)
+    print("Guardando predicciones en output_predictions.csv...")
+    preds.to_csv("data/output_predictions.csv", header=True)
+    print("Predicciones guardadas.")
