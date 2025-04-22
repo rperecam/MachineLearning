@@ -158,6 +158,6 @@ if __name__ == "__main__":
     preds = get_predictions(pipe, X)
 
     # NO CAMBIAR LA RUTA DE SALIDA NI EL FORMATO. UNA ÚNICA COLUMNA CON LAS PREDICCIONES 0/1
-    print("Guardando predicciones en output_predictions.csv...")
+    print("Guardando predicciones en data/output_predictions.csv...")
     preds.to_csv("data/output_predictions.csv", header=True)
     print("Predicciones guardadas.")
