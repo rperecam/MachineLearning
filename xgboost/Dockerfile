@@ -1,6 +1,6 @@
 FROM python:3.12-slim
 
-ENV SCRIPT_TO_RUN=bost_train
+ENV SCRIPT_TO_RUN=boost_train
 
 WORKDIR /app
 
