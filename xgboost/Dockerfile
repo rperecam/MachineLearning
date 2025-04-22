@@ -4,27 +4,31 @@ ENV SCRIPT_TO_RUN=bost_train
 
 WORKDIR /app
 
-# Copiar primero solo los datos
-COPY data/*.csv /app/
-COPY xgboost/data/*.csv /app/ 2>/dev/null || true
+# Crear primero la estructura de directorios necesaria
+RUN mkdir -p /app/data /app/models
 
-# Luego copiar el código
+# Copiar los archivos CSV desde la ubicación correcta
+COPY data/*.csv /app/data/
+
+# Copiar los scripts Python
 COPY xgboost/*.py /app/
-COPY *.py /app/ 2>/dev/null || true
-COPY xgboost/requirements.txt /app/
 
+# Copiar el archivo de requisitos e instalar dependencias
+COPY xgboost/requirements.txt /app/
 RUN pip install -r requirements.txt
 
-# NO CAMBIAR ESTAS RUTAS
-ENV INFERENCE_DATA_PATH=/app/bookings_train.csv
-ENV HOTELS_DATA_PATH=/app/hotels.csv
-ENV TRAIN_DATA_PATH=/app/bookings_train.csv
-ENV MODEL_PATH=/app/pipeline.cloudpkl
-
-# Crear directorio para modelos
-RUN mkdir -p /app/models
+# Configurar las rutas correctas para los archivos de datos
+ENV INFERENCE_DATA_PATH=/app/data/bookings_train.csv
+ENV HOTELS_DATA_PATH=/app/data/hotels.csv
+ENV TRAIN_DATA_PATH=/app/data/bookings_train.csv
+ENV MODEL_PATH=/app/models/pipeline.cloudpkl
 
 # Verificar los archivos copiados
-RUN ls -la /app/
+RUN ls -la /app/ && ls -la /app/data/
 
 CMD ["sh", "-c", "python -m $SCRIPT_TO_RUN"]
+
+# Para construir la imagen, ejecutar el siguiente comando en la terminal desde la raiz del proyecto:
+# docker build -t xgboost-model -f xgboost/Dockerfile .
+# docker run -v "${PWD}\models:/app/models" xgboost-model
+# docker run -e SCRIPT_TO_RUN=inference -v "${PWD}\models:/app/models" xgboost-model
