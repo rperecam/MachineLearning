@@ -3,14 +3,15 @@ import pandas as pd
 import numpy as np
 import cloudpickle
 from sklearn import set_config
-from sklearn.model_selection import GroupKFold, RandomizedSearchCV
+from sklearn.model_selection import GroupKFold, RandomizedSearchCV, train_test_split
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
 from sklearn.compose import ColumnTransformer
 from sklearn.pipeline import Pipeline
 from sklearn.impute import SimpleImputer
+from sklearn.feature_selection import VarianceThreshold
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, roc_auc_score, make_scorer
 import xgboost as xgb
-from imblearn.over_sampling import ADASYN
+from imblearn.over_sampling import SMOTE
 import warnings
 
 # Configuración
@@ -31,6 +32,7 @@ def get_X_y():
 
     # Filtrar datos relevantes
     data['reservation_status'] = data['reservation_status'].replace('No Show', np.nan)
+    data = data[data['reservation_status'].notna()].copy()
     data = data[data['reservation_status'] != 'Booked'].copy()
 
     # Convertir fechas
@@ -38,38 +40,38 @@ def get_X_y():
         if col in data.columns:
             data[col] = pd.to_datetime(data[col])
 
-    # Definir target: cancelación con al menos 30 días de anticipación
+    # Target: cancelación con al menos 30 días de anticipación
     data['days_before_arrival'] = (data['arrival_date'] - data['reservation_status_date']).dt.days
     data['target'] = ((data['reservation_status'] == 'Canceled') &
                       (data['days_before_arrival'] >= 30)).astype(int)
 
     # Crear características clave
-    # Tiempo de anticipación
     data['lead_time'] = (data['arrival_date'] - data['booking_date']).dt.days
-
-    # Temporada alta
     data['is_high_season'] = data['arrival_date'].dt.month.isin([6, 7, 8, 12]).astype(int)
-
-    # Fin de semana
     data['is_weekend_arrival'] = data['arrival_date'].dt.dayofweek.isin([4, 5]).astype(int)
-
-    # Precio por noche/persona
     data['price_per_night'] = data['rate'] / np.maximum(data['stay_nights'], 1)
-
-    # Duración de estancia categorizada
     data['stay_duration_category'] = pd.cut(data['stay_nights'],
                                             bins=[-1, 1, 3, 7, 14, float('inf')],
                                             labels=['1_night', '2-3_nights', '4-7_nights', '8-14_nights', '15+_nights'])
-
-    # Solicitudes especiales
     data['has_special_requests'] = (data['special_requests'] > 0).astype(int)
 
     # Eliminar columnas que podrían causar data leakage
     columns_to_drop = [
         'reservation_status', 'reservation_status_date', 'days_before_arrival',
-        'arrival_date', 'booking_date','special_requests','stay_nights',
+        'arrival_date', 'booking_date', 'special_requests', 'stay_nights',
     ]
     columns_to_drop = [col for col in columns_to_drop if col in data.columns]
+
+    # Manejar valores nulos en todo el dataset
+    # Imputar valores nulos en columnas numéricas
+    for col in data.select_dtypes(include=['int64', 'float64']).columns:
+        if data[col].isna().any():
+            data[col] = data[col].fillna(data[col].median())
+
+    # Imputar valores nulos en columnas categóricas
+    for col in data.select_dtypes(include=['object', 'category']).columns:
+        if col not in columns_to_drop and data[col].isna().any():
+            data[col] = data[col].fillna(data[col].mode()[0])
 
     # Preparar X e y
     X = data.drop(columns=['target'] + columns_to_drop)
@@ -82,45 +84,39 @@ def get_X_y():
     return X, y, groups
 
 
-def get_pipeline(X):
-    """Define y retorna la pipeline para entrenar el modelo."""
-    # Identificar tipos de características
-    # Seleccionar características categóricas y numéricas por tipo de dato
-    categorical_features = list(X.select_dtypes(include=['object', 'category', 'bool']).columns)
-    numerical_features = list(X.select_dtypes(include=['int64', 'float64']).columns)
+from imblearn.pipeline import Pipeline as ImbPipeline
+from imblearn.over_sampling import SMOTE
+from sklearn.preprocessing import StandardScaler, OneHotEncoder
+from sklearn.compose import ColumnTransformer
+from xgboost import XGBClassifier
 
-    # Excluir hotel_id de las características para el modelo
-    if 'hotel_id' in categorical_features:
-        categorical_features.remove('hotel_id')
+def get_pipeline(X: pd.DataFrame):
+    # Identificar tipos de columnas
+    num_features = X.select_dtypes(include=["int64", "float64"]).columns.tolist()
+    cat_features = X.select_dtypes(include=["object", "category", "bool"]).columns.tolist()
 
-    # Pipeline para características categóricas
-    categorical_transformer = Pipeline(steps=[
-        ('imputer', SimpleImputer(strategy='most_frequent')),
-        ('onehot', OneHotEncoder(handle_unknown='ignore', sparse_output=False))
-    ])
-
-    # Pipeline para características numéricas
-    numerical_transformer = Pipeline(steps=[
-        ('imputer', SimpleImputer(strategy='median')),
-        ('scaler', StandardScaler())
-    ])
-
-    # Preprocesador
+    # Preprocesamiento
     preprocessor = ColumnTransformer(
         transformers=[
-            ('num', numerical_transformer, numerical_features),
-            ('cat', categorical_transformer, categorical_features)
-        ],
-        remainder='drop'
+            ("num", StandardScaler(), num_features),
+            ("cat", OneHotEncoder(handle_unknown="ignore", sparse_output=False), cat_features),
+        ]
     )
 
-    # Modelo XGBoost
-    xgb_model = xgb.XGBClassifier(objective='binary:logistic', eval_metric='logloss')
+    # Clasificador
+    classifier = XGBClassifier(
+        objective='binary:logistic',
+        tree_method='gpu_hist',
+        eval_metric='logloss',
+        use_label_encoder=False,
+        verbosity=0
+    )
 
-    # Pipeline final
-    pipeline = Pipeline([
-        ('preprocessor', preprocessor),
-        ('classifier', xgb_model)
+    # Pipeline completa con SMOTE
+    pipeline = ImbPipeline(steps=[
+        ("preprocessor", preprocessor),
+        ("smote", SMOTE(random_state=42)),
+        ("classifier", classifier)
     ])
 
     return pipeline
@@ -142,19 +138,15 @@ def find_optimal_threshold(y_true, y_pred_proba):
     return best_threshold
 
 
-def balance_dataset(X, y):
-    """Balancea el conjunto de datos con ADASYN."""
-    print(f"Distribución original - Clase 0: {sum(y == 0)}, Clase 1: {sum(y == 1)}")
+def balance_dataset(X_train, y_train):
+    """Balancea el conjunto de datos con SMOTE."""
+    print(f"Distribución original - Clase 0: {sum(y_train == 0)}, Clase 1: {sum(y_train == 1)}")
 
-    # Verificar si hay suficientes ejemplos para aplicar ADASYN
-    if sum(y == 1) >= 5:  # ADASYN necesita al menos 5 ejemplos
-        adasyn = ADASYN(sampling_strategy=0.7, random_state=42)
-        X_balanced, y_balanced = adasyn.fit_resample(X, y)
-        print(f"Distribución balanceada - Clase 0: {sum(y_balanced == 0)}, Clase 1: {sum(y_balanced == 1)}")
-        return X_balanced, y_balanced
-    else:
-        print("No se pudo aplicar ADASYN, usando datos originales")
-        return X, y
+    smote = SMOTE(sampling_strategy=0.7, random_state=42)
+    X_balanced, y_balanced = smote.fit_resample(X_train, y_train)
+
+    print(f"Distribución balanceada - Clase 0: {sum(y_balanced == 0)}, Clase 1: {sum(y_balanced == 1)}")
+    return X_balanced, y_balanced
 
 
 def save_pipeline(pipe):
@@ -190,101 +182,92 @@ if __name__ == "__main__":
     X, y, groups = get_X_y()
     print(f"Distribución de clases: Clase 0: {sum(y == 0)}, Clase 1: {sum(y == 1)}")
 
-    # Eliminar hotel_id de las características si existe (ya lo usamos como grupo)
-    if 'hotel_id' in X.columns:
-        X = X.drop(columns=['hotel_id'])
+    # Crear conjunto de test separado antes de cualquier procesamiento
+    X_dev, X_test, y_dev, y_test, groups_dev, groups_test = train_test_split(
+        X, y, groups, test_size=0.3, random_state=42, stratify=y
+    )
 
-    # Obtener la pipeline básica
-    pipe = get_pipeline(X)
+    print(f"\nConjunto de desarrollo: {X_dev.shape[0]} muestras")
+    print(f"Conjunto de test (separado): {X_test.shape[0]} muestras")
 
-    # Definir hiperparámetros para RandomSearch
+    # Guardar hotel_id para GroupKFold pero sacarlo de las características
+    if 'hotel_id' in X_dev.columns:
+        hotel_id_dev = X_dev['hotel_id'].copy()
+        hotel_id_test = X_test['hotel_id'].copy()
+        X_dev = X_dev.drop(columns=['hotel_id'])
+        X_test = X_test.drop(columns=['hotel_id'])
+
+    # Obtener la pipeline
+    pipe = get_pipeline(X_dev)
+
+    # Búsqueda de hiperparámetros conservadora
     param_dist = {
-        'classifier__max_depth': [6, 8, 10],
-        'classifier__min_child_weight': [1, 2, 3],
-        'classifier__gamma': [0, 0.1, 0.2],
-        'classifier__subsample': [0.7, 0.8, 0.9],
-        'classifier__colsample_bytree': [0.5, 0.6, 0.7],
-        'classifier__reg_alpha': [0, 0.1, 0.5],
-        'classifier__reg_lambda': [1, 2, 3],
-        'classifier__learning_rate': [0.01, 0.05, 0.1],
-        'classifier__n_estimators': [100, 200, 300]
+        'classifier__max_depth': [3, 4, 5],
+        'classifier__min_child_weight': [3, 5],
+        'classifier__subsample': [0.8, 0.9],
+        'classifier__colsample_bytree': [0.7, 0.9],
+        'classifier__learning_rate': [0.05],
+        'classifier__n_estimators': [50, 100]
     }
 
-    # Definir validación cruzada con GroupKFold
+    # Validación cruzada con GroupKFold
     group_cv = GroupKFold(n_splits=5)
-
-    # Crear splits para visualización y análisis
     print("\nDistribución de folds con GroupKFold:")
-    for fold_idx, (train_idx, test_idx) in enumerate(group_cv.split(X, y, groups)):
+    for fold_idx, (train_idx, val_idx) in enumerate(group_cv.split(X_dev, y_dev, groups_dev)):
         print(f"Fold {fold_idx + 1}:")
-        unique_hotels_train = groups.iloc[train_idx].nunique()
-        unique_hotels_test = groups.iloc[test_idx].nunique()
+        unique_hotels_train = np.unique(groups_dev.iloc[train_idx]).size
+        unique_hotels_val = np.unique(groups_dev.iloc[val_idx]).size
         print(f"  Training: {len(train_idx)} muestras, {unique_hotels_train} hoteles únicos")
-        print(f"  Testing:  {len(test_idx)} muestras, {unique_hotels_test} hoteles únicos")
+        print(f"  Validación: {len(val_idx)} muestras, {unique_hotels_val} hoteles únicos")
 
     # Definir métrica para RandomSearch
     scoring = {'f1': make_scorer(f1_score)}
 
-    # Realizar RandomSearch con GroupKFold
+    # Realizar búsqueda aleatoria con validación cruzada
+    print("\nEntrenando modelo con validación cruzada GroupKFold...")
     random_search = RandomizedSearchCV(
         pipe,
         param_distributions=param_dist,
-        n_iter=30,
-        cv=group_cv.split(X, y, groups),
+        n_iter=10,
+        cv=group_cv.split(X_dev, y_dev, groups_dev),
         scoring=scoring,
         refit='f1',
         random_state=42,
-        n_jobs=-1
+        n_jobs=-1,
+        verbose=1
     )
 
-    # Entrenar el modelo
-    print("\nEntrenando modelo con validación cruzada GroupKFold...")
-    best_model = random_search.fit(X, y, groups=groups).best_estimator_
+    best_model = random_search.fit(X_dev, y_dev).best_estimator_
     print(f"Mejores parámetros: {random_search.best_params_}")
 
-    # Crear conjunto de validación final para evaluar el rendimiento
-    # Usamos GroupKFold para crear un split final de validación
-    final_cv = list(GroupKFold(n_splits=4).split(X, y, groups))[-1]  # Tomamos el último fold
-    train_idx, val_idx = final_cv
-    X_train, X_val = X.iloc[train_idx], X.iloc[val_idx]
-    y_train, y_val = y.iloc[train_idx], y.iloc[val_idx]
+    #
+    final_model = best_model.fit(X_dev, y_dev)
 
-    # Ajustar el modelo final en este conjunto de entrenamiento
-    final_model = best_model.fit(X_train, y_train)
-
-    # Realizamos predicciones sobre el conjunto de validación
-    y_val_proba = final_model.predict_proba(X_val)[:, 1]
-
-    # Encontrar umbral óptimo
-    threshold = find_optimal_threshold(y_val, y_val_proba)
+    # Predicciones en conjunto de desarrollo (para obtener el mejor umbral)
+    y_dev_proba = final_model.predict_proba(X_dev)[:, 1]
+    threshold = find_optimal_threshold(y_dev, y_dev_proba)
     print(f"\nUmbral óptimo: {threshold:.4f}")
 
-    # Realizamos predicciones con el umbral óptimo
-    y_val_pred = (y_val_proba >= threshold).astype(int)
+    # Evaluación en conjunto de test
+    print("\nEvaluando en conjunto de test no visto...")
+    y_test_proba = final_model.predict_proba(X_test)[:, 1]
+    y_test_pred = (y_test_proba >= threshold).astype(int)
 
-    # Calcular métricas
-    accuracy = accuracy_score(y_val, y_val_pred)
-    precision = precision_score(y_val, y_val_pred)
-    recall = recall_score(y_val, y_val_pred)
-    f1 = f1_score(y_val, y_val_pred)
-    roc_auc = roc_auc_score(y_val, y_val_proba)
+    test_accuracy = accuracy_score(y_test, y_test_pred)
+    test_precision = precision_score(y_test, y_test_pred)
+    test_recall = recall_score(y_test, y_test_pred)
+    test_f1 = f1_score(y_test, y_test_pred)
+    test_roc_auc = roc_auc_score(y_test, y_test_proba)
 
-    # Imprimir métricas
-    print("\nMétricas en conjunto de validación:")
-    print(f"Exactitud:    {accuracy:.4f}")
-    print(f"Precisión:    {precision:.4f}")
-    print(f"Sensibilidad: {recall:.4f}")
-    print(f"F1-Score:     {f1:.4f}")
-    print(f"ROC AUC:      {roc_auc:.4f}")
+    print("\nMétricas en conjunto de test:")
+    print(f"Exactitud:    {test_accuracy:.4f}")
+    print(f"Precisión:    {test_precision:.4f}")
+    print(f"Sensibilidad: {test_recall:.4f}")
+    print(f"F1-Score:     {test_f1:.4f}")
+    print(f"ROC AUC:      {test_roc_auc:.4f}")
 
-    # Crear y entrenar el modelo final con todos los datos
-    print("\nEntrenando modelo final con todos los datos...")
-    final_model = best_model.fit(X, y)
-
-    # Creamos un clasificador con umbral personalizado
+    # Guardar clasificador con umbral personalizado
     threshold_classifier = ThresholdClassifier(final_model, threshold)
-
-    # Guardar el modelo con umbral personalizado
     save_pipeline(threshold_classifier)
 
     print("\n¡Proceso completado con éxito!")
