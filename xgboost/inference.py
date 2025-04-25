@@ -20,6 +20,8 @@ def get_X():
 
     # Unir datos
     data = pd.merge(inference, hotels, on='hotel_id', how='left')
+    #Quito los registros con reservation_status = Canceled, Check-in o No-Show para hacer inferencia solo en Booked
+    data = data[data['reservation_status'].isin(['No-Show', 'Canceled', 'Check-in'])].copy()
 
     # Convertir fechas
     for col in ['arrival_date', 'booking_date', 'reservation_status_date']:
@@ -40,10 +42,17 @@ def get_X():
                                             labels=['1_night', '2-3_nights', '4-7_nights', '8-14_nights', '15+_nights'])
     data['has_special_requests'] = (data['special_requests'] > 0).astype(int)
 
+    # Característica de cliente extranjero (importante para predecir cancelaciones)
+    country_col_x = 'country_x'
+    country_col_y = 'country_y'
+    if country_col_x in data.columns and country_col_y in data.columns:
+        data['is_foreign'] = (data[country_col_x].astype(str) != data[country_col_y].astype(str)).astype(int)
+        data.loc[data[country_col_x].isna() | data[country_col_y].isna(), 'is_foreign'] = 0
+
     # Eliminar columnas que podrían causar data leakage
     columns_to_drop = [
         'reservation_status', 'reservation_status_date', 'days_before_arrival',
-        'arrival_date', 'booking_date', 'special_requests', 'stay_nights',
+        'arrival_date', 'booking_date''special_requests', 'stay_nights', 'country_y'
     ]
     columns_to_drop = [col for col in columns_to_drop if col in data.columns]
 

@@ -3,7 +3,7 @@ import pandas as pd
 import numpy as np
 import cloudpickle
 from sklearn import set_config
-from sklearn.model_selection import GroupKFold, RandomizedSearchCV, train_test_split
+from sklearn.model_selection import StratifiedGroupKFold, RandomizedSearchCV, train_test_split
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, roc_auc_score, make_scorer
 import warnings
 from imblearn.pipeline import Pipeline as ImbPipeline
@@ -12,6 +12,7 @@ from sklearn.preprocessing import StandardScaler, OneHotEncoder
 from sklearn.compose import ColumnTransformer
 from xgboost import XGBClassifier
 import multiprocessing.resource_tracker
+from copy import deepcopy
 
 # Parche para silenciar "ChildProcessError: No child processes"
 def silence_resource_tracker():
@@ -52,6 +53,9 @@ def get_X_y():
     data['target'] = ((data['reservation_status'] == 'Canceled') &
                       (data['days_before_arrival'] >= 30)).astype(int)
 
+    hotel_cancellation_rate = data.groupby('hotel_id')['target'].mean()
+    data['hotel_cancel_rate'] = data['hotel_id'].map(hotel_cancellation_rate)
+
     # Crear características clave
     data['lead_time'] = (data['arrival_date'] - data['booking_date']).dt.days
     data['is_high_season'] = data['arrival_date'].dt.month.isin([6, 7, 8, 12]).astype(int)
@@ -62,10 +66,17 @@ def get_X_y():
                                             labels=['1_night', '2-3_nights', '4-7_nights', '8-14_nights', '15+_nights'])
     data['has_special_requests'] = (data['special_requests'] > 0).astype(int)
 
+    # Característica de cliente extranjero (importante para predecir cancelaciones)
+    country_col_x = 'country_x'
+    country_col_y = 'country_y'
+    if country_col_x in data.columns and country_col_y in data.columns:
+        data['is_foreign'] = (data[country_col_x].astype(str) != data[country_col_y].astype(str)).astype(int)
+        data.loc[data[country_col_x].isna() | data[country_col_y].isna(), 'is_foreign'] = 0
+
     # Eliminar columnas que podrían causar data leakage
     columns_to_drop = [
         'reservation_status', 'reservation_status_date', 'days_before_arrival',
-        'arrival_date', 'booking_date', 'special_requests', 'stay_nights',
+        'arrival_date', 'booking_date''special_requests', 'stay_nights', 'country_y'
     ]
     columns_to_drop = [col for col in columns_to_drop if col in data.columns]
 
@@ -105,12 +116,13 @@ def get_pipeline(X: pd.DataFrame):
         tree_method='hist',
         eval_metric='logloss',
         use_label_encoder=False,
-        verbosity=0
+        verbosity=0,
+        scale_pos_weight=len(y_dev[y_dev == 0]) / len(y_dev[y_dev == 1])  # Añadir esta línea
     )
 
     pipeline = ImbPipeline(steps=[
         ("preprocessor", preprocessor),
-        ("smote", SMOTE(random_state=42)),
+        ("smote", SMOTE(random_state=42, k_neighbors=3)),
         ("classifier", classifier)
     ])
 
@@ -118,7 +130,7 @@ def get_pipeline(X: pd.DataFrame):
 
 
 def find_optimal_threshold(y_true, y_pred_proba):
-    thresholds = np.linspace(0.3, 0.7, 40)
+    thresholds = np.linspace(0.1, 0.95, 60)
     best_threshold, best_f1 = 0.5, 0
 
     for threshold in thresholds:
@@ -150,7 +162,6 @@ class ThresholdClassifier:
     def predict_proba(self, X):
         return self.classifier.predict_proba(X)
 
-
 if __name__ == "__main__":
     print("=" * 60)
     print("PREDICCIÓN DE CANCELACIONES ANTICIPADAS DE RESERVAS DE HOTEL")
@@ -178,10 +189,12 @@ if __name__ == "__main__":
         'classifier__subsample': [0.8, 0.9],
         'classifier__colsample_bytree': [0.7, 0.9],
         'classifier__learning_rate': [0.05],
-        'classifier__n_estimators': [50, 100]
+        'classifier__n_estimators': [50, 100],
+        'classifier__lambda': [1, 2, 5],
+        'classifier__alpha': [0, 0.1, 0.5]
     }
 
-    group_cv = GroupKFold(n_splits=5)
+    group_cv = StratifiedGroupKFold(n_splits=7, shuffle=True, random_state=42)
     print("\nDistribución de folds con GroupKFold:")
     for fold_idx, (train_idx, val_idx) in enumerate(group_cv.split(X_dev, y_dev, groups_dev)):
         print(f"Fold {fold_idx + 1}:")
@@ -194,22 +207,40 @@ if __name__ == "__main__":
     random_search = RandomizedSearchCV(
         pipe,
         param_distributions=param_dist,
-        n_iter=10,
+        n_iter=14,
         cv=group_cv.split(X_dev, y_dev, groups_dev),
         scoring=scoring,
         refit='f1',
         random_state=42,
         n_jobs=-1,
-        verbose=1
+        verbose=10
     )
 
     best_model = random_search.fit(X_dev, y_dev).best_estimator_
     print(f"Mejores parámetros: {random_search.best_params_}")
 
     final_model = best_model.fit(X_dev, y_dev)
-    y_dev_proba = final_model.predict_proba(X_dev)[:, 1]
-    threshold = find_optimal_threshold(y_dev, y_dev_proba)
-    print(f"\nUmbral óptimo: {threshold:.4f}")
+
+    fold_thresholds = []
+
+    print("\nCalculando umbral óptimo por fold...")
+    for fold_idx, (train_idx, val_idx) in enumerate(group_cv.split(X_dev, y_dev, groups_dev)):
+        X_train, X_val = X_dev.iloc[train_idx], X_dev.iloc[val_idx]
+        y_train, y_val = y_dev.iloc[train_idx], y_dev.iloc[val_idx]
+
+        model_fold = deepcopy(best_model)
+        model_fold.fit(X_train, y_train)
+
+        y_val_proba = model_fold.predict_proba(X_val)[:, 1]
+        threshold_fold = find_optimal_threshold(y_val, y_val_proba)
+        fold_thresholds.append(threshold_fold)
+
+        print(f"Fold {fold_idx + 1} — Threshold óptimo: {threshold_fold:.4f}")
+
+    # Umbral final (puedes elegir el que prefieras)
+    threshold = np.mean(fold_thresholds)  # Alternativa más robusta
+    print(f"\nUmbral final promedio usado: {threshold:.4f}")
+
 
     print("\nEvaluando en conjunto de test no visto...")
     y_test_proba = final_model.predict_proba(X_test)[:, 1]
@@ -226,3 +257,7 @@ if __name__ == "__main__":
     save_pipeline(threshold_classifier)
 
     print("\n¡Proceso completado con éxito!")
+
+# Mostrar la pipeline final
+#for name, step in pipe.named_steps.items():
+# print(f"\nPaso: {name}\n{step}")
