@@ -1,20 +1,9 @@
-# =======================
-# Standard library
-# =======================
 import os
 import time
 import warnings
-
-# =======================
-# Third-party libraries
-# =======================
 import numpy as np
 import pandas as pd
 import cloudpickle
-
-# =======================
-# Scikit-learn
-# =======================
 from sklearn import set_config
 from sklearn.impute import SimpleImputer
 from sklearn.pipeline import Pipeline
@@ -29,34 +18,24 @@ from sklearn.metrics import (
     f1_score,
     roc_auc_score,
 )
-
-# =======================
-# Imbalanced-learn
-# =======================
 from imblearn.pipeline import Pipeline as ImbPipeline
 from imblearn.over_sampling import SMOTE
-
-# =======================
-# Models
-# =======================
 from xgboost import XGBClassifier
 from lightgbm import LGBMClassifier
 from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
 from sklearn.linear_model import LogisticRegression
 
-
 # Configuración
 set_config(transform_output="pandas")
 warnings.filterwarnings('ignore')
-
 
 def get_X_y():
     """Carga y preprocesa los datos para el entrenamiento."""
     print("Cargando datos...")
 
     # Cargar datos
-    hotels = pd.read_csv(os.environ.get("HOTELS_DATA_PATH", 'data/hotels.csv'))
-    bookings = pd.read_csv(os.environ.get("TRAIN_DATA_PATH", 'data/bookings_train.csv'))
+    hotels = pd.read_csv(os.environ.get("HOTELS_DATA_PATH"))
+    bookings = pd.read_csv(os.environ.get("TRAIN_DATA_PATH"))
 
     # Combinar datos
     data = pd.merge(bookings, hotels, on='hotel_id', how='left')
@@ -65,16 +44,16 @@ def get_X_y():
     data = data[data['reservation_status'] != 'Booked'].copy()
 
     # Convertir fechas
-    for col in ['arrival_date', 'booking_date', 'reservation_status_date']:
+    date_columns = ['arrival_date', 'booking_date', 'reservation_status_date']
+    for col in date_columns:
         if col in data.columns:
             data[col] = pd.to_datetime(data[col])
 
-    # Target: cancelación con al menos 30 días de anticipación
+    # Crear características clave
     data['days_before_arrival'] = (data['arrival_date'] - data['reservation_status_date']).dt.days
     data['target'] = ((data['reservation_status'] == 'Canceled') &
                       (data['days_before_arrival'] >= 30)).astype(int)
 
-    # Crear características clave simplificadas
     data['lead_time'] = (data['arrival_date'] - data['booking_date']).dt.days
     data['is_high_season'] = data['arrival_date'].dt.month.isin([6, 7, 8, 12]).astype(int)
     data['is_weekend_arrival'] = data['arrival_date'].dt.dayofweek.isin([4, 5]).astype(int)
@@ -82,29 +61,23 @@ def get_X_y():
     data['has_special_requests'] = (data['special_requests'] > 0).astype(int)
 
     # Característica de cliente extranjero si existen las columnas
-    country_col_x = 'country_x'
-    country_col_y = 'country_y'
-    if country_col_x in data.columns and country_col_y in data.columns:
-        data['is_foreign'] = (data[country_col_x].astype(str) != data[country_col_y].astype(str)).astype(int)
-        data.loc[data[country_col_x].isna() | data[country_col_y].isna(), 'is_foreign'] = 0
+    if 'country_x' in data.columns and 'country_y' in data.columns:
+        data['is_foreign'] = (data['country_x'].astype(str) != data['country_y'].astype(str)).astype(int)
+        data.loc[data['country_x'].isna() | data['country_y'].isna(), 'is_foreign'] = 0
 
     # Eliminar columnas que podrían causar data leakage
     columns_to_drop = [
         'reservation_status', 'reservation_status_date', 'days_before_arrival',
         'arrival_date', 'booking_date', 'special_requests', 'stay_nights',
-        'country_y', 'country_x'  # Eliminamos las columnas de país para evitar sobreajuste
+        'country_y', 'country_x'
     ]
     columns_to_drop = [col for col in columns_to_drop if col in data.columns]
-
-    # Eliminar el código de imputación, ya que ahora se hará en el preprocesador
-    # La imputación se hará dentro del pipeline a través de create_preprocessor()
 
     X = data.drop(columns=['target'] + columns_to_drop)
     y = data['target']
 
     print(f"Datos cargados: {X.shape[0]} registros, {X.shape[1]} características")
     return X, y
-
 
 def create_preprocessor(X: pd.DataFrame):
     """Crea un preprocesador que incluye la imputación de valores nulos."""
@@ -137,65 +110,71 @@ def create_preprocessor(X: pd.DataFrame):
 
     return preprocessor
 
-
 def create_base_model(model_type='xgboost', pos_weight=1.0, random_state=42):
     """Crea un modelo base con hiperparámetros originales."""
-    if model_type == 'xgboost':
-        return XGBClassifier(
-            objective='binary:logistic',
-            tree_method='hist',
-            eval_metric='logloss',
-            use_label_encoder=False,
-            scale_pos_weight=pos_weight,
-            max_depth=6,  # Restaurado de 5 a 6
-            n_estimators=150,  # Restaurado de 100 a 150
-            learning_rate=0.05,  # Restaurado de 0.03 a 0.05
-            subsample=0.8,  # Restaurado de 0.7 a 0.8
-            colsample_bytree=0.8,  # Restaurado de 0.7 a 0.8
-            lambda_=1.0,  # Restaurado de 1.5 a 1.0
-            alpha=0.1,  # Restaurado de 0.2 a 0.1
-            verbosity=0,
-            random_state=random_state
-        )
-    elif model_type == 'lightgbm':
-        return LGBMClassifier(
-            objective='binary',
-            metric='binary_logloss',
-            scale_pos_weight=pos_weight,
-            n_estimators=150,  # Restaurado de 100 a 150
-            learning_rate=0.05,  # Restaurado de 0.03 a 0.05
-            num_leaves=31,  # Restaurado de 25 a 31
-            max_depth=6,  # Restaurado de 5 a 6
-            subsample=0.8,  # Restaurado de 0.7 a 0.8
-            colsample_bytree=0.8,  # Restaurado de 0.7 a 0.8
-            reg_alpha=0.1,  # Restaurado de 0.2 a 0.1
-            reg_lambda=1.0,  # Restaurado de 1.5 a 1.0
-            verbose=-1,
-            random_state=random_state
-        )
-    elif model_type == 'rf':
-        return RandomForestClassifier(
-            n_estimators=150,  # Restaurado de 100 a 150
-            max_depth=10,  # Restaurado de 8 a 10
-            min_samples_split=10,  # Restaurado de 15 a 10
-            min_samples_leaf=4,  # Restaurado de 5 a 4
-            class_weight='balanced',
-            random_state=random_state,
-            n_jobs=-1
-        )
-    elif model_type == 'gbm':
-        return GradientBoostingClassifier(
-            n_estimators=150,  # Restaurado de 100 a 150
-            learning_rate=0.05,  # Restaurado de 0.03 a 0.05
-            max_depth=6,  # Restaurado de 5 a 6
-            min_samples_split=10,  # Restaurado de 15 a 10
-            min_samples_leaf=4,  # Restaurado de 5 a 4
-            subsample=0.8,  # Restaurado de 0.7 a 0.8
-            random_state=random_state
-        )
-    else:
+    model_params = {
+        'xgboost': {
+            'objective': 'binary:logistic',
+            'tree_method': 'hist',
+            'eval_metric': 'logloss',
+            'use_label_encoder': False,
+            'scale_pos_weight': pos_weight,
+            'max_depth': 6,
+            'n_estimators': 150,
+            'learning_rate': 0.05,
+            'subsample': 0.8,
+            'colsample_bytree': 0.8,
+            'reg_lambda': 1.0,
+            'reg_alpha': 0.1,
+            'verbosity': 0,
+            'random_state': random_state
+        },
+        'lightgbm': {
+            'objective': 'binary',
+            'metric': 'binary_logloss',
+            'scale_pos_weight': pos_weight,
+            'n_estimators': 150,
+            'learning_rate': 0.05,
+            'num_leaves': 31,
+            'max_depth': 6,
+            'subsample': 0.8,
+            'colsample_bytree': 0.8,
+            'reg_alpha': 0.1,
+            'reg_lambda': 1.0,
+            'verbose': -1,
+            'random_state': random_state
+        },
+        'rf': {
+            'n_estimators': 150,
+            'max_depth': 10,
+            'min_samples_split': 10,
+            'min_samples_leaf': 4,
+            'class_weight': 'balanced',
+            'random_state': random_state,
+            'n_jobs': -1
+        },
+        'gbm': {
+            'n_estimators': 150,
+            'learning_rate': 0.05,
+            'max_depth': 6,
+            'min_samples_split': 10,
+            'min_samples_leaf': 4,
+            'subsample': 0.8,
+            'random_state': random_state
+        }
+    }
+
+    if model_type not in model_params:
         raise ValueError(f"Tipo de modelo no soportado: {model_type}")
 
+    if model_type == 'xgboost':
+        return XGBClassifier(**model_params[model_type])
+    elif model_type == 'lightgbm':
+        return LGBMClassifier(**model_params[model_type])
+    elif model_type == 'rf':
+        return RandomForestClassifier(**model_params[model_type])
+    elif model_type == 'gbm':
+        return GradientBoostingClassifier(**model_params[model_type])
 
 class StackingEnsemble(BaseEstimator, ClassifierMixin):
     """Ensemble simplificado de modelos mediante stacking."""
@@ -207,81 +186,50 @@ class StackingEnsemble(BaseEstimator, ClassifierMixin):
         self.model_types = ['xgboost', 'lightgbm', 'rf', 'gbm']  # Modelos a usar
 
     def fit(self, X, y):
-        """
-        Entrena múltiples modelos usando validación cruzada.
-        """
-        # Configuramos la validación cruzada
-        n_splits = 7
-        groups = None
-
-        if 'hotel_id' in X.columns:
-            groups = X['hotel_id'].copy()
-            X = X.drop(columns=['hotel_id'])
+        """Entrena múltiples modelos usando validación cruzada."""
+        n_splits = 7 # Muy importante
+        groups = X['hotel_id'].copy() if 'hotel_id' in X.columns else None
+        X = X.drop(columns=['hotel_id']) if groups is not None else X
 
         group_cv = StratifiedGroupKFold(n_splits=n_splits, shuffle=True, random_state=42)
-        if groups is not None:
-            cv_splits = list(group_cv.split(X, y, groups))
-        else:
-            cv_splits = list(group_cv.split(X, y))
+        cv_splits = list(group_cv.split(X, y, groups)) if groups is not None else list(group_cv.split(X, y))
 
-        # Preparamos matrices para las predicciones out-of-fold
         n_samples = X.shape[0]
         n_models_per_fold = len(self.model_types)
-
-        # Matriz para guardar todas las predicciones out-of-fold
         oof_preds = np.zeros((n_samples, n_splits * n_models_per_fold))
 
         start_time = time.time()
-
-        # Para cada fold, entrenamos varios modelos
         self.fold_models = []
 
         for fold_idx, (train_idx, val_idx) in enumerate(cv_splits):
-            fold_start_time = time.time()
             print(f"Entrenando fold {fold_idx + 1}/{n_splits}...")
-
             X_train, X_val = X.iloc[train_idx], X.iloc[val_idx]
             y_train, y_val = y.iloc[train_idx], y.iloc[val_idx]
 
             fold_models = []
 
-            # Para cada tipo de modelo
             for i, model_type in enumerate(self.model_types):
-                # Creamos el preprocesador
                 preprocessor = create_preprocessor(X_train)
-
-                # Calcular weight para clases desbalanceadas
                 pos_weight = len(y_train[y_train == 0]) / max(len(y_train[y_train == 1]), 1)
-
-                # Crear clasificador
                 classifier = create_base_model(model_type, pos_weight, random_state=42 + fold_idx * 10 + i)
 
-                # Crear pipeline con SMOTE
                 pipeline = ImbPipeline(steps=[
                     ("preprocessor", preprocessor),
                     ("sampling", SMOTE(random_state=42 + fold_idx, k_neighbors=3)),
                     ("classifier", classifier)
                 ])
 
-                # Entrenamos el modelo
                 pipeline.fit(X_train, y_train)
-
-                # Guardamos el modelo entrenado
                 fold_models.append(pipeline)
 
-                # Evaluamos el modelo en el fold de validación
                 val_preds_proba = pipeline.predict_proba(X_val)[:, 1]
-
-                # Guardamos las predicciones para el metamodelo
                 col_idx = fold_idx * n_models_per_fold + i
                 oof_preds[val_idx, col_idx] = val_preds_proba
 
-            # Guardamos los modelos de este fold
             self.fold_models.append(fold_models)
 
-        # Entrenamos el metamodelo con todas las predicciones out-of-fold
         self.meta_model = LogisticRegression(
-            C=0.6,  # Restaurado a un valor menos conservador
+            C=0.6,
             class_weight='balanced',
             solver='liblinear',
             max_iter=1000,
@@ -289,31 +237,21 @@ class StackingEnsemble(BaseEstimator, ClassifierMixin):
         )
         self.meta_model.fit(oof_preds, y)
 
-        # Calculamos el tiempo total de entrenamiento
         total_time = time.time() - start_time
         print(f"Entrenamiento completado en {total_time:.2f} segundos")
 
         return self
 
     def predict_proba(self, X):
-        """
-        Genera probabilidades combinando las predicciones de todos los modelos base
-        y pasándolas a través del metamodelo.
-        """
+        """Genera probabilidades combinando las predicciones de todos los modelos base."""
         if not self.fold_models or self.meta_model is None:
             raise ValueError("El modelo no ha sido entrenado. Llama a fit() primero.")
 
-        # Guardar hotel_id si existe y eliminarlo para la predicción
-        groups = None
-        if 'hotel_id' in X.columns:
-            groups = X['hotel_id'].copy()
-            X = X.drop(columns=['hotel_id'])
+        groups = X['hotel_id'].copy() if 'hotel_id' in X.columns else None
+        X = X.drop(columns=['hotel_id']) if groups is not None else X
 
-        # Número de modelos por fold
         n_models_per_fold = len(self.model_types)
         n_folds = len(self.fold_models)
-
-        # Generamos predicciones de cada modelo en cada fold
         all_preds = np.zeros((X.shape[0], n_folds * n_models_per_fold))
 
         for fold_idx, fold_models in enumerate(self.fold_models):
@@ -321,16 +259,12 @@ class StackingEnsemble(BaseEstimator, ClassifierMixin):
                 col_idx = fold_idx * n_models_per_fold + model_idx
                 all_preds[:, col_idx] = model.predict_proba(X)[:, 1]
 
-        # El metamodelo hace la predicción final
         meta_probs = self.meta_model.predict_proba(all_preds)
-
-        # Devolvemos las probabilidades en formato requerido: [[1-p, p], [1-p, p], ...]
         return np.column_stack((1 - meta_probs[:, 1], meta_probs[:, 1]))
 
     def predict(self, X):
         """Predice la clase aplicando el umbral a las probabilidades."""
         return (self.predict_proba(X)[:, 1] >= self.threshold).astype(int)
-
 
 def find_optimal_threshold(y_true, y_pred_proba):
     """Encuentra el umbral óptimo que maximiza el F1-score."""
@@ -346,23 +280,19 @@ def find_optimal_threshold(y_true, y_pred_proba):
 
     return best_threshold
 
-
 def get_pipeline():
     """Retorna el pipeline de modelo stacking."""
     return StackingEnsemble()
 
-
 def save_pipeline(pipe):
     """Guarda el modelo entrenado."""
-    model_path = os.environ.get("MODEL_PATH", "models/stacking_model.pkl")
+    model_path = os.environ.get("MODEL_PATH")
     os.makedirs(os.path.dirname(model_path), exist_ok=True)
     with open(model_path, mode="wb") as f:
         cloudpickle.dump(pipe, f)
     print(f"Modelo guardado en {model_path}")
 
-
 if __name__ == "__main__":
-
     print("=" * 60)
     print("PREDICCIÓN DE CANCELACIONES ANTICIPADAS DE RESERVAS DE HOTEL")
     print("=" * 60)
@@ -376,8 +306,6 @@ if __name__ == "__main__":
 
     # Obtener y entrenar el pipeline
     pipe = get_pipeline()
-
-    # Entrenamos el modelo una sola vez con los datos de entrenamiento
     pipe.fit(X_train, y_train)
 
     # Encontrar el umbral óptimo en validación
@@ -402,7 +330,6 @@ if __name__ == "__main__":
     print(f"AUC-ROC: {val_auc:.4f}")
 
     # Guardar el modelo ya entrenado con los datos de entrenamiento
-    # No volvemos a entrenar con todos los datos
     save_pipeline(pipe)
 
     print("\n¡Modelo entrenado y guardado con éxito!")

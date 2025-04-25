@@ -1,41 +1,38 @@
-FROM python:3.12-slim
+FROM python:3.11-slim
 
 ENV SCRIPT_TO_RUN=boost_train
 
 WORKDIR /app
 
-# Crear estructura de directorios
-RUN mkdir -p /app/data /app/models
-
-# Copiar archivos necesarios
-COPY data/*.csv /app/data/
-COPY xgboost/*.py /app/
-COPY xgboost/requirements.txt /app/
-
-
-# Modifica la línea para instalar las herramientas de compilación necesarias
+# Instalar dependencias del sistema necesarias para LightGBM
 RUN apt-get update && apt-get install -y --no-install-recommends \
     libgomp1 \
-    build-essential \
     gcc \
     && rm -rf /var/lib/apt/lists/*
 
-# Instalar dependencias de Python
-RUN pip install -r requirements.txt
+# Crear estructura de directorios
+RUN mkdir -p /app/data /app/models
 
-# Configurar rutas de datos
+# Copiar requirements y archivos necesarios
+COPY xgboost/requirements.txt /app/
+COPY data/*.csv /app/data/
+COPY xgboost/*.py /app/
+
+# Instalar dependencias
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Configurar variables de entorno
 ENV INFERENCE_DATA_PATH=/app/data/bookings_train.csv
 ENV HOTELS_DATA_PATH=/app/data/hotels.csv
 ENV TRAIN_DATA_PATH=/app/data/bookings_train.csv
 ENV MODEL_PATH=/app/models/pipeline.cloudpkl
 
-# Verificar archivos
-RUN ls -la /app/ && ls -la /app/data/
-
 # Comando principal
 CMD ["sh", "-c", "python -m $SCRIPT_TO_RUN"]
 
-# Instrucciones de uso desde la raíz del proyecto en el terminal:
-# docker build -t xgboost-model -f xgboost/Dockerfile .
-# docker run -v "${PWD}\models:/app/models" xgboost-model
-# docker run -e SCRIPT_TO_RUN=inference -v "${PWD}\models:/app/models" -v "${PWD}\data:/app/data" xgboost-model
+#------------ Instrucciones de uso desde la raíz del proyecto en el terminal---------#
+# Para construir la imagen de Docker:
+# docker build -t ensembled-model -f xgboost/Dockerfile .
+# Para ejecutar los contenedores con diferentes scripts:
+# docker run -v "$(pwd)/models:/app/models" ensembled-model
+# docker run -e SCRIPT_TO_RUN=inference -v "$(pwd)/models:/app/models" -v "$(pwd)/data:/app/data" ensembled-model

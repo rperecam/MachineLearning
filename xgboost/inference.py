@@ -9,14 +9,13 @@ from sklearn import set_config
 set_config(transform_output="pandas")
 warnings.filterwarnings('ignore')
 
-
 def get_X():
     """Carga y preprocesa los datos para inferencia."""
     print("Cargando datos de inferencia...")
 
     # Cargar datos
-    inference = pd.read_csv(os.environ.get("INFERENCE_DATA_PATH", "data/bookings_train.csv"))
-    hotels = pd.read_csv(os.environ.get("HOTELS_DATA_PATH", "data/hotels.csv"))
+    inference = pd.read_csv(os.environ.get("INFERENCE_DATA_PATH"))
+    hotels = pd.read_csv(os.environ.get("HOTELS_DATA_PATH"))
 
     # Unir datos
     data = pd.merge(inference, hotels, on='hotel_id', how='left')
@@ -25,7 +24,8 @@ def get_X():
     data = data[data['reservation_status'] == 'Booked'].copy()
 
     # Convertir fechas
-    for col in ['arrival_date', 'booking_date', 'reservation_status_date']:
+    date_columns = ['arrival_date', 'booking_date', 'reservation_status_date']
+    for col in date_columns:
         if col in data.columns:
             data[col] = pd.to_datetime(data[col])
 
@@ -37,11 +37,9 @@ def get_X():
     data['has_special_requests'] = (data['special_requests'] > 0).astype(int)
 
     # Característica de cliente extranjero
-    country_col_x = 'country_x'
-    country_col_y = 'country_y'
-    if country_col_x in data.columns and country_col_y in data.columns:
-        data['is_foreign'] = (data[country_col_x].astype(str) != data[country_col_y].astype(str)).astype(int)
-        data.loc[data[country_col_x].isna() | data[country_col_y].isna(), 'is_foreign'] = 0
+    if 'country_x' in data.columns and 'country_y' in data.columns:
+        data['is_foreign'] = (data['country_x'].astype(str) != data['country_y'].astype(str)).astype(int)
+        data.loc[data['country_x'].isna() | data['country_y'].isna(), 'is_foreign'] = 0
 
     # Eliminar columnas que podrían causar data leakage
     columns_to_drop = [
@@ -57,18 +55,16 @@ def get_X():
     print(f"Datos preprocesados para inferencia: {X.shape[0]} registros, {X.shape[1]} características")
     return X
 
-
 def get_pipeline():
     """Carga el modelo entrenado (StackingEnsemble)."""
     print("Cargando el modelo entrenado...")
-    model_path = os.environ.get("MODEL_PATH", "models/stacking_model.pkl")
+    model_path = os.environ.get("MODEL_PATH")
 
     with open(model_path, mode="rb") as f:
-        model = cloudpickle.load(f)
+        pipe = cloudpickle.load(f)
 
     print("Modelo cargado correctamente.")
-    return model
-
+    return pipe
 
 def get_predictions(pipe, X=None):
     """Realiza predicciones usando el modelo cargado."""
@@ -89,12 +85,15 @@ def get_predictions(pipe, X=None):
     print("Predicciones realizadas con éxito.")
     return predictions
 
-
 if __name__ == "__main__":
+    # Cargar datos y modelo
     X = get_X()
     pipe = get_pipeline()
-    preds = get_predictions(pipe, X)
+
+    # Realizar predicciones
+    predictions = get_predictions(pipe, X)
 
     # Guardar predicciones en el formato requerido
-    preds.to_csv("output_predictions.csv", index=False)
-    print(f"Predicciones guardadas: {preds.sum()} cancelaciones de {len(preds)} reservas ({preds.mean() * 100:.1f}%)")
+    output_path = "output_predictions.csv"
+    predictions.to_csv(output_path, index=False)
+    print(f"Predicciones guardadas en {output_path}: {predictions.sum()} cancelaciones de {len(predictions)} reservas ({predictions.mean() * 100:.1f}%)")
