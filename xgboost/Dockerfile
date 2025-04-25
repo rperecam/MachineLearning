@@ -12,7 +12,15 @@ COPY data/*.csv /app/data/
 COPY xgboost/*.py /app/
 COPY xgboost/requirements.txt /app/
 
-# Instalar dependencias
+
+# Modifica la línea para instalar las herramientas de compilación necesarias
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libgomp1 \
+    build-essential \
+    gcc \
+    && rm -rf /var/lib/apt/lists/*
+
+# Instalar dependencias de Python
 RUN pip install -r requirements.txt
 
 # Configurar rutas de datos
