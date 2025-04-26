@@ -547,11 +547,74 @@ Las métricas actualizadas reflejan un modelo altamente efectivo para la detecci
 
 La arquitectura del ensemble stacking, combinando múltiples algoritmos y estrategias de manejo de datos, proporciona una solución robusta que puede adaptarse a diferentes patrones en los datos hoteleros, reduciendo significativamente la variabilidad de rendimiento entre diferentes hoteles que era una limitación importante en el trabajo anterior.
 
-En futuras iteraciones, sería valioso explorar:
-- Técnicas de calibración de probabilidades para mejorar la interpretabilidad del modelo
-- Implementación de soluciones específicas por segmentos de hotel para adaptarse mejor a los diferentes patrones de cancelación
-- Exploración de características adicionales basadas en el comportamiento histórico de los clientes
-- Optimización del tiempo de entrenamiento mediante aceleración por GPU para facilitar actualizaciones frecuentes del modelo
-- Experimentar con umbrales de decisión dinámicos que se adapten a características específicas de cada hotel o temporada
-
 Este trabajo establece una base sólida y corrige los principales errores del primer intento, ofreciendo una solución aplicable y valiosa para el problema de la predicción de cancelaciones hoteleras que puede traducirse directamente en beneficios económicos tangibles para la industria.
+
+## Verificación de funcionamiento en docker desde el terminal
+
+```bash
+Windows PowerShell
+Copyright (C) Microsoft Corporation. Todos los derechos reservados.
+
+Prueba la nueva tecnología PowerShell multiplataforma https://aka.ms/pscore6
+
+PS C:\Users\Administrador\DataspellProjects\Aprendizaje_automatico2>  docker build -t hotel-predictor -f xgboost/Dockerfile .
+[+] Building 67.8s (14/14) FINISHED                                                                                                                                                                            docker:desktop-linux
+ => [internal] load build definition from Dockerfile                                                                                                                                                                           0.0s
+ => => transferring dockerfile: 1.40kB                                                                                                                                                                                         0.0s
+ => [auth] library/python:pull token for registry-1.docker.io                                                                                                                                                                  0.0s 
+ => [internal] load .dockerignore                                                                                                                                                                                              0.0s 
+ => => transferring context: 2B                                                                                                                                                                                                0.0s 
+ => [1/8] FROM docker.io/library/python:3.11-slim@sha256:82c07f2f6e35255b92eb16f38dbd22679d5e8fb523064138d7c6468e7bf0c15b                                                                                                      0.0s 
+ => [internal] load build context                                                                                                                                                                                              0.0s 
+ => => transferring context: 21.72kB                                                                                                                                                                                           0.0s 
+ => CACHED [2/8] WORKDIR /app                                                                                                                                                                                                  0.0s 
+ => CACHED [3/8] RUN apt-get update && apt-get install -y --no-install-recommends     libgomp1     gcc     && rm -rf /var/lib/apt/lists/*                                                                                      0.0s 
+ => CACHED [4/8] RUN mkdir -p /app/data /app/models                                                                                                                                                                            0.0s 
+ => CACHED [5/8] COPY xgboost/requirements.txt /app/                                                                                                                                                                           0.0s 
+ => [6/8] COPY data/*.csv /app/data/                                                                                                                                                                                           0.0s 
+ => [7/8] COPY xgboost/*.py /app/                                                                                                                                                                                              0.0s 
+ => [8/8] RUN pip install --no-cache-dir -r requirements.txt                                                                                                                                                                  63.3s 
+ => exporting to image                                                                                                                                                                                                         3.5s 
+ => => exporting layers                                                                                                                                                                                                        3.4s 
+ => => writing image sha256:56c8cf01dd523cb0f6feaad1e1613e2cf12d304b2be1849fc59932f27b7e7f80                                                                                                                                   0.0s 
+ => => naming to docker.io/library/hotel-predictor                                                                                                                                                                             0.0s 
+
+View build details: docker-desktop://dashboard/build/desktop-linux/desktop-linux/xno4yhuravz7jq08vfeef8m3h
+
+What's next:
+    View a summary of image vulnerabilities and recommendations → docker scout quickview
+PS C:\Users\Administrador\DataspellProjects\Aprendizaje_automatico2> docker run -v "$(pwd)/models:/app/models" hotel-predictor
+============================================================
+PREDICCIÓN DE CANCELACIONES ANTICIPADAS DE RESERVAS DE HOTEL
+============================================================
+Cargando datos...
+Datos cargados: 46620 registros, 20 características
+Entrenando fold 1/7...
+Entrenando fold 2/7...
+Entrenando fold 3/7...
+Entrenando fold 4/7...
+Entrenando fold 5/7...
+Entrenando fold 6/7...
+Entrenando fold 7/7...
+Entrenamiento completado en 138.89 segundos
+Umbral óptimo encontrado: 0.9900
+
+Rendimiento en validación:
+Precisión: 0.4351
+Recall: 0.9896
+F1-Score: 0.6044
+Accuracy: 0.8222
+AUC-ROC: 0.9593
+Modelo guardado en /app/models/pipeline.cloudpkl
+
+¡Modelo entrenado y guardado con éxito!
+
+PS C:\Users\Administrador\DataspellProjects\Aprendizaje_automatico2> docker run -e SCRIPT_TO_RUN=inference -v "$(pwd)/models:/app/models" -v "$(pwd)/data:/app/data" hotel-predictor
+Cargando datos de inferencia...
+Datos preprocesados para inferencia: 4121 registros, 20 características
+Cargando el modelo entrenado...
+Modelo cargado correctamente.
+Realizando predicciones...
+Predicciones realizadas con éxito.
+Predicciones guardadas en /app/data/predictions.csv: 1485 cancelaciones de 4121 reservas (36.0%)
+```
