@@ -1,4 +1,4 @@
-# Memoria Actualizada del Proyecto: Ensemble Avanzado para la Predicción de Cancelaciones Hoteleras
+# Memoria del Proyecto: Ensemble Avanzado para la Predicción de Cancelaciones Hoteleras
 
 ## Índice
 
