@@ -552,6 +552,7 @@ Este trabajo establece una base sólida y corrige los principales errores del pr
 ## Verificación de funcionamiento en docker desde el terminal
 
 ```bash
+
 Windows PowerShell
 Copyright (C) Microsoft Corporation. Todos los derechos reservados.
 
