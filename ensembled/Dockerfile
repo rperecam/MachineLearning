@@ -33,7 +33,7 @@ CMD ["sh", "-c", "python -m $SCRIPT_TO_RUN"]
 
 #------------ Instrucciones de uso desde la raíz del proyecto en el terminal---------#
 # Para construir la imagen de Docker:
-# docker build -t hotel-predictor -f xgboost/Dockerfile .
+# docker build -t hotel-predictor -f ensembled/Dockerfile .
 #
 # Para entrenar el modelo:
 # docker run -v "$(pwd)/models:/app/models" hotel-predictor
