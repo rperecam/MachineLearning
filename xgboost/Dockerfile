@@ -26,13 +26,17 @@ ENV INFERENCE_DATA_PATH=/app/data/bookings_train.csv
 ENV HOTELS_DATA_PATH=/app/data/hotels.csv
 ENV TRAIN_DATA_PATH=/app/data/bookings_train.csv
 ENV MODEL_PATH=/app/models/pipeline.cloudpkl
+ENV OUTPUT_PATH=/app/data/output_predictions.csv
 
 # Comando principal
 CMD ["sh", "-c", "python -m $SCRIPT_TO_RUN"]
 
 #------------ Instrucciones de uso desde la raíz del proyecto en el terminal---------#
 # Para construir la imagen de Docker:
-# docker build -t ensembled-model -f xgboost/Dockerfile .
-# Para ejecutar los contenedores con diferentes scripts:
-# docker run -v "$(pwd)/models:/app/models" ensembled-model
-# docker run -e SCRIPT_TO_RUN=inference -v "$(pwd)/models:/app/models" -v "$(pwd)/data:/app/data" ensembled-model
+# docker build -t hotel-predictor -f xgboost/Dockerfile .
+#
+# Para entrenar el modelo:
+# docker run -v "$(pwd)/models:/app/models" hotel-predictor
+#
+# Para ejecutar inferencia y guardar predicciones en data/:
+# docker run -e SCRIPT_TO_RUN=inference -v "$(pwd)/models:/app/models" -v "$(pwd)/data:/app/data" hotel-predictor

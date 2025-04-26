@@ -20,6 +20,9 @@ def get_X():
     # Unir datos
     data = pd.merge(inference, hotels, on='hotel_id', how='left')
 
+    # Interpreto los NoShow como Check-Out, ya que realmente han pagado
+    data['reservation_status'] = data['reservation_status'].replace('No-Show', 'Check-Out')
+
     # Filtrar solo reservas en estado 'Booked'
     data = data[data['reservation_status'] == 'Booked'].copy()
 
@@ -94,6 +97,6 @@ if __name__ == "__main__":
     predictions = get_predictions(pipe, X)
 
     # Guardar predicciones en el formato requerido
-    output_path = "output_predictions.csv"
+    output_path = os.environ.get("OUTPUT_PATH")
     predictions.to_csv(output_path, index=False)
     print(f"Predicciones guardadas en {output_path}: {predictions.sum()} cancelaciones de {len(predictions)} reservas ({predictions.mean() * 100:.1f}%)")

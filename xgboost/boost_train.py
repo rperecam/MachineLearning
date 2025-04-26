@@ -43,6 +43,9 @@ def get_X_y():
     # Filtrar datos relevantes - excluir reservas que aún están en estado 'Booked'
     data = data[data['reservation_status'] != 'Booked'].copy()
 
+    # Interpreto los NoShow como Check-Out, ya que realmente han pagado
+    data['reservation_status'] = data['reservation_status'].replace('No-Show', 'Check-Out')
+
     # Convertir fechas
     date_columns = ['arrival_date', 'booking_date', 'reservation_status_date']
     for col in date_columns:
@@ -268,7 +271,7 @@ class StackingEnsemble(BaseEstimator, ClassifierMixin):
 
 def find_optimal_threshold(y_true, y_pred_proba):
     """Encuentra el umbral óptimo que maximiza el F1-score."""
-    thresholds = np.linspace(0.05, 0.95, 50)
+    thresholds = np.linspace(0.05, 0.99, 50)
     best_threshold, best_f1 = 0.5, 0
 
     for threshold in thresholds:
@@ -279,6 +282,7 @@ def find_optimal_threshold(y_true, y_pred_proba):
             best_threshold = threshold
 
     return best_threshold
+
 
 def get_pipeline():
     """Retorna el pipeline de modelo stacking."""
