@@ -14,9 +14,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 RUN mkdir -p /app/data /app/models
 
 # Copiar requirements y archivos necesarios
-COPY xgboost/requirements.txt /app/
+COPY ensembled/requirements.txt /app/
 COPY data/*.csv /app/data/
-COPY xgboost/*.py /app/
+COPY ensembled/*.py /app/
 
 # Instalar dependencias
 RUN pip install --no-cache-dir -r requirements.txt
