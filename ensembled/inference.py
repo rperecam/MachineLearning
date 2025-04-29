@@ -1,102 +1,92 @@
 import os
+import warnings
 import cloudpickle
 import pandas as pd
-import numpy as np
-import warnings
 from sklearn import set_config
 
-# Configuración
+# Configuración global
 set_config(transform_output="pandas")
-warnings.filterwarnings('ignore')
+warnings.filterwarnings("ignore")
+
 
 def get_X():
     """Carga y preprocesa los datos para inferencia."""
     print("Cargando datos de inferencia...")
 
     # Cargar datos
-    inference = pd.read_csv(os.environ.get("INFERENCE_DATA_PATH"))
-    hotels = pd.read_csv(os.environ.get("HOTELS_DATA_PATH"))
+    inference = pd.read_csv(os.environ.get("INFERENCE_DATA_PATH", "data/bookings_train.csv"))
+    hotels = pd.read_csv(os.environ.get("HOTELS_DATA_PATH", "data/hotels.csv"))
 
-    # Unir datos
-    data = pd.merge(inference, hotels, on='hotel_id', how='left')
+    # Unir reservas con información del hotel
+    data = pd.merge(inference, hotels, on="hotel_id", how="left")
 
-    # Interpreto los NoShow como Check-Out, ya que realmente han pagado
-    data['reservation_status'] = data['reservation_status'].replace('No-Show', 'Check-Out')
+    # Reemplazar 'No-Show' por 'Check-Out'
+    if 'reservation_status' in data.columns:
+        data["reservation_status"] = data["reservation_status"].replace("No-Show", "Check-Out")
 
-    # Filtrar solo reservas en estado 'Booked'
-    data = data[data['reservation_status'] == 'Booked'].copy()
+    # Filtrar reservas con estado 'Booked' (a predecir)
+    data = data[data["reservation_status"] == "Booked"].copy()
 
-    # Convertir fechas
-    date_columns = ['arrival_date', 'booking_date', 'reservation_status_date']
-    for col in date_columns:
+    # Convertir columnas de fecha
+    for col in ["arrival_date", "booking_date", "reservation_status_date"]:
         if col in data.columns:
             data[col] = pd.to_datetime(data[col])
 
-    # Crear características clave
-    data['lead_time'] = (data['arrival_date'] - data['booking_date']).dt.days
-    data['is_high_season'] = data['arrival_date'].dt.month.isin([6, 7, 8, 12]).astype(int)
-    data['is_weekend_arrival'] = data['arrival_date'].dt.dayofweek.isin([4, 5]).astype(int)
-    data['price_per_night'] = data['rate'] / np.maximum(data['stay_nights'], 1)
-    data['has_special_requests'] = (data['special_requests'] > 0).astype(int)
+    # Calcular lead_time (coherente con boost_train.py)
+    if 'arrival_date' in data.columns and 'booking_date' in data.columns:
+        data['lead_time'] = (data['arrival_date'] - data['booking_date']).dt.days
 
-    # Característica de cliente extranjero
-    if 'country_x' in data.columns and 'country_y' in data.columns:
-        data['is_foreign'] = (data['country_x'].astype(str) != data['country_y'].astype(str)).astype(int)
-        data.loc[data['country_x'].isna() | data['country_y'].isna(), 'is_foreign'] = 0
+    # Eliminar columnas que causan data leakage
+    columns_to_drop = ["reservation_status", "reservation_status_date",
+                       "days_before_arrival", "arrival_date", "booking_date"]
+    X = data.drop(columns=[col for col in columns_to_drop if col in data.columns])
 
-    # Eliminar columnas que podrían causar data leakage
-    columns_to_drop = [
-        'reservation_status', 'reservation_status_date',
-        'arrival_date', 'booking_date', 'special_requests', 'stay_nights',
-        'country_x', 'country_y'
-    ]
-    columns_to_drop = [col for col in columns_to_drop if col in data.columns]
-
-    # Preparar X
-    X = data.drop(columns=columns_to_drop)
-
-    print(f"Datos preprocesados para inferencia: {X.shape[0]} registros, {X.shape[1]} características")
+    print(f"Datos preprocesados: {X.shape[0]} registros, {X.shape[1]} características.")
     return X
 
-def get_pipeline():
-    """Carga el modelo entrenado (StackingEnsemble)."""
-    print("Cargando el modelo entrenado...")
-    model_path = os.environ.get("MODEL_PATH")
 
-    with open(model_path, mode="rb") as f:
-        pipe = cloudpickle.load(f)
+def load_model():
+    """Carga el modelo entrenado y el umbral óptimo."""
+    print("Cargando el modelo entrenado...")
+    model_path = os.environ.get("MODEL_PATH", "models/pipeline.cloudpkl")
+
+    with open(model_path, "rb") as f:
+        model_package = cloudpickle.load(f)
 
     print("Modelo cargado correctamente.")
-    return pipe
+    return model_package["pipeline"], model_package["threshold"]
 
-def get_predictions(pipe, X=None):
-    """Realiza predicciones usando el modelo cargado."""
-    if X is None:
-        X = get_X()
 
-    print("Realizando predicciones...")
+def predict(pipeline, threshold, X):
+    """Genera predicciones usando el pipeline y umbral dado."""
+    print("Generando predicciones...")
 
-    try:
-        predictions = pipe.predict(X)
-    except Exception as e:
-        print(f"Error al realizar predicciones: {e}")
-        raise ValueError("No se pudieron generar predicciones con el modelo")
+    # Obtener probabilidades
+    y_proba = pipeline.predict_proba(X)[:, 1]
 
-    # Convertir a Series con formato correcto
-    predictions = pd.Series(predictions, name='prediction')
+    # Aplicar umbral óptimo
+    y_pred = (y_proba >= threshold).astype(int)
 
-    print("Predicciones realizadas con éxito.")
-    return predictions
+    print("Predicciones completadas.")
+    return pd.Series(y_pred, name="prediction")
+
+
+def main():
+    # Obtener datos y modelo
+    X = get_X()
+    pipeline, threshold = load_model()
+
+    # Generar predicciones
+    predictions = predict(pipeline, threshold, X)
+
+    # Guardar resultados
+    output_path = os.environ.get("OUTPUT_PATH", "data/output_predictions.csv")
+    predictions.to_csv(output_path, index=False)
+
+    print(f"Predicciones guardadas en {output_path}:")
+    print(f"→ {predictions.sum()} cancelaciones previstas de {len(predictions)} reservas "
+          f"({predictions.mean() * 100:.1f}%)")
+
 
 if __name__ == "__main__":
-    # Cargar datos y modelo
-    X = get_X()
-    pipe = get_pipeline()
-
-    # Realizar predicciones
-    predictions = get_predictions(pipe, X)
-
-    # Guardar predicciones en el formato requerido
-    output_path = os.environ.get("OUTPUT_PATH")
-    predictions.to_csv(output_path, index=False)
-    print(f"Predicciones guardadas en {output_path}: {predictions.sum()} cancelaciones de {len(predictions)} reservas ({predictions.mean() * 100:.1f}%)")
+    main()
