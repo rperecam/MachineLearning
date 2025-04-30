@@ -1,621 +1,515 @@
-# Memoria del Proyecto: Ensemble Avanzado para la Predicción de Cancelaciones Hoteleras
+# Memoria del Proyecto: Modelo XGBoost Optimizado para la Predicción de Cancelaciones Hoteleras
 
 ## Índice
 
-1. Introducción: El Desafío de las Cancelaciones Anticipadas
-2. Mirando Atrás: Lecciones Aprendidas del Primer Intento
-3. El Nuevo Enfoque: Preprocesamiento y Construcción del Ensemble
-   3.1. Preparación y Análisis de Datos
-   3.2. Ingeniería de Características Avanzada
-   3.3. Estrategia de Gestión de Valores Nulos
-   3.4. Arquitectura del Ensemble Stacking
-   3.5. Manejo del Desbalanceo de Clases
-   3.6. Validación Estratificada por Grupos
-   3.7. Optimización del Umbral de Decisión
-4. Evaluación del Modelo y Resultados
-   4.1. Análisis de la Distribución de Probabilidades y Umbral Óptimo
-5. Conclusiones y Direcciones Futuras
+1. [Introducción: El Desafío de las Cancelaciones Anticipadas](#introducción-el-desafío-de-las-cancelaciones-anticipadas)
+2. [Mirando Atrás: Lecciones Aprendidas del Primer Intento](#mirando-atrás-lecciones-aprendidas-del-primer-intento)
+3. [El Nuevo Enfoque: Preprocesamiento y Optimización del Modelo](#el-nuevo-enfoque-preprocesamiento-y-optimización-del-modelo)
+    - 3.1. [Preparación y Análisis de Datos](#preparación-y-análisis-de-datos)
+    - 3.2. [Ingeniería de Características Avanzada](#ingeniería-de-características-avanzada)
+    - 3.3. [Estrategia de Gestión de Valores Nulos](#estrategia-de-gestión-de-valores-nulos)
+    - 3.4. [Simplicidad y Generalización: De Stacking a XGBoost](#simplicidad-y-generalización-de-stacking-a-xgboost)
+    - 3.5. [Manejo del Desbalanceo de Clases](#manejo-del-desbalanceo-de-clases)
+    - 3.6. [Validación Estratificada por Grupos](#validación-estratificada-por-grupos)
+    - 3.7. [Optimización del Umbral de Decisión](#optimización-del-umbral-de-decisión)
+4. [Evaluación del Modelo y Resultados](#evaluación-del-modelo-y-resultados)
+    - 4.1. [Análisis de la Distribución de Probabilidades y Umbral Óptimo](#análisis-de-la-distribución-de-probabilidades-y-umbral-óptimo)
+5. [Conclusiones y Direcciones Futuras](#conclusiones-y-direcciones-futuras)
+6. Resultados del Script de Inferencia
+7. Verificación de Docker
 
-## 1. Introducción: El Desafío de las Cancelaciones Anticipadas
+## Introducción: El Desafío de las Cancelaciones Anticipadas
 
 En la industria hotelera, las cancelaciones anticipadas representan un desafío crítico para la gestión eficiente del inventario y la maximización de ingresos. Predecir qué reservas tienen alta probabilidad de cancelarse con al menos 30 días de antelación permite implementar estrategias de overbooking controlado y promociones dirigidas, mitigando así el impacto económico de las habitaciones no ocupadas.
 
-Nuestro objetivo se centra en desarrollar un sistema de predicción que identifique con alta precisión las reservas con mayor riesgo de cancelación anticipada, priorizando especialmente minimizar los falsos negativos (reservas que se cancelarán pero no son detectadas por el modelo).
+Nuestro objetivo se centra en desarrollar un sistema de predicción que identifique con alta precisión las reservas con mayor riesgo de cancelación anticipada, buscando un equilibrio óptimo entre precisión y recall para maximizar el valor de negocio.
 
-## 2. Mirando Atrás: Lecciones Aprendidas del Primer Intento
+## Mirando Atrás: Lecciones Aprendidas del Primer Intento
 
 Nuestro primer trabajo en este problema utilizó un modelo XGBoost único optimizado mediante búsqueda de hiperparámetros. Aunque mostró resultados prometedores, la evaluación y el feedback recibido revelaron importantes deficiencias:
 
 - **Alta variabilidad entre folds**: Las métricas F1 mostraban fluctuaciones significativas en diferentes subconjuntos de datos, indicando problemas de estabilidad.
-
 - **Preprocesamiento fragmentado**: El proceso de transformación de datos se realizaba en múltiples etapas, complicando la reproducibilidad y aumentando el riesgo de fugas de datos.
-
 - **Manejo subóptimo del desbalanceo**: La clase minoritaria (cancelaciones anticipadas) no se trataba eficientemente, siendo este uno de los problemas principales del trabajo.
-
 - **Estrategia de validación inadecuada**: No se utilizaba cross validation excepto en GridSearch, y no se eligió la estrategia más adecuada para este problema, ignorando la estructura de grupo natural de los datos (reservas del mismo hotel).
-
 - **Error crítico en la etapa de inferencia**: Eliminamos incorrectamente los registros de tipo "Booked" en inferencia, lo que nos dejaba sin filas para hacer predicciones. Además, clasificamos erróneamente los "No-show" como cancelaciones cuando realmente son clientes que han pagado.
+- **Definición incorrecta del target**: Definimos la variable objetivo incorrectamente como cancelaciones con 30 días o más de anticipación, cuando debíamos predecir cancelaciones con 30 días o menos de anticipación.
 
-Estas observaciones críticas del feedback anterior fueron fundamentales para dirigir nuestro desarrollo hacia un enfoque más robusto y sofisticado en este nuevo trabajo.
+Estas observaciones críticas del feedback anterior fueron fundamentales para dirigir nuestro desarrollo hacia un enfoque más robusto.
 
-## 3. El Nuevo Enfoque: Preprocesamiento y Construcción del Ensemble
+## El Nuevo Enfoque: Preprocesamiento y Optimización del Modelo
 
-### 3.1. Preparación y Análisis de Datos
+### Preparación y Análisis de Datos
 
 El proceso de preparación de datos se mejoró significativamente integrándolo en una estructura coherente:
 
 ```python
 def get_X_y():
-    """Carga y preprocesa los datos para el entrenamiento."""
-    print("Cargando datos...")
+    """
+    Carga y preprocesa los datos para el entrenamiento del modelo.
+    Crea la variable objetivo y define los features.
+    """
+    hotels = pd.read_csv(os.environ.get("HOTELS_DATA_PATH", "data/hotels.csv"))
+    bookings = pd.read_csv(os.environ.get("TRAIN_DATA_PATH", "data/bookings_train.csv"))
 
-    # Cargar datos
-    hotels = pd.read_csv(os.environ.get("HOTELS_DATA_PATH", 'data/hotels.csv'))
-    bookings = pd.read_csv(os.environ.get("TRAIN_DATA_PATH", 'data/bookings_train.csv'))
-
-    # Combinar datos
+    # Une las tablas de reservas con los hoteles
     data = pd.merge(bookings, hotels, on='hotel_id', how='left')
 
-    # CORRECCIÓN: Filtrar datos 'Booked' solo durante entrenamiento, no en inferencia
-    # Este código se ejecuta en el contexto de entrenamiento
-    # Para inferencia, se usa un pipeline separado que no filtra 'Booked'
+    # Filtra solo reservas finalizadas o canceladas (excluye las aún en estado "Booked")
     data = data[data['reservation_status'] != 'Booked'].copy()
 
-    # CORRECCIÓN: Interpretar correctamente los No-Show como Check-Out, ya que han pagado
-    data['reservation_status'] = data['reservation_status'].replace('No-Show', 'Check-Out')
-    
-    # Resto del preprocesamiento...
+    # Considera los "No-Show" como "Check-Out" para el target
+    data['reservation_status'].replace('No-Show', 'Check-Out', inplace=True)
+
+    # Convierte fechas a formato datetime
+    for col in ['arrival_date', 'booking_date', 'reservation_status_date']:
+        if col in data.columns:
+            data[col] = pd.to_datetime(data[col])
+
+    # Días entre fecha de llegada y la fecha del estado de la reserva
+    data['days_before_arrival'] = (data['arrival_date'] - data['reservation_status_date']).dt.days
+
+    # CORRECCIÓN: Define el target como cancelaciones con 30 días o MENOS de anticipación
+    data['target'] = ((data['reservation_status'] == 'Canceled') &
+                       (data['days_before_arrival'] <= 30)).astype(int)
 ```
 
-Esta corrección aborda el error crítico identificado en el feedback anterior: ahora interpretamos correctamente los "No-Show" como "Check-Out" puesto que son clientes que efectivamente han pagado, y solo filtramos los registros "Booked" durante el entrenamiento. El código verifica exactamente con esta implementación, donde claramente se especifica: 
+Esta corrección aborda varios errores críticos identificados en el feedback anterior:
 
-```python
-# Filtrar datos relevantes - excluir reservas que aún están en estado 'Booked'
-data = data[data['reservation_status'] != 'Booked'].copy()
+- **Corrección de la definición del target**: Ahora definimos correctamente el objetivo como predicción de cancelaciones con 30 días o menos de anticipación (`days_before_arrival <= 30`).
+- **Interpretación correcta de "No-Show"**: Clasificamos correctamente los registros "No-Show" como "Check-Out" puesto que son clientes que efectivamente han pagado.
+- **Filtrado adecuado**: Solo filtramos registros "Booked" durante el entrenamiento, manteniendo la coherencia con el procedimiento de inferencia.
 
-# Interpreto los NoShow como Check-Out, ya que realmente han pagado
-data['reservation_status'] = data['reservation_status'].replace('No-Show', 'Check-Out')
+El análisis de la distribución del target muestra un claro desbalanceo de clases:
+
+```plaintext
+--- Distribución Original del Target (y) ---
+target
+0    38442
+1     8178
+Name: count, dtype: int64
 ```
 
-En el contexto de inferencia utilizamos un pipeline separado diseñado específicamente para procesar todos los registros sin aplicar este filtro, permitiendo así hacer predicciones sobre todas las reservas pendientes.
+Porcentaje de clase positiva (1 = Cancelación <= 30 días): 17.54%
+Total de registros: 46620
 
-### 3.2. Ingeniería de Características Avanzada
+Este desbalanceo, con solo el 17.54% de las reservas resultando en cancelaciones en los 30 días previos a la llegada, es un aspecto importante a considerar en nuestro enfoque de modelado.
 
-La ingeniería de características se enfocó en incorporar conocimiento del dominio, creando indicadores predictivos clave. El código implementa exactamente estas transformaciones:
+### Ingeniería de Características Avanzada
+
+La ingeniería de características se enfocó en incorporar conocimiento del dominio, creando tan solo un indicador predictivo clave:
 
 ```python
-# Convertir fechas
-date_columns = ['arrival_date', 'booking_date', 'reservation_status_date']
-for col in date_columns:
-    if col in data.columns:
-        data[col] = pd.to_datetime(data[col])
-
 # Crear características clave
-data['days_before_arrival'] = (data['arrival_date'] - data['reservation_status_date']).dt.days
-data['target'] = ((data['reservation_status'] == 'Canceled') &
-                  (data['days_before_arrival'] >= 30)).astype(int)
-
 data['lead_time'] = (data['arrival_date'] - data['booking_date']).dt.days
-data['is_high_season'] = data['arrival_date'].dt.month.isin([6, 7, 8, 12]).astype(int)
-data['is_weekend_arrival'] = data['arrival_date'].dt.dayofweek.isin([4, 5]).astype(int)
-data['price_per_night'] = data['rate'] / np.maximum(data['stay_nights'], 1)
-data['has_special_requests'] = (data['special_requests'] > 0).astype(int)
 ```
 
-Destacan características como:
-- **Lead time**: Días entre reserva y llegada, un predictor clásico de cancelaciones.
-- **High season**: Identificación de temporadas alta (verano y diciembre).
-- **Weekend arrival**: Las llegadas en fin de semana tienen patrones diferenciados.
-- **Price per night**: Normalización del precio por noche de estancia.
-- **Special requests**: Indicador de si el cliente ha hecho solicitudes especiales.
+- **Lead time**: Días entre reserva y llegada, un predictor clásico de cancelaciones, y suficientemente correlacionado con el target, pero sin causar data leakage.
 
-El código también implementa una característica adicional cuando están disponibles los datos de país:
+Consideramos la posibilidad de crear características agregadas por grupo de hotel, pero decidimos no implementarlas debido al riesgo de data leakage. Estas características podrían haber incluido tasas históricas de cancelación por hotel o patrones estacionales específicos por establecimiento, pero su implementación inadecuada podría introducir fugas de información del conjunto de validación al de entrenamiento.
 
-```python
-# Característica de cliente extranjero si existen las columnas
-if 'country_x' in data.columns and 'country_y' in data.columns:
-    data['is_foreign'] = (data['country_x'].astype(str) != data['country_y'].astype(str)).astype(int)
-    data.loc[data['country_x'].isna() | data['country_y'].isna(), 'is_foreign'] = 0
-```
+### Estrategia de Gestión de Valores Nulos
 
-Esta característica **Foreign guest** compara el país de origen con el país del hotel, agregando un factor importante para predecir cancelaciones.
-
-Estas características incorporan conocimiento del sector hotelero y fueron seleccionadas por su alto poder predictivo en análisis exploratorios previos.
-
-Es importante destacar que se decidió no categorizar las nuevas columnas resultantes del feature engineering, ya que los propios algoritmos predictivos utilizados (XGBoost, LightGBM, RandomForest, etc.) tienen la capacidad de categorizar por sí solos estas características, permitiendo así un procesamiento más eficiente y adaptado a la estructura natural de los datos.
-
-### 3.3. Estrategia de Gestión de Valores Nulos
-
-Un avance significativo fue la integración de la imputación de valores nulos dentro del pipeline de preprocesamiento, garantizando que los métodos de imputación se apliquen correctamente tanto en entrenamiento como en predicción. El código implementa esta estrategia de forma clara:
+Un avance significativo fue la integración de la imputación de valores nulos dentro del pipeline de preprocesamiento:
 
 ```python
-def create_preprocessor(X: pd.DataFrame):
-    """Crea un preprocesador que incluye la imputación de valores nulos."""
-    num_features = X.select_dtypes(include=["int64", "float64"]).columns.tolist()
-    bool_features = X.select_dtypes(include=["bool"]).columns.tolist()
-    cat_features = X.select_dtypes(include=["object", "category"]).columns.tolist()
-    cat_features = [col for col in cat_features if col not in bool_features]
+# Pipeline para variables numéricas: imputación y escalado
+numeric_transformer = Pipeline(steps=[
+    ('imputer', SimpleImputer(strategy='median')),
+    ('scaler', StandardScaler())
+])
 
-    # Pipelines para cada tipo de característica
-    numeric_transformer = Pipeline(steps=[
-        ('imputer', SimpleImputer(strategy='median')),
-        ('scaler', StandardScaler())
-    ])
+# Pipeline para variables categóricas: imputación y one-hot encoding
+categorical_transformer = Pipeline(steps=[
+    ('imputer', SimpleImputer(strategy='most_frequent')),
+    ('onehot', OneHotEncoder(handle_unknown="ignore", sparse_output=False))
+])
 
-    categorical_transformer = Pipeline(steps=[
-        ('imputer', SimpleImputer(strategy='most_frequent')),
-        ('onehot', OneHotEncoder(handle_unknown="ignore", sparse_output=False))
-    ])
-
-    # Si hay características booleanas, las mantenemos como están
-    bool_transformer = 'passthrough'
-
-    preprocessor = ColumnTransformer(
-        transformers=[
-            ("num", numeric_transformer, num_features),
-            ("cat", categorical_transformer, cat_features),
-            ("bool", bool_transformer, bool_features),
-        ]
-    )
-
-    return preprocessor
+# Aplica transformaciones por tipo de columna
+preprocessor = ColumnTransformer(
+    transformers=[
+        ("num", numeric_transformer, num_features + bool_features),
+        ("cat", categorical_transformer, cat_features),
+    ]
+)
 ```
 
 Esta implementación presenta varias ventajas clave:
 
-1. **Detección automática de tipos de datos**: El código identifica automáticamente qué columnas son numéricas, booleanas o categóricas, haciendo el preprocesamiento adaptable a cambios en el conjunto de datos.
+- **Tratamiento específico por tipo de dato**: Cada tipo de característica recibe un tratamiento diferenciado:
+  - **Variables numéricas**: Imputación por mediana y escalado estándar.
+  - **Variables categóricas**: Imputación por moda y codificación one-hot con `handle_unknown="ignore"` para manejar categorías nuevas en inferencia.
+- **Prevención de data leakage**: Al encapsular todo el preprocesamiento en `ColumnTransformer`, las estadísticas para la imputación (medianas, modas) y el escalado (medias, desviaciones estándar) se calculan solo en el conjunto de entrenamiento y se aplican de manera consistente tanto en entrenamiento como en inferencia.
+- **Manejo coherente de valores ausentes**: La estrategia garantiza que los valores nulos se traten de manera coherente durante todo el ciclo de vida del modelo.
 
-2. **Tratamiento específico por tipo de dato**: Cada tipo de característica recibe un tratamiento diferenciado:
-   - **Variables numéricas**: Imputación por mediana y escalado estándar
-   - **Variables categóricas**: Imputación por moda y codificación one-hot con `handle_unknown="ignore"` para manejar categorías nuevas en inferencia
-   - **Variables booleanas**: Preservadas intactas mediante "passthrough"
+### Simplicidad y Generalización: De Stacking a XGBoost
 
-3. **Prevención de data leakage**: Al encapsular todo el preprocesamiento en `ColumnTransformer`, las estadísticas para la imputación (medianas, modas) y el escalado (medias, desviaciones estándar) se calculan solo en el conjunto de entrenamiento y se aplican de manera consistente tanto en entrenamiento como en inferencia.
-
-4. **Manejo coherente de valores ausentes**: La estrategia garantiza que los valores nulos se traten de manera coherente durante todo el ciclo de vida del modelo, evitando discrepancias entre entrenamiento y producción.
-
-Este enfoque integrado es crucial para mantener la calidad y coherencia de los datos, especialmente al desplegar el modelo en un entorno de producción donde pueden aparecer valores ausentes o categorías nuevas.
-
-### 3.4. Arquitectura del Ensemble Stacking
-
-La decisión de implementar un ensemble stacking fue motivada principalmente por la necesidad de reducir la variabilidad observada en las métricas F1 entre diferentes folds. El código implementa esta arquitectura de forma efectiva:
+Una decisión crítica en este proyecto fue abandonar la arquitectura de ensemble stacking inicialmente propuesta en favor de un modelo XGBoost único pero bien optimizado. Esta decisión se basó en evidencia empírica de que el modelo stacking podría estar provocando overfitting, especialmente considerando el desbalanceo de clases y la estructura de los datos.
 
 ```python
-class StackingEnsemble(BaseEstimator, ClassifierMixin):
-    """Ensemble simplificado de modelos mediante stacking."""
-
-    def __init__(self, threshold=0.5):
-        self.threshold = threshold
-        self.fold_models = []
-        self.meta_model = None
-        self.model_types = ['xgboost', 'lightgbm', 'rf', 'gbm']  # Modelos a usar
-```
-
-El método `fit` de esta clase implementa el entrenamiento del ensemble:
-
-```python
-def fit(self, X, y):
-    """Entrena múltiples modelos usando validación cruzada."""
-    n_splits = 7 # Muy importante
-    groups = X['hotel_id'].copy() if 'hotel_id' in X.columns else None
-    X = X.drop(columns=['hotel_id']) if groups is not None else X
-
-    group_cv = StratifiedGroupKFold(n_splits=n_splits, shuffle=True, random_state=42)
-    cv_splits = list(group_cv.split(X, y, groups)) if groups is not None else list(group_cv.split(X, y))
-
-    n_samples = X.shape[0]
-    n_models_per_fold = len(self.model_types)
-    oof_preds = np.zeros((n_samples, n_splits * n_models_per_fold))
-
-    start_time = time.time()
-    self.fold_models = []
-
-    for fold_idx, (train_idx, val_idx) in enumerate(cv_splits):
-        print(f"Entrenando fold {fold_idx + 1}/{n_splits}...")
-        X_train, X_val = X.iloc[train_idx], X.iloc[val_idx]
-        y_train, y_val = y.iloc[train_idx], y.iloc[val_idx]
-
-        fold_models = []
-
-        for i, model_type in enumerate(self.model_types):
-            preprocessor = create_preprocessor(X_train)
-            pos_weight = len(y_train[y_train == 0]) / max(len(y_train[y_train == 1]), 1)
-            classifier = create_base_model(model_type, pos_weight, random_state=42 + fold_idx * 10 + i)
-
-            pipeline = ImbPipeline(steps=[
-                ("preprocessor", preprocessor),
-                ("sampling", SMOTE(random_state=42 + fold_idx, k_neighbors=3)),
-                ("classifier", classifier)
-            ])
-
-            pipeline.fit(X_train, y_train)
-            fold_models.append(pipeline)
-
-            val_preds_proba = pipeline.predict_proba(X_val)[:, 1]
-            col_idx = fold_idx * n_models_per_fold + i
-            oof_preds[val_idx, col_idx] = val_preds_proba
-
-        self.fold_models.append(fold_models)
-```
-
-El meta-modelo se entrena con las predicciones out-of-fold de todos los modelos base:
-
-```python
-self.meta_model = LogisticRegression(
-    C=0.6,
-    class_weight='balanced',
-    solver='liblinear',
-    max_iter=1000,
-    random_state=42
+# Modelo base: XGBoost con configuración personalizada
+model = XGBClassifier(
+    objective='binary:logistic',
+    tree_method='hist',
+    eval_metric='logloss',
+    use_label_encoder=False,
+    random_state=42,
+    min_child_weight=4,  # Previene overfitting
+    learning_rate=0.05,  # Aprendizaje lento para mejor generalización
+    n_estimators=300,    # Suficientes árboles para aprender sin overfitting
+    gamma=0.1,           # Regularización para controlar overfitting
 )
-self.meta_model.fit(oof_preds, y)
 ```
 
-Esta arquitectura de dos niveles incorpora:
+Los hiperparámetros fueron cuidadosamente seleccionados para favorecer la generalización:
 
-1. **Diversidad de algoritmos**: Cuatro tipos diferentes de modelos para capturar distintos patrones:
-   - XGBoost: Eficiente con datos tabulares y manejo de valores nulos.
-   - LightGBM: Implementación alternativa de gradient boosting con particionamiento leaf-wise.
-   - RandomForest: Enfoque de bagging con mejor robustez ante outliers.
-   - GradientBoosting: Implementación clásica con características complementarias.
+- `min_child_weight=4`: Un valor más alto que el predeterminado para prevenir que el modelo se ajuste demasiado a patrones específicos en los datos de entrenamiento.
+- `learning_rate=0.05`: Una tasa de aprendizaje relativamente baja que permite al modelo converger más suavemente, reduciendo la probabilidad de overfitting.
+- `gamma=0.1`: Un parámetro de regularización que controla la creación de nodos adicionales en los árboles, limitando la complejidad del modelo.
 
-2. **Diversidad de datos**: Cada modelo se entrena en diferentes particiones mediante validación cruzada de 7 folds, exponiendo cada algoritmo a diferentes subconjuntos de datos.
+Esta configuración busca un equilibrio deliberado entre ajuste a los datos y capacidad de generalización, favoreciendo ligeramente la generalización para asegurar un rendimiento estable en datos no vistos.
 
-3. **Meta-aprendizaje**: Un modelo de regresión logística aprende a combinar las predicciones de los modelos base, ponderando implícitamente cada algoritmo según su rendimiento en diferentes contextos.
+### Manejo del Desbalanceo de Clases
 
-Este diseño permite que el ensemble aproveche las fortalezas complementarias de cada algoritmo, reduciendo la varianza y mejorando la estabilidad de las predicciones.
-
-### 3.5. Manejo del Desbalanceo de Clases
-
-El desbalanceo entre clases (mayoría de reservas no canceladas anticipadamente) fue uno de los problemas principales identificados en el feedback del primer trabajo. El código implementa múltiples estrategias para abordar este desafío:
+El desbalanceo entre clases (17.54% de cancelaciones con ≤ 30 días de anticipación vs. 82.46% de no cancelaciones) fue uno de los problemas principales identificados en el feedback anterior. Para abordar este desafío, implementamos una estrategia de SMOTE cuidadosamente calibrada:
 
 ```python
-# Dentro del pipeline de cada modelo base
-pipeline = ImbPipeline(steps=[
-    ("preprocessor", preprocessor),
-    ("sampling", SMOTE(random_state=42 + fold_idx, k_neighbors=3)),
-    ("classifier", classifier)
+# Pipeline completo con SMOTE para reequilibrar clases
+pipeline = ImbPipeline([
+    ('preprocessor', preprocessor),
+    ('smote', SMOTE(random_state=42, sampling_strategy=0.6, k_neighbors=5)),
+    ('classifier', model)
 ])
 ```
 
-Las estrategias implementadas incluyen:
+La configuración de SMOTE incluye características importantes:
 
-1. **Técnicas de sobremuestreo**: Implementación de SMOTE (Synthetic Minority Over-sampling Technique) para generar ejemplos sintéticos de la clase minoritaria y equilibrar el conjunto de entrenamiento. El parámetro `k_neighbors=3` en SMOTE fue cuidadosamente seleccionado para evitar la generación de ejemplos sintéticos poco realistas, un problema común cuando se utiliza un valor demasiado alto.
+- `sampling_strategy=0.6`: En lugar de igualar completamente las clases (lo que podría introducir demasiada información sintética), optamos por un valor moderado de 0.6, lo que significa que la clase minoritaria alcanzará aproximadamente el 60% del tamaño de la clase mayoritaria. Esta decisión equilibra la necesidad de abordar el desbalanceo sin introducir demasiados datos sintéticos.
+- `k_neighbors=5`: Un valor moderado para `k_neighbors` que permite generar instancias sintéticas basadas en vecinos reales, manteniendo la credibilidad de los datos generados.
 
-2. **Ponderación de clases**: Configuración dinámica de ponderación en cada fold:
+Esta estrategia deliberadamente conservadora de SMOTE está diseñada para mejorar la detección de la clase minoritaria sin ir tan lejos como para generar datos sintéticos excesivos que podrían confundir al modelo con patrones irreales.
+
+### Validación Estratificada por Grupos
+
+Mantuvimos e incluso mejoramos la estrategia de validación cruzada estratificada por grupos, utilizando `StratifiedGroupKFold` con 7 folds:
 
 ```python
-# Cálculo dinámico del peso para cada fold
-pos_weight = len(y_train[y_train == 0]) / max(len(y_train[y_train == 1]), 1)
-classifier = create_base_model(model_type, pos_weight, random_state=42 + fold_idx * 10 + i)
+# Validación cruzada estratificada por grupo (hotel)
+cv = StratifiedGroupKFold(n_splits=7, shuffle=True, random_state=42)
 ```
 
-La función `create_base_model` incorpora este peso en la configuración de los modelos:
+Esta implementación es crucial por varias razones:
+
+- **Agrupación por `hotel_id`**: Todas las reservas de un mismo hotel permanecen juntas ya sea en entrenamiento o validación, nunca divididas entre ambos. Esto previene el data leakage y asegura que estamos evaluando la capacidad del modelo para generalizar a hoteles con características similares pero no idénticas.
+- **Estratificación por clase**: Cada fold mantiene aproximadamente la misma proporción de cancelaciones anticipadas, asegurando que la distribución de clases sea similar en todos los folds.
+- **Número óptimo de folds**: La elección de 7 folds proporciona suficiente diversidad de datos para entrenar modelos robustos mientras mantiene conjuntos de validación significativos.
+
+Esta estrategia de validación nos permite obtener una evaluación más realista del rendimiento del modelo en nuevos datos, evitando la "fuga" de información entre los conjuntos de entrenamiento y validación.
+
+### Optimización del Umbral de Decisión
+
+Un componente crítico del proceso es la optimización del umbral de decisión para maximizar el F1-score global:
 
 ```python
-model_params = {
-    'xgboost': {
-        'scale_pos_weight': pos_weight,
-        # otros parámetros...
-    },
-    'lightgbm': {
-        'scale_pos_weight': pos_weight,
-        # otros parámetros...
-    },
-    'rf': {
-        'class_weight': 'balanced',
-        # otros parámetros...
-    },
-    # configuración para GBM...
-}
-```
-
-3. **Meta-modelo sensible al desbalanceo**: El modelo de regresión logística también se configura con ponderación de clases:
-
-```python
-self.meta_model = LogisticRegression(
-    C=0.6,
-    class_weight='balanced',
-    solver='liblinear',
-    max_iter=1000,
-    random_state=42
-)
-```
-
-4. **Optimización del umbral**: Se implementa una búsqueda del umbral óptimo que maximiza el F1-score:
-
-```python
-def find_optimal_threshold(y_true, y_pred_proba):
-    """Encuentra el umbral óptimo que maximiza el F1-score."""
-    thresholds = np.linspace(0.05, 0.99, 50)
-    best_threshold, best_f1 = 0.5, 0
+def find_threshold(y_true, y_pred_proba):
+    """
+    Encuentra el mejor umbral de decisión para maximizar el F1-score.
+    """
+    best_f1, best_threshold = 0, 0.5
+    thresholds = np.linspace(0.1, 0.8, 40)
 
     for threshold in thresholds:
         y_pred = (y_pred_proba >= threshold).astype(int)
         f1 = f1_score(y_true, y_pred)
+
         if f1 > best_f1:
-            best_f1 = f1
-            best_threshold = threshold
+            best_f1, best_threshold = f1, threshold
 
-    return best_threshold
+    return best_threshold, best_f1
 ```
 
-Este umbral se utiliza después para las predicciones finales:
+Esta búsqueda sistemática del umbral óptimo explora 40 valores entre 0.1 y 0.8, seleccionando aquel que maximiza el F1-score.
 
-```python
-# Encontrar el umbral óptimo en validación
-val_proba = pipe.predict_proba(X_val)[:, 1]
-optimal_threshold = find_optimal_threshold(y_val, val_proba)
-pipe.threshold = optimal_threshold
+Los resultados muestran que el umbral óptimo para nuestro modelo es 0.441, un valor razonable que refleja un equilibrio entre precisión y recall:
+
+- **Umbral óptimo seleccionado**: 0.4410 (F1: 0.5867)
+
+Este umbral cercano al 0.5 estándar sugiere que nuestro modelo está bien calibrado, a diferencia de la versión anterior que requería un umbral extremadamente alto (0.95) para obtener resultados aceptables. El umbral más equilibrado obtenido es indicativo de un modelo que generaliza mejor y gestiona más eficazmente el desbalanceo de clases.
+
+## Evaluación del Modelo y Resultados
+
+La evaluación del modelo utilizando el umbral optimizado muestra un rendimiento sólido:
+
+```plaintext
+------ Evaluación del Modelo ------
+Umbral aplicado: 0.4410
+
+Métricas principales:
+→ Precision:   0.5572 (De las predicciones positivas, ¿cuántas son correctas?)
+→ Recall:      0.6196 (De todos los positivos reales, ¿cuántos detectamos?)
+→ F1-Score:    0.5867 (Media armónica entre precision y recall)
+→ AUC-ROC:     0.8601 (Capacidad discriminativa general del modelo)
+
+Métricas adicionales:
+→ Accuracy:    0.8469 (Porcentaje general de aciertos)
+→ Specificity: 0.8952 (De los negativos reales, ¿cuántos detectamos?)
+
+Matriz de confusión:
+→ Verdaderos Negativos (TN): 34415 (No cancela y predecimos que no cancela)
+→ Falsos Positivos (FP):    4027 (No cancela pero predecimos cancelación)
+→ Falsos Negativos (FN):    3111 (Cancela pero no lo detectamos)
+→ Verdaderos Positivos (TP): 5067 (Cancela y predecimos correctamente)
 ```
 
-5. **Evaluación con métricas adecuadas**: Uso de F1-score como métrica principal, que equilibra precisión y recall:
+Estos resultados muestran un modelo que logra un equilibrio efectivo entre precisión (55.72%) y recall (61.96%), lo que se traduce en un F1-Score de 0.5867. Este equilibrio es crucial para el problema de negocio, donde tanto los falsos positivos como los falsos negativos tienen costos asociados.
 
-```python
-val_f1 = f1_score(y_val, val_pred)
-val_precision = precision_score(y_val, val_pred)
-val_recall = recall_score(y_val, val_pred)
+El AUC-ROC de 0.8601 indica una excelente capacidad discriminativa del modelo, muy por encima del nivel aleatorio (0.5), lo que confirma que el modelo está capturando patrones valiosos en los datos.
+
+Desde la perspectiva de negocio, las métricas más relevantes son:
+
+- **Tasa de falsa alarma**: 0.1048 (De todas las reservas que no cancelan, ¿cuántas marcamos erróneamente?)
+- **Tasa de pérdida**: 0.3804 (De todas las cancelaciones, ¿cuántas no detectamos?)
+
+Estas métricas indican que:
+
+- Solo el 10.48% de las reservas que realmente no cancelan son incorrectamente marcadas como cancelaciones, lo que significa que la estrategia de overbooking basada en estas predicciones sería razonablemente segura.
+- Se pierden aproximadamente el 38.04% de las cancelaciones reales, lo que representa una oportunidad de mejora futura pero sigue siendo un avance significativo comparado con no tener modelo predictivo.
+
+El reporte de clasificación detallado muestra el rendimiento por clase:
+
+```plaintext
+              precision    recall  f1-score   support
+           0       0.92      0.90      0.91     38442
+           1       0.56      0.62      0.59      8178
+    accuracy                           0.85     46620
+   macro avg       0.74      0.76      0.75     46620
+weighted avg       0.85      0.85      0.85     46620
 ```
 
-Esta estrategia multinivel garantiza que el desbalanceo se aborde en cada etapa del proceso de modelado, desde la preparación de datos hasta la decisión final de clasificación.
+Este reporte confirma que el modelo logra un buen equilibrio entre las métricas para ambas clases, con una precisión y recall particularmente altos para la clase mayoritaria (no cancelaciones) y un rendimiento razonable para la clase minoritaria (cancelaciones).
 
-### 3.6. Validación Estratificada por Grupos y Prevención de Data Leakage
+### Análisis de la Distribución de Probabilidades y Umbral Óptimo
 
-Una innovación crítica para abordar los problemas de validación identificados en el feedback anterior fue la implementación de `StratifiedGroupKFold` para la validación cruzada. El código implementa esta estrategia de forma clara:
+La búsqueda exhaustiva del umbral óptimo reveló un comportamiento interesante de las probabilidades predichas en relación con el F1-score:
 
-```python
-n_splits = 7 # Muy importante
-groups = X['hotel_id'].copy() if 'hotel_id' in X.columns else None
-X = X.drop(columns=['hotel_id']) if groups is not None else X
-
-group_cv = StratifiedGroupKFold(n_splits=n_splits, shuffle=True, random_state=42)
-cv_splits = list(group_cv.split(X, y, groups)) if groups is not None else list(group_cv.split(X, y))
+```plaintext
+------ Búsqueda de umbral óptimo ------
+Umbral		F1		Precision	Recall
+0.10		0.4342		0.2822		0.9412
+0.12		0.4535		0.3005		0.9238
+...
+0.44		0.5867		0.5572		0.6196
+...
+0.58		0.5285		0.6206		0.4603
+0.60		0.5132		0.6282		0.4337
+...
+0.80		0.2626		0.7286		0.1602
 ```
 
-Esta implementación aborda el data leakage de varias maneras:
+Observamos que:
 
-1. **Agrupación por hotel_id**: Todas las reservas de un mismo hotel permanecen juntas ya sea en entrenamiento o validación, nunca divididas entre ambos. Esto es crucial para evitar que el modelo aprenda patrones específicos de cada hotel que luego "reconozca" en validación.
+- **Umbrales bajos (0.10-0.20)**: Ofrecen un recall extremadamente alto (>90%) pero con precisión baja (<35%), lo que significa que detectaríamos casi todas las cancelaciones pero con muchos falsos positivos.
+- **Umbrales medios (0.40-0.50)**: Proporcionan el mejor equilibrio entre precisión y recall, con el F1-score máximo alrededor de 0.44.
+- **Umbrales altos (>0.60)**: Ofrecen alta precisión (>62%) pero bajo recall (<43%), lo que significa que las predicciones positivas son muy confiables pero se pierden muchas cancelaciones reales.
 
-2. **Estratificación por clase**: Cada fold mantiene aproximadamente la misma proporción de cancelaciones anticipadas, asegurando que la distribución de clases sea similar en todos los folds.
+La elección del umbral óptimo de 0.441 representa un punto de inflexión donde el modelo maximiza el F1-score, ofreciendo el mejor equilibrio entre detectar la mayor cantidad posible de cancelaciones reales sin generar demasiados falsos positivos.
 
-3. **Eliminación de variables que causan data leakage**: El código elimina explícitamente columnas que podrían filtrar información del futuro:
+Este umbral cercano al estándar de 0.5 sugiere que nuestro modelo está bien calibrado, a diferencia de la versión anterior que requería un umbral extremadamente alto (0.95) para obtener resultados aceptables, lo que indica una mejora significativa en la robustez y generalización del modelo.
 
-```python
-# Eliminar columnas que podrían causar data leakage
-columns_to_drop = [
-    'reservation_status', 'reservation_status_date', 'days_before_arrival',
-    'arrival_date', 'booking_date', 'special_requests', 'stay_nights',
-    'country_y', 'country_x'
-]
-columns_to_drop = [col for col in columns_to_drop if col in data.columns]
+## Conclusiones y Direcciones Futuras
 
-X = data.drop(columns=['target'] + columns_to_drop)
-y = data['target']
+La evolución de nuestro sistema, desde un modelo complejo de stacking hasta un XGBoost único pero bien optimizado, demuestra el valor de un enfoque iterativo y basado en evidencia. Este trabajo ha incorporado específicamente las lecciones y correcciones del feedback recibido en el primer intento, con énfasis en:
+
+- **Correcta definición del target**: Hemos corregido la definición del objetivo para predecir cancelaciones con 30 días o menos de anticipación, alineando el modelo con el requerimiento de negocio real.
+- **Generalización sobre complejidad**: La elección de un modelo más simple pero bien optimizado en lugar de un ensemble complejo ha mejorado la generalización y reducido el riesgo de overfitting.
+- **Hiperparámetros enfocados en generalización**: La configuración de hiperparámetros como `min_child_weight=4`, `learning_rate=0.05` y `gamma=0.1` favorece la estabilidad y generalización del modelo.
+- **Estrategia balanceada para clases desbalanceadas**: El uso de SMOTE con `sampling_strategy=0.6` proporciona suficiente reequilibrio sin introducir demasiados datos sintéticos que podrían confundir al modelo.
+- **Mantenimiento de la validación estratificada por grupos**: La validación cruzada utilizando `StratifiedGroupKFold` sigue siendo fundamental para evaluar correctamente el rendimiento en nuevos hoteles.
+- **Equilibrio en el umbral de decisión**: El umbral optimizado de 0.441 refleja un modelo bien calibrado que equilibra precisión y recall, a diferencia del umbral extremo (0.95) que requería la versión anterior.
+
+Las métricas actuales muestran un modelo con un F1-score de 0.5867, un AUC-ROC de 0.8601, y un balance efectivo entre precisión (55.72%) y recall (61.96%). Estos resultados son particularmente valiosos en el contexto de la industria hotelera, donde tanto los falsos positivos como los falsos negativos tienen costos operativos asociados.
+
+# Resultados del Script de Inferencia
+
+## Output del Script local
+
+```plaintext
+Cargando datos de inferencia...
+Datos preprocesados: 4121 registros, 19 características.
+Cargando el modelo entrenado...
+Modelo cargado correctamente.
+Generando predicciones...
+Predicciones completadas.
+Predicciones guardadas en data/output_predictions.csv:
+→ 655 cancelaciones previstas de 4121 reservas (15.9%)
 ```
 
-Esto asegura que no se utilicen variables que contengan información futura o información que no estaría disponible en el momento de hacer la predicción real.
+## Análisis de los Resultados
 
-La elección específica de 7 folds fue deliberada:
+### Resumen de Predicciones
 
-1. **Número óptimo para el tamaño del dataset**: Se eligió 7 porque es el número máximo de grupos posible con `StratifiedGroupKFold` dada la distribución de nuestros datos por hotel_id, manteniendo una distribución equilibrada de clases en cada fold.
+El script de inferencia ha procesado un total de 4121 registros, cada uno con 19 características. Utilizando el modelo XGBoost entrenado, se han generado predicciones para estas reservas. Los resultados indican que se espera que 655 de estas reservas (el 15.9%) sean canceladas.
 
-2. **Mitigación del data leakage**: Al aumentar el número de folds a 7, se incrementa la robustez del ensemble al exponer los modelos a más combinaciones de datos de entrenamiento/validación.
+### Comparación con Datos Históricos
 
-3. **Reducción de la variabilidad entre folds**: Combinada con la estrategia de ensemble, esta validación permite identificar y mitigar la variabilidad en las métricas F1 observada entre diferentes hoteles.
+Para contextualizar estos resultados, es útil compararlos con los datos históricos de cancelaciones. En el conjunto de datos de entrenamiento (`bookings_train`), la tasa de cancelaciones anticipadas (con 30 días o menos de antelación) fue del 17.54%. La tasa de cancelaciones prevista en el conjunto de inferencia (15.9%) es ligeramente inferior, lo que podría indicar una mejora en la gestión de reservas o una variación natural en el comportamiento de los clientes.
 
-Esta estrategia de validación fue fundamental para corregir uno de los errores graves identificados en el feedback anterior: la falta de una estrategia de cross-validation adecuada para este problema particular.
+### Análisis de Reservas "Booked"
 
-### 3.7. Optimización del Umbral de Decisión
+Para un análisis más detallado, se puede examinar el subconjunto de reservas que actualmente están en estado "Booked" en el conjunto de datos de entrenamiento (`bookings_train`). Este análisis puede proporcionar información adicional sobre la precisión del modelo en reservas activas.
 
-Un componente crítico del proceso es la optimización del umbral de decisión para maximizar el F1-score global. El código implementa esta optimización de forma efectiva:
+#### Pasos para el Análisis
 
-```python
-def find_optimal_threshold(y_true, y_pred_proba):
-    """Encuentra el umbral óptimo que maximiza el F1-score."""
-    thresholds = np.linspace(0.05, 0.99, 50)
-    best_threshold, best_f1 = 0.5, 0
+1. **Filtrar Reservas "Booked"**: Extraer las reservas que están actualmente en estado "Booked" del conjunto de datos de entrenamiento.
+2. **Aplicar el Modelo**: Generar predicciones para estas reservas utilizando el mismo modelo entrenado.
+3. **Evaluar Resultados**: Comparar las predicciones con las tasas históricas de cancelación y analizar la distribución de las probabilidades predichas.
 
-    for threshold in thresholds:
-        y_pred = (y_pred_proba >= threshold).astype(int)
-        f1 = f1_score(y_true, y_pred)
-        if f1 > best_f1:
-            best_f1 = f1
-            best_threshold = threshold
+#### Resultados Esperados
 
-    return best_threshold
-```
+- **Tasa de Cancelación Prevista**: Se espera que la tasa de cancelación prevista para las reservas "Booked" sea similar a la observada en el conjunto de inferencia (alrededor del 15.9%).
+- **Distribución de Probabilidades**: La distribución de las probabilidades predichas puede proporcionar información sobre la confianza del modelo en sus predicciones. Un análisis detallado puede revelar si hay un subconjunto de reservas con alta probabilidad de cancelación que requiera atención especial.
 
-En el script principal, esta función se utiliza para encontrar el umbral óptimo:
+### Conclusiones
 
-```python
-# Encontrar el umbral óptimo en validación
-val_proba = pipe.predict_proba(X_val)[:, 1]
-optimal_threshold = find_optimal_threshold(y_val, val_proba)
-pipe.threshold = optimal_threshold
-print(f"Umbral óptimo encontrado: {optimal_threshold:.4f}")
-```
+El modelo XGBoost optimizado ha demostrado ser efectivo para predecir cancelaciones anticipadas en el conjunto de inferencia, con una tasa de cancelación prevista del 15.9%. Este resultado es coherente con las tasas históricas observadas y sugiere que el modelo está bien calibrado. Un análisis adicional de las reservas "Booked" en el conjunto de entrenamiento puede proporcionar información valiosa para la gestión proactiva de reservas y la implementación de estrategias de overbooking controlado.
 
-Esta optimización explora 50 valores de umbral posibles entre 0.05 y 0.99, seleccionando aquel que maximiza el F1-score en el conjunto de validación. 
-
-Un aspecto importante es que esta optimización se realiza sobre un conjunto de validación independiente (30% de los datos), garantizando que el umbral óptimo sea generalizable y no sobreajustado a particularidades del conjunto de entrenamiento:
-
-```python
-# Dividir en entrenamiento y validación para evaluar el rendimiento final
-X_train, X_val, y_train, y_val = train_test_split(
-    X, y, test_size=0.3, random_state=42, stratify=y
-)
-```
-
-El umbral optimizado se almacena como parte del modelo, asegurando que se utilice el mismo umbral en la fase de inferencia:
-
-```python
-pipe.threshold = optimal_threshold
-```
-
-Esto garantiza que todas las predicciones futuras utilizarán el umbral identificado como óptimo para maximizar el F1-score, manteniendo el enfoque en un equilibrio adecuado entre precisión y recall, fundamental para el problema de cancelaciones anticipadas.
-
-## 4. Evaluación del Modelo y Resultados
-
-La evaluación del modelo se realizó utilizando un conjunto de validación independiente (30% de los datos), obteniendo los siguientes resultados actualizados:
-
-```
-Umbral óptimo encontrado: 0.9500
-
-Rendimiento en validación:
-Precisión: 0.3772
-Recall: 0.9911
-F1-Score: 0.5464
-Accuracy: 0.7741
-AUC-ROC: 0.9563
-```
-
-Estos resultados muestran un enfoque claramente orientado a maximizar el recall (99.11%), lo que indica que el modelo es capaz de identificar casi todas las cancelaciones anticipadas. Este enfoque es estratégicamente valioso para la gestión hotelera, donde no detectar una potencial cancelación (falso negativo) tiene un costo económico mayor que equivocarse al predecir una cancelación (falso positivo).
-
-El umbral muy alto (0.95) refleja esta estrategia: el modelo está configurado para ser extremadamente sensible, clasificando como cancelación cualquier reserva que tenga incluso una pequeña probabilidad de cancelarse.
-
-La precisión relativamente baja (37.72%) es un compromiso aceptable dado el alto recall, y el F1-Score de 0.5464 representa un equilibrio razonable entre ambas métricas. El AUC-ROC de 0.9563 indica que el modelo tiene una excelente capacidad discriminativa general.
-
-Estos resultados actualizados difieren significativamente de los reportados previamente en la memoria original, lo que demuestra la evolución del modelo hacia una configuración que prioriza aún más la detección de cancelaciones potenciales.
-
-### 4.1. Análisis de la Distribución de Probabilidades y Umbral Óptimo
-
-Un análisis detallado de la distribución de probabilidades predichas por el modelo revela un patrón interesante que justifica el alto umbral de decisión seleccionado.
-
-![threshold.png](../graphs/threshold.png)
-
-El gráfico muestra la distribución de las probabilidades predichas para ambas clases: cancelaciones tempranas (clase 1) y no cancelaciones (clase 0). Se observa una separación casi perfecta entre las dos clases:
-
-- La mayoría de las no cancelaciones (clase 0) se concentran en probabilidades cercanas a 0
-- Las cancelaciones tempranas (clase 1) se agrupan en probabilidades cercanas a 1
-
-Esta polarización extrema de las probabilidades indica que el modelo logra discriminar muy bien entre ambas clases, con muy poca superposición de distribuciones. Este comportamiento es lo que permite establecer un umbral de decisión extraordinariamente alto (0.95) sin comprometer significativamente el recall.
-
-La selección del umbral óptimo se realizó mediante una búsqueda exhaustiva en el rango de 0.05 a 0.99:
-
-```python
-def find_optimal_threshold(y_true, y_pred_proba):
-    """Encuentra el umbral óptimo que maximiza el F1-score."""
-    thresholds = np.linspace(0.05, 0.99, 50)
-    best_threshold, best_f1 = 0.5, 0
-
-    for threshold in thresholds:
-        y_pred = (y_pred_proba >= threshold).astype(int)
-        f1 = f1_score(y_true, y_pred)
-        if f1 > best_f1:
-            best_f1 = f1
-            best_threshold = threshold
-
-    return best_threshold
-```
-
-Esta función evalúa sistemáticamente 50 posibles umbrales y selecciona aquel que maximiza el F1-score, que en nuestro caso resultó ser 0.95. Este valor tan alto del umbral tiene importantes implicaciones:
-
-**Ventajas**:
-- **Alta precisión selectiva**: Las reservas que el modelo identifica como cancelaciones son casi con total seguridad verdaderas cancelaciones, lo que aumenta la confianza en las predicciones positivas.
-- **Reducción de falsos positivos**: Minimiza la probabilidad de clasificar incorrectamente reservas como cancelaciones cuando no lo son, lo cual es valioso en escenarios donde el costo de una falsa alarma es alto.
-
-**Consideraciones**:
-- **Equilibrio con el recall**: A pesar del alto umbral, el modelo mantiene un recall extraordinariamente alto (99.11%), lo que sugiere que las verdaderas cancelaciones reciben consistentemente probabilidades muy cercanas a 1.
-- **Implicaciones operativas**: Este umbral permite a los hoteles implementar estrategias más agresivas para las reservas identificadas como cancelaciones, con alta confianza en la precisión de estas predicciones.
-
-La combinación de características del ensemble (diversidad de algoritmos, validación cruzada, y estrategias de manejo del desbalanceo) ha producido un modelo con una capacidad discriminativa excepcional, permitiendo este umbral tan alto sin comprometer el recall, algo que no es común en problemas de clasificación binaria con clases desbalanceadas.
-
-## 5. Conclusiones y Direcciones Futuras
-
-La evolución de nuestro sistema, desde un modelo XGBoost único hasta un sofisticado ensemble stacking, demuestra el valor de un enfoque iterativo y basado en evidencia. Este trabajo ha incorporado específicamente las lecciones y correcciones del feedback recibido en el primer intento, con énfasis en:
-
-1. **Preprocesamiento integrado**: La implementación de un preprocesamiento completamente integrado en el pipeline ha sido crucial para garantizar la consistencia entre entrenamiento e inferencia. Esta estrategia es especialmente importante para:
-   - Gestionar correctamente los valores nulos con imputación adaptada a cada tipo de variable
-   - Preservar la coherencia en las transformaciones de datos
-   - Facilitar el despliegue en producción sin inconsistencias
-
-2. **Corrección de errores críticos**: Se han corregido los errores fundamentales identificados en el feedback:
-   - Interpretación correcta de los registros "No-Show" como "Check-Out"
-   - Filtrado apropiado de registros "Booked" solo durante el entrenamiento
-   - Prevención efectiva del data leakage mediante la eliminación de variables problemáticas y el uso de validación por grupos
-
-3. **Enfoque estratégico para el desbalanceo**: La combinación de SMOTE, ponderación de clases, y optimización del umbral ha permitido un manejo efectivo del desbalanceo de clases, logrando un recall extremadamente alto, lo que era una prioridad para este problema específico.
-
-4. **Validación estratificada por grupos**: La implementación de `StratifiedGroupKFold` con 7 folds ha sido fundamental para:
-   - Respetar la estructura natural de los datos (agrupación por hotel)
-   - Mantener la distribución de clases en cada fold
-   - Reducir la variabilidad entre folds mediante el ensemble
-
-5. **Optimización global del umbral**: El ajuste del umbral de decisión a un valor muy alto (0.95) refleja tanto la prioridad estratégica de maximizar el recall como la extraordinaria capacidad discriminativa del modelo. La clara separación entre las distribuciones de probabilidad para ambas clases permitió este umbral inusualmente alto sin comprometer la detección de cancelaciones.
-
-Las métricas actualizadas reflejan un modelo altamente efectivo para la detección de cancelaciones anticipadas, con un recall cercano al 100%, lo que permitiría implementar estrategias proactivas para prácticamente todas las cancelaciones potenciales.
-
-La arquitectura del ensemble stacking, combinando múltiples algoritmos y estrategias de manejo de datos, proporciona una solución robusta que puede adaptarse a diferentes patrones en los datos hoteleros, reduciendo significativamente la variabilidad de rendimiento entre diferentes hoteles que era una limitación importante en el trabajo anterior.
-
-Este trabajo establece una base sólida y corrige los principales errores del primer intento, ofreciendo una solución aplicable y valiosa para el problema de la predicción de cancelaciones hoteleras que puede traducirse directamente en beneficios económicos tangibles para la industria.
-
-## Verificación de funcionamiento en docker desde el terminal
+# Verificación de Docker
 
 ```bash
-
 Windows PowerShell
 Copyright (C) Microsoft Corporation. Todos los derechos reservados.
 
 Prueba la nueva tecnología PowerShell multiplataforma https://aka.ms/pscore6
 
-PS C:\Users\Administrador\DataspellProjects\Aprendizaje_automatico2>  docker build -t hotel-predictor -f xgboost/Dockerfile .
-[+] Building 67.8s (14/14) FINISHED                                                                                                                                                                            docker:desktop-linux
+PS C:\Users\Administrador\DataspellProjects\Aprendizaje_automatico2> docker build -t hotel-predictor -f ensembled/Dockerfile .
+[+] Building 46.6s (13/13) FINISHED                                                                                                                                                                            docker:desktop-linux
  => [internal] load build definition from Dockerfile                                                                                                                                                                           0.0s
- => => transferring dockerfile: 1.40kB                                                                                                                                                                                         0.0s
- => [auth] library/python:pull token for registry-1.docker.io                                                                                                                                                                  0.0s 
- => [internal] load .dockerignore                                                                                                                                                                                              0.0s 
- => => transferring context: 2B                                                                                                                                                                                                0.0s 
- => [1/8] FROM docker.io/library/python:3.11-slim@sha256:82c07f2f6e35255b92eb16f38dbd22679d5e8fb523064138d7c6468e7bf0c15b                                                                                                      0.0s 
- => [internal] load build context                                                                                                                                                                                              0.0s 
- => => transferring context: 21.72kB                                                                                                                                                                                           0.0s 
- => CACHED [2/8] WORKDIR /app                                                                                                                                                                                                  0.0s 
- => CACHED [3/8] RUN apt-get update && apt-get install -y --no-install-recommends     libgomp1     gcc     && rm -rf /var/lib/apt/lists/*                                                                                      0.0s 
- => CACHED [4/8] RUN mkdir -p /app/data /app/models                                                                                                                                                                            0.0s 
- => CACHED [5/8] COPY xgboost/requirements.txt /app/                                                                                                                                                                           0.0s 
- => [6/8] COPY data/*.csv /app/data/                                                                                                                                                                                           0.0s 
- => [7/8] COPY xgboost/*.py /app/                                                                                                                                                                                              0.0s 
- => [8/8] RUN pip install --no-cache-dir -r requirements.txt                                                                                                                                                                  63.3s 
- => exporting to image                                                                                                                                                                                                         3.5s 
- => => exporting layers                                                                                                                                                                                                        3.4s 
- => => writing image sha256:56c8cf01dd523cb0f6feaad1e1613e2cf12d304b2be1849fc59932f27b7e7f80                                                                                                                                   0.0s 
+ => => transferring dockerfile: 1.21kB                                                                                                                                                                                         0.0s
+ => [internal] load metadata for docker.io/library/python:3.11-slim                                                                                                                                                            1.2s
+ => [auth] library/python:pull token for registry-1.docker.io                                                                                                                                                                  0.0s
+ => [internal] load .dockerignore                                                                                                                                                                                              0.0s
+ => => transferring context: 2B                                                                                                                                                                                                0.0s
+ => [1/7] FROM docker.io/library/python:3.11-slim@sha256:75a17dd6f00b277975715fc094c4a1570d512708de6bb4c5dc130814813ebfe4                                                                                                      0.0s
+ => => resolve docker.io/library/python:3.11-slim@sha256:75a17dd6f00b277975715fc094c4a1570d512708de6bb4c5dc130814813ebfe4                                                                                                      0.0s
+ => [internal] load build context                                                                                                                                                                                              0.0s
+ => => transferring context: 23.09kB                                                                                                                                                                                           0.0s 
+ => CACHED [3/7] RUN mkdir -p /app/data /app/models                                                                                                                                                                            0.0s 
+ => CACHED [4/7] COPY ensembled/requirements.txt /app/                                                                                                                                                                         0.0s 
+ => [5/7] COPY data/*.csv /app/data/                                                                                                                                                                                           0.0s 
+ => [6/7] COPY ensembled/*.py /app/                                                                                                                                                                                            0.0s 
+ => [7/7] RUN pip install --no-cache-dir -r requirements.txt                                                                                                                                                                  42.4s 
+ => exporting to image                                                                                                                                                                                                         2.9s 
+ => => exporting layers                                                                                                                                                                                                        2.9s 
+ => => writing image sha256:ac82f7c1c9c8bb944a94c0ff27f8af8babd06509da0f865cb68fa3938b0a500e                                                                                                                                   0.0s 
  => => naming to docker.io/library/hotel-predictor                                                                                                                                                                             0.0s 
 
-View build details: docker-desktop://dashboard/build/desktop-linux/desktop-linux/xno4yhuravz7jq08vfeef8m3h
+View build details: docker-desktop://dashboard/build/desktop-linux/desktop-linux/t79faos3ugf71pehisv83fwo4
 
 What's next:
     View a summary of image vulnerabilities and recommendations → docker scout quickview
 PS C:\Users\Administrador\DataspellProjects\Aprendizaje_automatico2> docker run -v "$(pwd)/models:/app/models" hotel-predictor
-============================================================
-PREDICCIÓN DE CANCELACIONES ANTICIPADAS DE RESERVAS DE HOTEL
-============================================================
-Cargando datos...
-Datos cargados: 46620 registros, 20 características
-Entrenando fold 1/7...
-Entrenando fold 2/7...
-Entrenando fold 3/7...
-Entrenando fold 4/7...
-Entrenando fold 5/7...
-Entrenando fold 6/7...
-Entrenando fold 7/7...
-Entrenamiento completado en 138.89 segundos
-Umbral óptimo encontrado: 0.9900
+Iniciando entrenamiento...
 
-Rendimiento en validación:
-Precisión: 0.4351
-Recall: 0.9896
-F1-Score: 0.6044
-Accuracy: 0.8222
-AUC-ROC: 0.9593
+--- Distribución Original del Target (y) ---
+target
+0    38442
+1     8178
+Name: count, dtype: int64
+Porcentaje de clase positiva (1 = Cancelación <= 30 días): 17.54%
+Total de registros: 46620
+-------------------------------------------
+
+
+Realizando validación cruzada con 7 splits (estratificada por hotel_id)...
+
+------ Búsqueda de umbral óptimo ------
+Umbral          F1              Precision       Recall
+0.10            0.4403          0.2873          0.9414
+0.12            0.4558          0.3028          0.9219
+0.14            0.4718          0.3190          0.9055
+0.15            0.4871          0.3354          0.8895
+0.17            0.5003          0.3505          0.8733
+0.19            0.5158          0.3686          0.8590
+0.21            0.5267          0.3853          0.8321
+0.23            0.5385          0.4029          0.8117
+0.24            0.5446          0.4151          0.7915
+0.26            0.5520          0.4282          0.7764
+0.28            0.5608          0.4436          0.7624
+0.30            0.5666          0.4575          0.7439
+0.32            0.5723          0.4709          0.7294
+0.33            0.5766          0.4856          0.7096
+0.35            0.5805          0.5011          0.6898
+0.37            0.5825          0.5146          0.6709
+0.39            0.5843          0.5272          0.6553
+0.41            0.5839          0.5396          0.6360
+0.42            0.5856          0.5521          0.6234
+0.44            0.5846          0.5603          0.6112
+0.46            0.5824          0.5699          0.5954
+0.48            0.5803          0.5804          0.5802
+0.49            0.5762          0.5898          0.5632
+0.51            0.5696          0.5964          0.5451
+0.53            0.5608          0.6020          0.5249
+0.55            0.5526          0.6103          0.5049
+0.57            0.5427          0.6188          0.4832
+0.58            0.5342          0.6296          0.4639
+0.60            0.5183          0.6366          0.4371
+0.62            0.4989          0.6437          0.4073
+0.64            0.4792          0.6480          0.3802
+0.66            0.4584          0.6512          0.3536
+0.67            0.4340          0.6518          0.3253
+0.69            0.4058          0.6538          0.2942
+0.71            0.3845          0.6608          0.2711
+0.73            0.3644          0.6712          0.2501
+0.75            0.3389          0.6896          0.2246
+0.76            0.3065          0.6922          0.1969
+0.78            0.2780          0.7071          0.1730
+0.80            0.2434          0.7278          0.1461
+
+Umbral óptimo seleccionado: 0.4231 (F1: 0.5856)
+
+------ Evaluación del Modelo ------
+Umbral aplicado: 0.4231
+
+Métricas principales:
+→ Precision:   0.5521 (De las predicciones positivas, ¿cuántas son correctas?)
+→ Recall:      0.6234 (De todos los positivos reales, ¿cuántos detectamos?)
+→ F1-Score:    0.5856 (Media armónica entre precision y recall)
+→ AUC-ROC:     0.8612 (Capacidad discriminativa general del modelo)
+
+Métricas adicionales:
+→ Accuracy:    0.8452 (Porcentaje general de aciertos)
+→ Specificity: 0.8924 (De los negativos reales, ¿cuántos detectamos?)
+
+Matriz de confusión:
+→ Verdaderos Negativos (TN): 34306 (No cancela y predecimos que no cancela)
+→ Falsos Positivos (FP):    4136 (No cancela pero predecimos cancelación)
+→ Falsos Negativos (FN):    3080 (Cancela pero no lo detectamos)
+→ Verdaderos Positivos (TP): 5098 (Cancela y predecimos correctamente)
+
+Métricas de negocio:
+→ Tasa de falsa alarma:  0.1076 (De todas las reservas que no cancelan, ¿cuántas marcamos erróneamente?)
+→ Tasa de pérdida:       0.3766 (De todas las cancelaciones, ¿cuántas no detectamos?)
+
+              precision    recall  f1-score   support
+
+           0       0.92      0.89      0.90     38442
+           1       0.55      0.62      0.59      8178
+
+    accuracy                           0.85     46620
+   macro avg       0.73      0.76      0.75     46620
+weighted avg       0.85      0.85      0.85     46620
+
+
+Entrenando modelo final con todos los datos...
 Modelo guardado en /app/models/pipeline.cloudpkl
 
-¡Modelo entrenado y guardado con éxito!
-
+Entrenamiento completado. ¡El modelo está listo para inferencia!
 PS C:\Users\Administrador\DataspellProjects\Aprendizaje_automatico2> docker run -e SCRIPT_TO_RUN=inference -v "$(pwd)/models:/app/models" -v "$(pwd)/data:/app/data" hotel-predictor
 Cargando datos de inferencia...
-Datos preprocesados para inferencia: 4121 registros, 20 características
+Datos preprocesados: 4121 registros, 19 características.
 Cargando el modelo entrenado...
 Modelo cargado correctamente.
-Realizando predicciones...
-Predicciones realizadas con éxito.
-Predicciones guardadas en /app/data/predictions.csv: 1485 cancelaciones de 4121 reservas (36.0%)
-```
+Generando predicciones...
+Predicciones completadas.
+Predicciones guardadas en /app/data/output_predictions.csv:
+→ 696 cancelaciones previstas de 4121 reservas (16.9%)
