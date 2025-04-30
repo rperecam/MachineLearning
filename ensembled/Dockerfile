@@ -4,12 +4,6 @@ ENV SCRIPT_TO_RUN=boost_train
 
 WORKDIR /app
 
-# Instalar dependencias del sistema necesarias para LightGBM
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    libgomp1 \
-    gcc \
-    && rm -rf /var/lib/apt/lists/*
-
 # Crear estructura de directorios
 RUN mkdir -p /app/data /app/models
 

@@ -7,7 +7,8 @@ from sklearn.impute import SimpleImputer
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler, OneHotEncoder
 from sklearn.compose import ColumnTransformer
-from sklearn.metrics import f1_score
+from sklearn.metrics import (f1_score, precision_score, recall_score,
+                             roc_auc_score, confusion_matrix, classification_report)
 from sklearn.model_selection import StratifiedGroupKFold, cross_val_predict
 from imblearn.pipeline import Pipeline as ImbPipeline
 from imblearn.over_sampling import SMOTE
@@ -65,6 +66,7 @@ def get_X_y():
     print("\n--- Distribución Original del Target (y) ---")
     print(y.value_counts())
     print(f"Porcentaje de clase positiva (1 = Cancelación <= 30 días): {y.mean() * 100:.2f}%")
+    print("Total de registros:", len(y))
     print("-------------------------------------------\n")
 
     return X, y, hotel_ids
@@ -112,9 +114,10 @@ def create_pipeline(X, y):
         eval_metric='logloss',
         use_label_encoder=False,
         random_state=42,
-        min_child_weight=5,
+        min_child_weight=4,
         learning_rate=0.05,
-        n_estimators=300
+        n_estimators=300,
+        gamma=0.1,
     )
 
     # Pipeline completo con SMOTE para reequilibrar clases
@@ -127,16 +130,79 @@ def create_pipeline(X, y):
     return pipeline
 
 
+def evaluate_model(y_true, y_pred_proba, threshold=0.5):
+    """
+    Evalúa el modelo usando múltiples métricas.
+    Imprime un reporte detallado del rendimiento.
+    """
+    y_pred = (y_pred_proba >= threshold).astype(int)
+
+    # Calcula métricas principales
+    precision = precision_score(y_true, y_pred)
+    recall = recall_score(y_true, y_pred)
+    f1 = f1_score(y_true, y_pred)
+    auc_roc = roc_auc_score(y_true, y_pred_proba)
+
+    # Matriz de confusión
+    tn, fp, fn, tp = confusion_matrix(y_true, y_pred).ravel()
+
+    # Métricas adicionales
+    accuracy = (tp + tn) / (tp + tn + fp + fn)
+    specificity = tn / (tn + fp)
+
+    # Imprime resultados
+    print("\n------ Evaluación del Modelo ------")
+    print(f"Umbral aplicado: {threshold:.4f}")
+    print(f"\nMétricas principales:")
+    print(f"→ Precision:   {precision:.4f} (De las predicciones positivas, ¿cuántas son correctas?)")
+    print(f"→ Recall:      {recall:.4f} (De todos los positivos reales, ¿cuántos detectamos?)")
+    print(f"→ F1-Score:    {f1:.4f} (Media armónica entre precision y recall)")
+    print(f"→ AUC-ROC:     {auc_roc:.4f} (Capacidad discriminativa general del modelo)")
+
+    print(f"\nMétricas adicionales:")
+    print(f"→ Accuracy:    {accuracy:.4f} (Porcentaje general de aciertos)")
+    print(f"→ Specificity: {specificity:.4f} (De los negativos reales, ¿cuántos detectamos?)")
+
+    print(f"\nMatriz de confusión:")
+    print(f"→ Verdaderos Negativos (TN): {tn} (No cancela y predecimos que no cancela)")
+    print(f"→ Falsos Positivos (FP):    {fp} (No cancela pero predecimos cancelación)")
+    print(f"→ Falsos Negativos (FN):    {fn} (Cancela pero no lo detectamos)")
+    print(f"→ Verdaderos Positivos (TP): {tp} (Cancela y predecimos correctamente)")
+
+    # Tasas derivadas importantes para negocios
+    print(f"\nMétricas de negocio:")
+    print(
+        f"→ Tasa de falsa alarma:  {fp / (fp + tn):.4f} (De todas las reservas que no cancelan, ¿cuántas marcamos erróneamente?)")
+    print(f"→ Tasa de pérdida:       {fn / (fn + tp):.4f} (De todas las cancelaciones, ¿cuántas no detectamos?)")
+
+    print("\nReporte de clasificación detallado:")
+    print(classification_report(y_true, y_pred))
+
+    return threshold, f1
+
+
 def find_threshold(y_true, y_pred_proba):
     """
     Encuentra el mejor umbral de decisión para maximizar el F1-score.
     """
     best_f1, best_threshold = 0, 0.5
-    for threshold in np.linspace(0.1, 0.8, 40):
+    thresholds = np.linspace(0.1, 0.8, 40)
+
+    print("\n------ Búsqueda de umbral óptimo ------")
+    print("Umbral\t\tF1\t\tPrecision\tRecall")
+
+    for threshold in thresholds:
         y_pred = (y_pred_proba >= threshold).astype(int)
         f1 = f1_score(y_true, y_pred)
+        precision = precision_score(y_true, y_pred)
+        recall = recall_score(y_true, y_pred)
+
+        print(f"{threshold:.2f}\t\t{f1:.4f}\t\t{precision:.4f}\t\t{recall:.4f}")
+
         if f1 > best_f1:
             best_f1, best_threshold = f1, threshold
+
+    print(f"\nUmbral óptimo seleccionado: {best_threshold:.4f} (F1: {best_f1:.4f})")
     return best_threshold, best_f1
 
 
@@ -172,20 +238,25 @@ def main():
     # Validación cruzada estratificada por grupo (hotel)
     cv = StratifiedGroupKFold(n_splits=7, shuffle=True, random_state=42)
 
+    print(f"\nRealizando validación cruzada con {cv.n_splits} splits (estratificada por hotel_id)...")
+
     # Predice probabilidades en validación cruzada
     y_pred_proba = cross_val_predict(pipeline, X, y, cv=cv, groups=hotel_ids, method='predict_proba')[:, 1]
 
     # Encuentra el mejor umbral de decisión
     optimal_threshold, best_f1 = find_threshold(y, y_pred_proba)
-    print(f"Umbral óptimo para F1: {optimal_threshold:.4f} (F1: {best_f1:.4f})")
+
+    # Evalúa el modelo con el umbral óptimo
+    evaluate_model(y, y_pred_proba, optimal_threshold)
 
     # Entrena el pipeline completo en todos los datos
+    print("\nEntrenando modelo final con todos los datos...")
     pipeline.fit(X, y)
 
     # Guarda el pipeline junto al umbral óptimo
     save_model(pipeline, optimal_threshold)
 
-    print("Modelo entrenado y guardado exitosamente!")
+    print("\nEntrenamiento completado. ¡El modelo está listo para inferencia!")
 
 
 # Punto de entrada del script
