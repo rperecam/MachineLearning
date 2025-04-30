@@ -16,7 +16,7 @@ COPY ensembled/*.py /app/
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Configurar variables de entorno
-ENV INFERENCE_DATA_PATH=/app/data/bookings_train.csv
+ENV INFERENCE_DATA_PATH=/app/data/bookings_test.csv
 ENV HOTELS_DATA_PATH=/app/data/hotels.csv
 ENV TRAIN_DATA_PATH=/app/data/bookings_train.csv
 ENV MODEL_PATH=/app/models/pipeline.cloudpkl

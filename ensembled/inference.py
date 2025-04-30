@@ -14,7 +14,7 @@ def get_X():
     print("Cargando datos de inferencia...")
 
     # Cargar datos
-    inference = pd.read_csv(os.environ.get("INFERENCE_DATA_PATH", "data/bookings_train.csv"))
+    inference = pd.read_csv(os.environ.get("INFERENCE_DATA_PATH", "data/bookings_test.csv"))
     hotels = pd.read_csv(os.environ.get("HOTELS_DATA_PATH", "data/hotels.csv"))
 
     # Unir reservas con información del hotel
