@@ -1,6 +1,6 @@
 FROM python:3.11-slim
 
-ENV SCRIPT_TO_RUN=boost_train
+ENV SCRIPT_TO_RUN=train
 
 WORKDIR /app
 
@@ -27,7 +27,7 @@ CMD ["sh", "-c", "python -m $SCRIPT_TO_RUN"]
 
 #------------ Instrucciones de uso desde la raíz del proyecto en el terminal---------#
 # Para construir la imagen de Docker:
-# docker build -t hotel-predictor -f ensembled/Dockerfile .
+# docker build -t hotel-predictor -f xgboost/Dockerfile .
 #
 # Para entrenar el modelo:
 # docker run -v "$(pwd)/models:/app/models" hotel-predictor
