@@ -5,7 +5,7 @@ ENV SCRIPT_TO_RUN=train
 WORKDIR /app
 
 # Crear estructura de directorios
-RUN mkdir -p /app/data /app/models
+RUN mkdir -p /app/data /app/model
 
 # Copiar requirements y archivos necesarios
 COPY ensembled/requirements.txt /app/
@@ -19,7 +19,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 ENV INFERENCE_DATA_PATH=/app/data/bookings_test.csv
 ENV HOTELS_DATA_PATH=/app/data/hotels.csv
 ENV TRAIN_DATA_PATH=/app/data/bookings_train.csv
-ENV MODEL_PATH=/app/models/pipeline.cloudpkl
+ENV MODEL_PATH=/app/model/pipeline.cloudpkl
 ENV OUTPUT_PATH=/app/data/output_predictions.csv
 
 # Comando principal

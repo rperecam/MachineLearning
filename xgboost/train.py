@@ -9,7 +9,8 @@ from sklearn.preprocessing import StandardScaler, OneHotEncoder
 from sklearn.compose import ColumnTransformer
 from sklearn.metrics import (f1_score, precision_score, recall_score,
                              roc_auc_score, confusion_matrix, classification_report)
-from sklearn.model_selection import StratifiedGroupKFold, cross_val_predict
+from sklearn.model_selection import StratifiedGroupKFold, cross_val_predict, RandomizedSearchCV
+from sklearn.calibration import CalibratedClassifierCV
 from imblearn.pipeline import Pipeline as ImbPipeline
 from imblearn.over_sampling import SMOTE
 from xgboost import XGBClassifier
@@ -25,7 +26,7 @@ warnings.filterwarnings('ignore')
 def get_X_y():
     """
     Carga y preprocesa los datos para el entrenamiento del modelo.
-    Crea la variable objetivo y define los features.
+    Crea la variable objetivo y define los features con ingeniería simplificada.
     """
     hotels = pd.read_csv(os.environ.get("HOTELS_DATA_PATH", "data/hotels.csv"))
     bookings = pd.read_csv(os.environ.get("TRAIN_DATA_PATH", "data/bookings_train.csv"))
@@ -39,6 +40,10 @@ def get_X_y():
     # Considera los "No-Show" como "Check-Out" para el target
     data['reservation_status'].replace('No-Show', 'Check-Out', inplace=True)
 
+    # Imputa valores nulos en required_car_parking_spaces con 0
+    if 'required_car_parking_spaces' in data.columns:
+        data['required_car_parking_spaces'].fillna(0, inplace=True)
+
     # Convierte fechas a formato datetime
     for col in ['arrival_date', 'booking_date', 'reservation_status_date']:
         if col in data.columns:
@@ -50,8 +55,16 @@ def get_X_y():
     # Define el target: cancelaciones hechas con 30 días o menos de anticipación
     data['target'] = ((data['reservation_status'] == 'Canceled') & (data['days_before_arrival'] <= 30)).astype(int)
 
-    # Crea la variable lead_time: días entre reserva y llegada
+    # --- INGENIERÍA DE CARACTERÍSTICAS SIMPLIFICADA ---
+
+    # 1. Lead time: días entre reserva y llegada
     data['lead_time'] = (data['arrival_date'] - data['booking_date']).dt.days
+
+    # 2. Número de reservas históricas por hotel
+    data['hotel_booking_count'] = data.groupby('hotel_id')['booking_date'].transform('count')
+
+    # 3. Precio promedio por hotel
+    data['hotel_total_price_mean'] = data.groupby('hotel_id')['rate'].transform('mean')
 
     # Elimina columnas que ya no son necesarias para el modelo
     drop_cols = ['reservation_status', 'reservation_status_date', 'days_before_arrival',
@@ -72,10 +85,10 @@ def get_X_y():
     return X, y, hotel_ids
 
 
-def create_pipeline(X, y):
+
+def create_preprocessing_pipeline(X):
     """
-    Crea un pipeline completo con preprocesamiento y modelo.
-    Incluye imputación, codificación, escalado y SMOTE para rebalancear.
+    Crea un pipeline de preprocesamiento con tratamiento específico por tipo de variable.
     """
     # Detecta tipos de variables
     num_features = X.select_dtypes(include=["int64", "float64"]).columns.tolist()
@@ -107,30 +120,68 @@ def create_pipeline(X, y):
         ]
     )
 
-    # Modelo base: XGBoost con configuración personalizada
+    return preprocessor
+
+
+def optimize_hyperparameters(X, y, hotel_ids, cv):
+    """
+    Realiza una búsqueda aleatoria de hiperparámetros para XGBoost.
+    """
+    # Crea el preprocesador
+    preprocessor = create_preprocessing_pipeline(X)
+
+    # Espacio de búsqueda de hiperparámetros enfocados en generalización
+    param_space = {
+        'classifier__n_estimators': [300, 400, 500],
+        'classifier__learning_rate': [0.02, 0.05, 0.1],
+        'classifier__max_depth': [3, 4, 5, 6],  # Profundidades más bajas para evitar sobreajuste
+        'classifier__min_child_weight': [2, 3, 4],  # Controla el sobreajuste
+        'classifier__subsample': [0.7, 0.8],  # Submuestreo para generalización
+        'classifier__colsample_bytree': [0.7, 0.8],  # Submuestreo de características
+        'classifier__gamma': [0.0, 0.1, 0.2],  # Poda basada en la reducción de pérdida
+        'classifier__reg_alpha': [0.1, 0.5, 1.0],  # Regularización L1
+        'classifier__reg_lambda': [0.5, 1.0]  # Regularización L2
+    }
+
+    # Modelo base de XGBoost
     model = XGBClassifier(
         objective='binary:logistic',
         tree_method='hist',
         eval_metric='logloss',
-        use_label_encoder=False,
         random_state=42,
-        min_child_weight=4,
-        learning_rate=0.05,
-        n_estimators=300,
-        gamma=0.1,
     )
 
-    # Pipeline completo con SMOTE para reequilibrar clases
+    # Pipeline con preprocesamiento y SMOTE
     pipeline = ImbPipeline([
         ('preprocessor', preprocessor),
         ('smote', SMOTE(random_state=42, sampling_strategy=0.6, k_neighbors=5)),
         ('classifier', model)
     ])
 
-    return pipeline
+    # RandomizedSearchCV para búsqueda eficiente
+    search = RandomizedSearchCV(
+        pipeline,
+        param_distributions=param_space,
+        n_iter=100,  # Número de combinaciones a probar
+        scoring='f1',
+        cv=cv,
+        verbose=10,
+        n_jobs=-1,
+        random_state=42
+    )
+
+    print("\nIniciando búsqueda de hiperparámetros...")
+    search.fit(X, y, groups=hotel_ids)
+
+    print(f"\nMejor puntuación F1: {search.best_score_:.4f}")
+    print("Mejores hiperparámetros:")
+    for param, value in search.best_params_.items():
+        print(f"→ {param}: {value}")
+
+    return search.best_estimator_, search.best_params_, search.best_score_
 
 
-def evaluate_model(y_true, y_pred_proba, threshold=0.5):
+def evaluate_model(y_true, y_pred_proba, threshold=0.5, title="Evaluación del Modelo"):
     """
     Evalúa el modelo usando múltiples métricas.
     Imprime un reporte detallado del rendimiento.
@@ -151,7 +202,7 @@ def evaluate_model(y_true, y_pred_proba, threshold=0.5):
     specificity = tn / (tn + fp)
 
     # Imprime resultados
-    print("\n------ Evaluación del Modelo ------")
+    print(f"\n------ {title} ------")
     print(f"Umbral aplicado: {threshold:.4f}")
     print(f"\nMétricas principales:")
     print(f"→ Precision:   {precision:.4f} (De las predicciones positivas, ¿cuántas son correctas?)")
@@ -186,7 +237,7 @@ def find_threshold(y_true, y_pred_proba):
     Encuentra el mejor umbral de decisión para maximizar el F1-score.
     """
     best_f1, best_threshold = 0, 0.5
-    thresholds = np.linspace(0.1, 0.8, 40)
+    thresholds = np.linspace(0.1, 0.9, 50)
 
     print("\n------ Búsqueda de umbral óptimo ------")
     print("Umbral\t\tF1\t\tPrecision\tRecall")
@@ -206,57 +257,75 @@ def find_threshold(y_true, y_pred_proba):
     return best_threshold, best_f1
 
 
+def calibrate_probabilities(pipeline, X, y):
+    """
+    Calibra las probabilidades del modelo para mejorar la calibración de las predicciones.
+    """
+    print("\nCalibrando probabilidades del modelo...")
+    calibrated_model = CalibratedClassifierCV(
+        pipeline,
+        method='isotonic',  # Isotonic regression para calibración flexible
+        cv=7
+    )
+    calibrated_model.fit(X, y)
+    return calibrated_model
+
+
 def save_model(pipeline, threshold, path=None):
     """
-    Guarda el pipeline del modelo junto con el umbral óptimo.
+    Guarda el pipeline y el umbral óptimo.
     """
-    model_path = path or os.environ.get("MODEL_PATH", "models/pipeline.cloudpkl")
+    model_path = path or os.environ.get("MODEL_PATH", "model/pipeline.cloudpkl")
     os.makedirs(os.path.dirname(model_path), exist_ok=True)
-    model_package = {'pipeline': pipeline, 'threshold': threshold}
-    with open(model_path, mode="wb") as f:
-        cloudpickle.dump(model_package, f)
+
+    # Guarda el pipeline y el umbral
+    with open(model_path, 'wb') as f:
+        cloudpickle.dump((pipeline, threshold), f)
+
     print(f"Modelo guardado en {model_path}")
 
 
 def main():
     """
-    Ejecuta el proceso completo:
-    - carga y preprocesamiento de datos
-    - entrenamiento con validación cruzada
+    Ejecuta el proceso completo mejorado:
+    - carga y preprocesamiento de datos con ingeniería de características simplificada
+    - optimización de hiperparámetros con RandomSearch enfocado en generalización
+    - calibración de probabilidades
     - búsqueda del mejor umbral
-    - ajuste final del modelo
     - guardado del modelo entrenado
     """
-    print("Iniciando entrenamiento...")
+    print("Iniciando entrenamiento mejorado...")
 
     # Carga datos y define target
     X, y, hotel_ids = get_X_y()
 
-    # Crea pipeline de preprocesamiento y modelo
-    pipeline = create_pipeline(X, y)
-
-    # Validación cruzada estratificada por grupo (hotel)
+    # Define la estrategia de validación cruzada
     cv = StratifiedGroupKFold(n_splits=7, shuffle=True, random_state=42)
 
-    print(f"\nRealizando validación cruzada con {cv.n_splits} splits (estratificada por hotel_id)...")
+    # Optimiza hiperparámetros con RandomSearch
+    best_pipeline, best_params, best_cv_score = optimize_hyperparameters(X, y, hotel_ids, cv)
 
-    # Predice probabilidades en validación cruzada
-    y_pred_proba = cross_val_predict(pipeline, X, y, cv=cv, groups=hotel_ids, method='predict_proba')[:, 1]
+    # Predice probabilidades en validación cruzada con el mejor modelo
+    y_pred_proba = cross_val_predict(best_pipeline, X, y, cv=cv, groups=hotel_ids, method='predict_proba')[:, 1]
 
     # Encuentra el mejor umbral de decisión
     optimal_threshold, best_f1 = find_threshold(y, y_pred_proba)
 
     # Evalúa el modelo con el umbral óptimo
-    evaluate_model(y, y_pred_proba, optimal_threshold)
+    evaluate_model(y, y_pred_proba, optimal_threshold, title="Evaluación del Modelo Optimizado")
 
-    # Entrena el pipeline completo en todos los datos
+    # Entrena el modelo final en todos los datos
     print("\nEntrenando modelo final con todos los datos...")
-    pipeline.fit(X, y)
+    best_pipeline.fit(X, y)
+
+    # Calibra las probabilidades del modelo
+    calibrated_model = calibrate_probabilities(best_pipeline, X, y)
 
     # Guarda el pipeline junto al umbral óptimo
-    save_model(pipeline, optimal_threshold)
+    save_model(calibrated_model, optimal_threshold)
 
     print("\nEntrenamiento completado. ¡El modelo está listo para inferencia!")
+    print(f"F1-Score en validación cruzada: {best_f1:.4f}")
 
 
 # Punto de entrada del script
