@@ -24,6 +24,8 @@ def get_X():
     if 'reservation_status' in data.columns:
         data["reservation_status"] = data["reservation_status"].replace("No-Show", "Check-Out")
 
+    # Filtrar reservas con estado 'Booked' (a predecir)
+    data = data[data["reservation_status"] == "Booked"].copy()
 
     # Convertir columnas de fecha
     for col in ["arrival_date", "booking_date", "reservation_status_date"]:
@@ -34,17 +36,6 @@ def get_X():
     if 'arrival_date' in data.columns and 'booking_date' in data.columns:
         data['lead_time'] = (data['arrival_date'] - data['booking_date']).dt.days
 
-        # --- INGENIERÍA DE CARACTERÍSTICAS SIMPLIFICADA ---
-
-        # 1. Lead time: días entre reserva y llegada
-        data['lead_time'] = (data['arrival_date'] - data['booking_date']).dt.days
-
-        # 2. Número de reservas históricas por hotel
-        data['hotel_booking_count'] = data.groupby('hotel_id')['booking_date'].transform('count')
-
-        # 3. Precio promedio por hotel
-        data['hotel_total_price_mean'] = data.groupby('hotel_id')['rate'].transform('mean')
-
     # Eliminar columnas que causan data leakage
     columns_to_drop = ["reservation_status", "reservation_status_date",
                        "days_before_arrival", "arrival_date", "booking_date"]
@@ -54,14 +45,16 @@ def get_X():
     return X
 
 
-def load_model(path=None):
-    """
-    Carga el pipeline y el umbral desde el archivo serializado.
-    """
-    model_path = path or os.environ.get("MODEL_PATH", "model/pipeline.cloudpkl")
-    with open(model_path, 'rb') as f:
-        pipeline, threshold = cloudpickle.load(f)
-    return pipeline, threshold
+def load_model():
+    """Carga el modelo entrenado y el umbral óptimo."""
+    print("Cargando el modelo entrenado...")
+    model_path = os.environ.get("MODEL_PATH", "models/pipeline.cloudpkl")
+
+    with open(model_path, "rb") as f:
+        model_package = cloudpickle.load(f)
+
+    print("Modelo cargado correctamente.")
+    return model_package["pipeline"], model_package["threshold"]
 
 
 def predict(pipeline, threshold, X):
