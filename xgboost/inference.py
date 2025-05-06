@@ -42,7 +42,7 @@ def get_X():
     X = data.drop(columns=[col for col in columns_to_drop if col in data.columns])
 
     print(f"Datos preprocesados: {X.shape[0]} registros, {X.shape[1]} características.")
-    return X
+    return X, data['reservation_id'] if 'reservation_id' in data.columns else None
 
 
 def load_model():
@@ -57,35 +57,46 @@ def load_model():
     return model_package["pipeline"], model_package["threshold"]
 
 
-def predict(pipeline, threshold, X):
-    """Genera predicciones usando el pipeline y umbral dado."""
-    print("Generando predicciones...")
+def predict_probabilities(pipeline, X):
+    """Genera predicciones de probabilidad usando el pipeline."""
+    print("Generando probabilidades de cancelación...")
 
     # Obtener probabilidades
     y_proba = pipeline.predict_proba(X)[:, 1]
 
-    # Aplicar umbral óptimo
-    y_pred = (y_proba >= threshold).astype(int)
-
-    print("Predicciones completadas.")
-    return pd.Series(y_pred, name="prediction")
+    print("Probabilidades calculadas.")
+    return y_proba
 
 
 def main():
     # Obtener datos y modelo
-    X = get_X()
+    X, reservation_ids = get_X()
     pipeline, threshold = load_model()
 
-    # Generar predicciones
-    predictions = predict(pipeline, threshold, X)
+    # Generar probabilidades
+    probabilities = predict_probabilities(pipeline, X)
+
+    # Crear DataFrame con resultados
+    results = pd.DataFrame()
+
+    # Incluir ID de reserva si está disponible
+    if reservation_ids is not None:
+        results['reservation_id'] = reservation_ids
+
+    # Añadir probabilidades
+    results['cancellation_probability'] = probabilities
+
+    # Añadir predicción binaria como referencia (opcional)
+    results['predicted_cancellation'] = (probabilities >= threshold).astype(int)
 
     # Guardar resultados
     output_path = os.environ.get("OUTPUT_PATH", "data/output_predictions.csv")
-    predictions.to_csv(output_path, index=False)
+    results.to_csv(output_path, index=False)
 
-    print(f"Predicciones guardadas en {output_path}:")
-    print(f"→ {predictions.sum()} cancelaciones previstas de {len(predictions)} reservas "
-          f"({predictions.mean() * 100:.1f}%)")
+    print(f"Probabilidades guardadas en {output_path}:")
+    print(f"→ Probabilidad media de cancelación: {probabilities.mean() * 100:.2f}%")
+    print(f"→ {(probabilities >= threshold).sum()} cancelaciones previstas de {len(probabilities)} reservas "
+          f"({(probabilities >= threshold).mean() * 100:.1f}% usando umbral {threshold:.2f})")
 
 
 if __name__ == "__main__":
