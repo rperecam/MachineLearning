@@ -24,9 +24,6 @@ def get_X():
     if 'reservation_status' in data.columns:
         data["reservation_status"] = data["reservation_status"].replace("No-Show", "Check-Out")
 
-    # Filtrar reservas con estado 'Booked' (a predecir)
-    data = data[data["reservation_status"] == "Booked"].copy()
-
     # Convertir columnas de fecha
     for col in ["arrival_date", "booking_date", "reservation_status_date"]:
         if col in data.columns:
