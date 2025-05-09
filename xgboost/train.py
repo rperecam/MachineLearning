@@ -8,7 +8,7 @@ from sklearn import set_config
 from sklearn.impute import SimpleImputer
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler, OneHotEncoder
-from sklearn.compose import make_column_selector, make_column_transformer
+from sklearn.compose import ColumnTransformer
 from sklearn.metrics import precision_recall_curve
 from sklearn.model_selection import StratifiedGroupKFold
 
@@ -48,53 +48,54 @@ def get_X_y():
     return X, y, hotel_ids
 
 def create_pipeline(X):
-    """Crea pipeline de preprocesamiento + modelo con SMOTE."""
-    print("Creando pipeline...")
+    numeric_features = X.select_dtypes(include=['int64', 'float64', 'bool']).columns.tolist()
+    categorical_features = X.select_dtypes(include=['object', 'category']).columns.tolist()
 
-    num_selector = make_column_selector(dtype_include=['number'])
-    cat_selector = make_column_selector(dtype_include=['object', 'category', 'bool'])
+    numeric_transformer = Pipeline(steps=[
+        ('imputer', SimpleImputer(strategy='mean')),
+        ('scaler', StandardScaler())
+    ])
 
-    preprocessor = make_column_transformer(
-        (Pipeline([
-            ('imputer', SimpleImputer(strategy='median')),
-            ('scaler', StandardScaler())
-        ]), num_selector),
-        (Pipeline([
-            ('imputer', SimpleImputer(strategy='most_frequent')),
-            ('encoder', OneHotEncoder(handle_unknown='ignore', sparse_output=False))
-        ]), cat_selector),
-        verbose_feature_names_out=False
-    )
+    categorical_transformer = Pipeline(steps=[
+        ('imputer', SimpleImputer(strategy='most_frequent')),
+        ('encoder', OneHotEncoder(handle_unknown='ignore', sparse=False))
+    ])
+
+    preprocessor = ColumnTransformer(transformers=[
+        ('num', numeric_transformer, numeric_features),
+        ('cat', categorical_transformer, categorical_features)
+    ])
 
     model = XGBClassifier(
-        objective='binary:logistic',
-        tree_method='hist',
-        eval_metric='logloss',
+        n_estimators=250,
+        learning_rate=0.1,
+        max_depth=6,
+        subsample=0.8,
+        colsample_bytree=0.8,
         use_label_encoder=False,
-        random_state=42,
-        min_child_weight=4,
-        learning_rate=0.05,
-        n_estimators=300,
-        gamma=0.1,
+        eval_metric='logloss',
+        tree_method='hist',
+        random_state=42
     )
 
-    pipeline = ImbPipeline([
+    pipeline = ImbPipeline(steps=[
         ('preprocessor', preprocessor),
-        ('smote', SMOTE(random_state=42, sampling_strategy=0.6, k_neighbors=5)),
+        ('smote', SMOTE(random_state=42)),
         ('classifier', model)
     ])
 
     return pipeline
 
-def find_threshold(y_true, y_proba):
-    """Encuentra el mejor umbral para F1-score."""
+def find_threshold(y_true, y_proba, beta=1.0):
+    """Encuentra el mejor umbral según F-beta score."""
     precision, recall, thresholds = precision_recall_curve(y_true, y_proba)
-    f1 = 2 * precision * recall / (precision + recall + 1e-7)
-    idx = np.argmax(f1[:-1])
-    return thresholds[idx], f1[idx]
+    beta_sq = beta ** 2
+    fbeta = (1 + beta_sq) * precision * recall / (beta_sq * precision + recall + 1e-7)
+    idx = np.argmax(fbeta[:-1])
+    return thresholds[idx], fbeta[idx]
 
-def cv_threshold(X, y, groups, pipeline, cv):
-    """Calcula el umbral óptimo global para F1 con validación cruzada."""
+def cv_threshold(X, y, groups, pipeline, cv, beta=1.0):
+    """Calcula el umbral óptimo global para F-beta score con CV."""
     print("Buscando umbral óptimo con CV...")
     all_true, all_proba = [], []
 
@@ -106,10 +107,11 @@ def cv_threshold(X, y, groups, pipeline, cv):
         all_true.extend(y_test)
         all_proba.extend(y_proba)
 
-    threshold, f1 = find_threshold(np.array(all_true), np.array(all_proba))
-    print(f"Umbral óptimo global: {threshold:.4f}")
-    print(f"F1-score global: {f1:.4f}")
+    threshold, fbeta = find_threshold(np.array(all_true), np.array(all_proba), beta=beta)
+    print(f"Umbral óptimo global (F{beta}-score): {threshold:.4f}")
+    print(f"F{beta}-score global: {fbeta:.4f}")
     return threshold
+
 
 def save_model(pipeline, threshold, path=None):
     """Guarda el pipeline entrenado y el umbral."""
