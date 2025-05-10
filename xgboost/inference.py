@@ -14,7 +14,7 @@ DEFAULT_GUESTS = 2
 DEFAULT_RATE = 250.0
 DEFAULT_BOARD = "SC"
 CAMPAIGN_COST_PER_OFFER = 5.0
-DEFAULT_FALLBACK_THRESHOLD = 0.4236
+DEFAULT_FALLBACK_THRESHOLD = 0.4912
 
 # Costes de regalos
 COST = {
@@ -82,7 +82,7 @@ def impute_booking_data_for_gifting(df_bookings):
         if df_clean[column].isnull().any():
             if column not in ['stay_nights', 'total_guests', 'rate', 'board',
                               'required_car_parking_spaces', 'arrival_date',
-                              'booking_date', 'lead_time', 'hotel_id', 'booking_id']:
+                              'booking_date', 'lead_time', 'hotel_id']:
                 if pd.api.types.is_numeric_dtype(df_clean[column]):
                     df_clean[column].fillna(df_clean[column].mean(), inplace=True)
                 elif pd.api.types.is_object_dtype(df_clean[column]):
@@ -167,7 +167,7 @@ def calculate_gift_cost(row, gift_type):
     if gift_type == 'A':
         cost = COST['A'] * guests * nights
     elif gift_type == 'B':
-        cost = COST['B'] * rate * nights
+        cost = COST['B'] * rate
     elif gift_type == 'C':
         cost = COST['C'] * nights
     elif gift_type == 'D':
@@ -180,16 +180,14 @@ def calculate_gift_cost(row, gift_type):
 def select_optimal_gift(row_with_proba, current_threshold):
     """Selecciona el mejor regalo para maximizar el beneficio neto esperado."""
     rate = row_with_proba.get('rate', DEFAULT_RATE)
-    nights = row_with_proba.get('stay_nights', DEFAULT_NIGHTS)
-    reservation_value = rate * nights
 
     prob_cancel = row_with_proba['cancellation_probability']
     prob_no_cancel = 1.0 - prob_cancel
 
     replacement_rate = calculate_replacement_rate(row_with_proba)
-    value_if_replaced = reservation_value * replacement_rate
+    value_if_replaced = rate * replacement_rate
 
-    expected_value_no_gift = (prob_no_cancel * reservation_value) + (prob_cancel * value_if_replaced)
+    expected_value_no_gift = (prob_no_cancel * rate) + (prob_cancel * value_if_replaced)
 
     if prob_cancel < current_threshold:
         return np.nan, 0.0, expected_value_no_gift, expected_value_no_gift
@@ -208,7 +206,7 @@ def select_optimal_gift(row_with_proba, current_threshold):
         prob_no_cancel_with_gift = prob_no_cancel + (prob_cancel * success_prob)
         prob_cancel_despite_gift = prob_cancel * (1.0 - success_prob)
 
-        gift_expected_value = (prob_no_cancel_with_gift * reservation_value) + \
+        gift_expected_value = (prob_no_cancel_with_gift * rate) + \
                               (prob_cancel_despite_gift * value_if_replaced) - \
                               gift_cost
 

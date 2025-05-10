@@ -38,9 +38,9 @@ def get_X_y():
             data[col] = pd.to_datetime(data[col], errors='coerce')
 
     data['required_car_parking_spaces'] = data['required_car_parking_spaces'].fillna(0)
-    data['days_before_arrival'] = (data['arrival_date'] - data['reservation_status_date']).dt.days
     data['lead_time'] = (data['arrival_date'] - data['booking_date']).dt.days
 
+    data['days_before_arrival'] = (data['arrival_date'] - data['reservation_status_date']).dt.days
     data['target'] = ((data['reservation_status'] == 'Canceled') &
                       (data['days_before_arrival'] <= 30)).astype(int)
 
@@ -52,7 +52,6 @@ def get_X_y():
     hotel_ids = data['hotel_id']
 
     print(f"Datos cargados y preprocesados: {X.shape[0]} registros, {X.shape[1]} características.")
-    print(f"Distribución de la variable objetivo:\n{y.value_counts(normalize=True)}")
     return X, y, hotel_ids
 
 def get_pipeline(X_sample):
@@ -76,15 +75,15 @@ def get_pipeline(X_sample):
     ], remainder='passthrough')
 
     model = XGBClassifier(
-        n_estimators=250,
-        learning_rate=0.1,
-        max_depth=6,
-        subsample=0.8,
-        colsample_bytree=0.8,
-        use_label_encoder=False,
-        eval_metric='logloss',
+        objective='binary:logistic',
         tree_method='hist',
-        random_state=42
+        eval_metric='logloss',
+        use_label_encoder=False,
+        random_state=42,
+        min_child_weight=4,
+        learning_rate=0.05,
+        n_estimators=300,
+        gamma=0.1,
     )
 
     pipeline = ImbPipeline(steps=[
@@ -95,7 +94,7 @@ def get_pipeline(X_sample):
 
     return pipeline
 
-def find_threshold(y_true, y_proba, beta=1.0):
+def find_threshold(y_true, y_proba, beta=0.5):
     """Encuentra el mejor umbral según F-beta score."""
     precision, recall, thresholds = precision_recall_curve(y_true, y_proba)
     fbeta = np.zeros_like(precision)
