@@ -8,313 +8,349 @@ from datetime import datetime
 # Silenciar advertencias
 warnings.filterwarnings("ignore")
 
-# ----- VALORES Y CONSTANTES -----
-
-# Valores por defecto para imputación (exactamente como especifica el PDF)
+# Valores por defecto
 DEFAULT_NIGHTS = 2
 DEFAULT_GUESTS = 2
-DEFAULT_RATE = 250
-DEFAULT_BOARD = "SC"  # Añadido según el PDF
+DEFAULT_RATE = 250.0
+DEFAULT_BOARD = "SC"
+CAMPAIGN_COST_PER_OFFER = 5.0
+DEFAULT_FALLBACK_THRESHOLD = 0.4193
 
-# Costes de servicios
+# Costes de regalos
 COST = {
-    'A': 4,  # Desayuno (por persona/día)
+    'A': 4.0,  # Desayuno (por persona/día)
     'B': 0.09,  # Mejora habitación (% del precio total)
-    'C': 7,  # Parking (por día)
-    'D': 9  # Spa (por persona)
+    'C': 7.0,  # Parking (por día)
+    'D': 9.0  # Spa (por persona)
 }
 
-# Coste adicional de campaña por reserva impactada
-CAMPAIGN_COST = 5
-
-# Umbral óptimo del modelo
-THRESHOLD = 0.4088
-
-
-# ----- FUNCIONES DE INFERENCIA DE CANCELACIONES -----
-
 def get_X():
-    """Carga y preprocesa los datos para inferencia."""
-    print("Cargando datos de inferencia...")
+    """Carga los datos para predecir cancelaciones."""
+    inference_path = os.environ.get("INFERENCE_DATA_PATH", "data/bookings_test.csv")
+    hotels_path = os.environ.get("HOTELS_DATA_PATH", "data/hotels.csv")
 
-    # Cargar datos
-    inference = pd.read_csv(os.environ.get("INFERENCE_DATA_PATH", "data/bookings_test.csv"))
-    hotels = pd.read_csv(os.environ.get("HOTELS_DATA_PATH", "data/hotels.csv"))
+    inference_data = pd.read_csv(inference_path)
+    hotels_data = pd.read_csv(hotels_path)
 
-    # Unir reservas con información del hotel
-    data = pd.merge(inference, hotels, on="hotel_id", how="left")
+    data = pd.merge(inference_data, hotels_data, on="hotel_id", how="left")
+    original_data_for_gifting = data.copy()
 
-    # Reemplazar 'No-Show' por 'Check-Out' si existe
-    if 'reservation_status' in data.columns:
-        data["reservation_status"] = data["reservation_status"].replace("No-Show", "Check-Out")
-
-    # Convertir columnas de fecha
-    for col in ["arrival_date", "booking_date", "reservation_status_date"]:
+    date_cols = ["arrival_date", "booking_date"]
+    for col in date_cols:
         if col in data.columns:
-            data[col] = pd.to_datetime(data[col])
+            data[col] = pd.to_datetime(data[col], errors='coerce')
 
-    # Calcular lead_time
     if 'arrival_date' in data.columns and 'booking_date' in data.columns:
         data['lead_time'] = (data['arrival_date'] - data['booking_date']).dt.days
 
-    # Eliminar columnas que causan data leakage para predicción
-    columns_to_drop = ["reservation_status", "reservation_status_date",
-                       "days_before_arrival"]
-    X = data.drop(columns=[col for col in columns_to_drop if col in data.columns])
+    if 'required_car_parking_spaces' in data.columns:
+        data['required_car_parking_spaces'] = data['required_car_parking_spaces'].fillna(0)
 
-    print(f"Datos preprocesados: {X.shape[0]} registros, {X.shape[1]} características.")
-    return X, data
+    return data, original_data_for_gifting
 
-
-def load_model():
-    """Carga el modelo entrenado y el umbral óptimo."""
-    print("Cargando el modelo entrenado...")
+def get_pipeline():
+    """Carga el modelo y umbral para predecir cancelaciones."""
     model_path = os.environ.get("MODEL_PATH", "models/pipeline.cloudpkl")
 
     with open(model_path, "rb") as f:
         model_package = cloudpickle.load(f)
 
-    print("Modelo cargado correctamente.")
-    return model_package["pipeline"], model_package.get("threshold", THRESHOLD)
+    pipeline = model_package["pipeline"]
+    threshold = model_package.get("threshold", DEFAULT_FALLBACK_THRESHOLD)
 
+    return pipeline, threshold
 
-def predict_probabilities(pipeline, X):
-    """Genera predicciones de probabilidad usando el pipeline."""
-    print("Generando probabilidades de cancelación...")
+def get_predictions(pipeline, X_inference_processed):
+    """Predice probabilidades de cancelación."""
+    return pipeline.predict_proba(X_inference_processed)[:, 1]
 
-    # Obtener probabilidades
-    y_proba = pipeline.predict_proba(X)[:, 1]
+def impute_booking_data_for_gifting(df_bookings):
+    """Completa datos faltantes en las reservas según valores por defecto."""
+    df_clean = df_bookings.copy()
 
-    print("Probabilidades calculadas.")
-    return y_proba
+    df_clean['stay_nights'] = df_clean['stay_nights'].fillna(DEFAULT_NIGHTS).astype(int)
+    df_clean['total_guests'] = df_clean['total_guests'].fillna(DEFAULT_GUESTS).astype(int)
+    df_clean['rate'] = df_clean['rate'].fillna(DEFAULT_RATE).astype(float)
+    df_clean['board'] = df_clean['board'].fillna(DEFAULT_BOARD)
 
+    if 'required_car_parking_spaces' in df_clean.columns:
+        df_clean['required_car_parking_spaces'].fillna(0, inplace=True)
 
-# ----- FUNCIONES DE ESTRATEGIA DE REGALOS -----
+    for column in df_clean.columns:
+        if df_clean[column].isnull().any():
+            if column not in ['stay_nights', 'total_guests', 'rate', 'board',
+                              'required_car_parking_spaces', 'arrival_date',
+                              'booking_date', 'lead_time', 'hotel_id', 'booking_id']:
+                if pd.api.types.is_numeric_dtype(df_clean[column]):
+                    df_clean[column].fillna(df_clean[column].mean(), inplace=True)
+                elif pd.api.types.is_object_dtype(df_clean[column]):
+                    mode_val = df_clean[column].mode()
+                    if not mode_val.empty:
+                        df_clean[column].fillna(mode_val[0], inplace=True)
+                    else:
+                        df_clean[column].fillna('Unknown', inplace=True)
 
-def impute_data(df):
-    """Imputa valores faltantes con valores predefinidos según el PDF."""
-    df_clean = df.copy()
-
-    # Imputar valores específicos según el PDF
-    if 'stay_nights' in df_clean.columns:
-        df_clean['stay_nights'].fillna(DEFAULT_NIGHTS, inplace=True)
-    if 'total_guests' in df_clean.columns:
-        df_clean['total_guests'].fillna(DEFAULT_GUESTS, inplace=True)
-    if 'rate' in df_clean.columns:
-        df_clean['rate'].fillna(DEFAULT_RATE, inplace=True)
-    if 'board' in df_clean.columns:
-        df_clean['board'].fillna(DEFAULT_BOARD, inplace=True)
-
-    # Para otras columnas: mediana para numéricas y moda para categóricas
-    for col in df_clean.columns:
-        if df_clean[col].isnull().any() and col not in ['stay_nights', 'total_guests', 'rate', 'board']:
-            if pd.api.types.is_numeric_dtype(df_clean[col]):
-                df_clean[col].fillna(df_clean[col].median(), inplace=True)
-            else:
-                mode_val = df_clean[col].mode()
-                if not mode_val.empty:
-                    df_clean[col].fillna(mode_val.iloc[0], inplace=True)
+    if 'arrival_date' in df_clean.columns:
+        if not pd.api.types.is_datetime64_any_dtype(df_clean['arrival_date']):
+            df_clean['arrival_date'] = pd.to_datetime(df_clean['arrival_date'], errors='coerce')
+        if df_clean['arrival_date'].isnull().any():
+            df_clean['arrival_date'].fillna(pd.Timestamp.now() + pd.Timedelta(days=30), inplace=True)
+    else:
+        df_clean['arrival_date'] = pd.Timestamp.now() + pd.Timedelta(days=30)
 
     return df_clean
 
+def calculate_replacement_rate(row):
+    """Calcula probabilidad de que una habitación cancelada sea reservada de nuevo."""
+    arrival_date = row.get('arrival_date')
+    if pd.isnull(arrival_date):
+        arrival_date = pd.Timestamp.now() + pd.Timedelta(days=30)
 
-def calc_replacement_rate(row):
-    """
-    Calcula la tasa de reemplazo según las fórmulas exactas del PDF:
-    - Factor tiempo: 50% para reservas cortas de fin de semana, 35% resto
-    - Factor hotel: 70% ciudad, 55% resort
-    - Factor review: 20% * avg_review
-    """
-    arrival_date = pd.to_datetime(row['arrival_date'])
     stay_nights = row.get('stay_nights', DEFAULT_NIGHTS)
-    avg_review = row.get('avg_review', 5)
-    hotel_type = row.get('hotel_type', '').lower()
+    avg_review = row.get('avg_review', 5.0)
+    hotel_type = str(row.get('hotel_type', 'unknown')).lower()
 
-    # Factor tiempo: fin de semana (jueves-sábado) con estancia corta (1-3 noches)
-    is_weekend = arrival_date.weekday() >= 3 and arrival_date.weekday() <= 5  # Jueves(3), Viernes(4), Sábado(5)
-    is_short_stay = 1 <= stay_nights <= 3
-    time_factor = 0.5 if (is_weekend and is_short_stay) else 0.35
+    is_weekend = arrival_date.weekday() >= 3 and arrival_date.weekday() <= 5
+    is_short = 1 <= stay_nights <= 3
+    time_factor = 0.50 if (is_weekend and is_short) else 0.35
 
-    # Factor hotel: ciudad vs resort
-    hotel_factor = 0.7 if 'city' in hotel_type else 0.55
+    hotel_factor = 0.70 if 'City Hotel' in hotel_type else 0.55
+    review_factor = min(1.0, 0.20 * avg_review)
 
-    # Factor valoración: exactamente 20% * avg_review (limitado a 1.0 máximo)
-    review_factor = min(1.0, 0.2 * avg_review)
-
-    # La fórmula final es el producto de los tres factores
     return time_factor * hotel_factor * review_factor
 
-
-def is_gift_eligible(row, gift_type):
-    """Verifica si una reserva es elegible para un regalo específico según el PDF."""
-    if gift_type == 'A':  # Desayuno
-        return (row.get('board', '') not in ['BB', 'FB', 'HB'] and
+def check_gift_eligibility(row, gift_type):
+    """Verifica si una reserva puede recibir un regalo específico."""
+    if gift_type == 'A':
+        return (row.get('board', DEFAULT_BOARD) not in ['BB', 'FB', 'HB'] and
                 row.get('restaurant', 0) == 1)
-    elif gift_type == 'B':  # Mejora habitación
+
+    elif gift_type == 'B':
         return row.get('total_rooms', 0) > 80
-    elif gift_type == 'C':  # Parking
-        return (row.get('parking', 0) == 1 and
-                row.get('required_car_parking_spaces', 0) > 0)
-    elif gift_type == 'D':  # Spa
+
+    elif gift_type == 'C':
+        return row.get('parking', 0) == 1
+
+    elif gift_type == 'D':
         return row.get('pool_and_spa', 0) == 1
+
     return False
 
-
-def calc_success_rate(row, gift_type):
-    """Calcula la probabilidad de éxito para un regalo según las fórmulas exactas del PDF."""
+def calculate_gift_success_probability(row, gift_type):
+    """Calcula probabilidad de éxito de un regalo (cliente acepta y no cancela)."""
     nights = row.get('stay_nights', DEFAULT_NIGHTS)
     guests = row.get('total_guests', DEFAULT_GUESTS)
-    hotel_type = row.get('hotel_type', '').lower()
+    hotel_type = str(row.get('hotel_type', 'unknown')).lower()
 
-    if gift_type == 'A':  # Desayuno: min(1, sqrt(total_guests * stay_nights) / 4)
-        return min(1.0, np.sqrt(guests * nights) / 4)
-    elif gift_type == 'B':  # Mejora habitación: 80% ciudad, 65% resort
-        return 0.8 if 'city' in hotel_type else 0.65
-    elif gift_type == 'C':  # Parking: exactamente 50% fijo
-        return 0.5
-    elif gift_type == 'D':  # Spa: 70% resort, 55% ciudad (corregido según PDF)
-        return 0.55 if 'city' in hotel_type else 0.7
-    return 0
+    if gift_type == 'A':
+        return min(1.0, np.sqrt(guests * nights) / 4.0)
 
+    elif gift_type == 'B':
+        return 0.80 if 'City Hotel' in hotel_type else 0.65
 
-def calc_gift_cost(row, gift_type):
-    """Calcula el coste de ofrecer un regalo específico según el PDF."""
+    elif gift_type == 'C':
+        return 0.50
+
+    elif gift_type == 'D':
+        return 0.70 if 'Resort Hotel' in hotel_type else 0.55
+
+    return 0.0
+
+def calculate_gift_cost(row, gift_type):
+    """Calcula coste total de ofrecer un regalo."""
     nights = row.get('stay_nights', DEFAULT_NIGHTS)
     guests = row.get('total_guests', DEFAULT_GUESTS)
     rate = row.get('rate', DEFAULT_RATE)
 
-    if gift_type == 'A':  # Desayuno: 4€/persona/día
-        return COST['A'] * guests * nights
-    elif gift_type == 'B':  # Mejora habitación: 9% del precio total
-        return COST['B'] * rate * nights
-    elif gift_type == 'C':  # Parking: 7€/día
-        return COST['C'] * nights
-    elif gift_type == 'D':  # Spa: 9€/persona
-        return COST['D'] * guests
-    return 0
+    if gift_type == 'A':
+        cost = COST['A'] * guests * nights
+    elif gift_type == 'B':
+        cost = COST['B'] * rate * nights
+    elif gift_type == 'C':
+        cost = COST['C'] * nights
+    elif gift_type == 'D':
+        cost = COST['D'] * guests
+    else:
+        cost = 0.0
 
+    return cost + CAMPAIGN_COST_PER_OFFER
 
-def select_best_gift(row):
-    """
-    Selecciona el mejor regalo para maximizar la facturación esperada.
-    Solo para reservas con alta probabilidad de cancelación (>= umbral).
-    """
-    # Verificar si la reserva está en riesgo de cancelación
-    cancel_prob = row.get('cancellation_probability', 0)
-    if cancel_prob < THRESHOLD:
-        return np.nan
-
-    # Datos de la reserva
-    rate = row.get('rate', DEFAULT_RATE)
-    nights = row.get('stay_nights', DEFAULT_NIGHTS)
+def select_optimal_gift(row_with_proba, current_threshold):
+    """Selecciona el mejor regalo para maximizar el beneficio neto esperado."""
+    rate = row_with_proba.get('rate', DEFAULT_RATE)
+    nights = row_with_proba.get('stay_nights', DEFAULT_NIGHTS)
     reservation_value = rate * nights
 
-    # Calcular valor esperado con reemplazo si se cancela
-    replacement_rate = calc_replacement_rate(row)
-    expected_if_replaced = reservation_value * replacement_rate
+    prob_cancel = row_with_proba['cancellation_probability']
+    prob_no_cancel = 1.0 - prob_cancel
 
-    # Valor esperado sin ninguna intervención
-    expected_without_gift = reservation_value * (1 - cancel_prob) + expected_if_replaced * cancel_prob
+    replacement_rate = calculate_replacement_rate(row_with_proba)
+    value_if_replaced = reservation_value * replacement_rate
 
-    # Evaluar cada regalo posible
+    expected_value_no_gift = (prob_no_cancel * reservation_value) + (prob_cancel * value_if_replaced)
+
+    if prob_cancel < current_threshold:
+        return np.nan, 0.0, expected_value_no_gift, expected_value_no_gift
+
     best_gift = np.nan
-    best_expected_value = expected_without_gift  # Valor esperado sin intervención
+    best_expected_value = expected_value_no_gift
+    best_gift_cost = 0.0
 
-    for gift in ['A', 'B', 'C', 'D']:
-        # Verificar elegibilidad
-        if not is_gift_eligible(row, gift):
+    for gift_code in ['A', 'B', 'C', 'D']:
+        if not check_gift_eligibility(row_with_proba, gift_code):
             continue
 
-        # Calcular coste y beneficio esperado
-        gift_cost = calc_gift_cost(row, gift) + CAMPAIGN_COST
-        success_rate = calc_success_rate(row, gift)
+        gift_cost = calculate_gift_cost(row_with_proba, gift_code)
+        success_prob = calculate_gift_success_probability(row_with_proba, gift_code)
 
-        # Valor esperado con regalo = probabilidad de éxito * valor reserva - coste del regalo
-        # Nota: el éxito del regalo convierte una cancelación probable en una reserva confirmada
-        expected_with_gift = reservation_value * ((1 - cancel_prob) + cancel_prob * success_rate) - gift_cost
+        prob_no_cancel_with_gift = prob_no_cancel + (prob_cancel * success_prob)
+        prob_cancel_despite_gift = prob_cancel * (1.0 - success_prob)
 
-        # Seleccionar el regalo que maximice el valor esperado
-        if expected_with_gift > best_expected_value:
-            best_expected_value = expected_with_gift
-            best_gift = gift
+        gift_expected_value = (prob_no_cancel_with_gift * reservation_value) + \
+                              (prob_cancel_despite_gift * value_if_replaced) - \
+                              gift_cost
 
-    return best_gift
+        if gift_expected_value > best_expected_value:
+            best_expected_value = gift_expected_value
+            best_gift = gift_code
+            best_gift_cost = gift_cost
 
+    return best_gift, best_gift_cost, best_expected_value, expected_value_no_gift
 
-# ----- FUNCIÓN PRINCIPAL -----
+def perform_economic_analysis(results_df):
+    """Realiza análisis económico de la campaña de regalos."""
+    total_revenue_no_campaign = results_df['ev_no_intervention'].sum()
+    total_revenue_with_campaign = results_df['final_ev_with_gift_decision'].sum()
+    total_gift_costs = results_df['cost_of_selected_gift'][results_df['gift'].notna()].sum()
+
+    gifts_offered = results_df['gift'].notna().sum()
+    net_impact = total_revenue_with_campaign - total_revenue_no_campaign
+
+    print(f"\nAnálisis Económico:")
+    print(f"  Total Reservas: {len(results_df)}")
+    print(f"  Regalos Ofrecidos: {gifts_offered} ({gifts_offered / len(results_df) * 100:.1f}%)")
+    print(f"  Facturación Esperada SIN Campaña: {total_revenue_no_campaign:,.2f} €")
+    print(f"  Facturación Esperada CON Campaña: {total_revenue_with_campaign:,.2f} €")
+    print(f"  Coste Total de Regalos: {total_gift_costs:,.2f} €")
+    print(f"  INCREMENTO NETO: {net_impact:,.2f} €")
+
+    if gifts_offered > 0:
+        avg_cost = total_gift_costs / gifts_offered
+        roi = (net_impact / total_gift_costs) * 100 if total_gift_costs > 0 else 0
+        print(f"  Coste Medio por Regalo: {avg_cost:,.2f} €")
+        print(f"  ROI de Campaña: {roi:.2f}%")
+
+    print("\nDistribución de regalos:")
+    gift_counts = results_df['gift'].value_counts(dropna=False)
+    for gift_type, count in gift_counts.items():
+        gift_name = {
+            'A': 'Desayuno', 'B': 'Mejora habitación', 'C': 'Parking', 'D': 'Spa',
+            np.nan: 'Sin regalo (bajo riesgo o no rentable)'
+        }.get(gift_type, 'Null')
+
+        print(f"  - {gift_name}: {count} ({count / len(results_df) * 100:.1f}%)")
+
+        if gift_type is not np.nan:
+            subset = results_df[results_df['gift'] == gift_type]
+            avg_prob = subset['cancellation_probability'].mean()
+            avg_cost = subset['cost_of_selected_gift'].mean()
+            print(f"    * Prob. media cancelación: {avg_prob:.2f}")
+            print(f"    * Coste medio: {avg_cost:.2f} €")
+
+def export_results(results_df, output_path="data/output_predictions.csv"):
+    """Exporta resultados en formato requerido."""
+    output_df = pd.DataFrame({
+        'prediction': results_df['predicted_to_cancel'],
+        'cancellation_probability': results_df['cancellation_probability'],
+        'gift': results_df['gift']
+    })
+
+    os.makedirs(os.path.dirname(output_path), exist_ok=True)
+    output_df.to_csv(output_path, index=False, float_format='%.4f')
+    print(f"\nArchivo guardado en: {output_path}")
+
+    return output_df
 
 def main():
-    """Función principal que ejecuta todo el flujo del proceso."""
+    """Ejecuta el proceso completo de predicción y asignación de regalos."""
     try:
-        print(f"Iniciando proceso de inferencia y estrategia de regalos...")
+        print(f"Iniciando proceso... ({datetime.now()})")
         start_time = datetime.now()
 
-        # 1. Cargar y preprocesar datos
-        X, raw_data = get_X()
+        X_for_pipeline, raw_data = get_X()
+        pipeline, threshold = get_pipeline()
+        print(f"Umbral de predicción: {threshold:.4f}")
 
-        # 2. Cargar modelo y obtener predicciones
-        pipeline, threshold = load_model()
-        probabilities = predict_probabilities(pipeline, X)
+        cancel_probs = get_predictions(pipeline, X_for_pipeline)
 
-        # 3. Preparar datos para estrategia de regalos
-        bookings = raw_data.copy()
-        bookings = impute_data(bookings)
-        bookings['cancellation_probability'] = probabilities
-        bookings['prediction'] = (probabilities >= threshold).astype(int)  # Convertir a 0/1 entero
+        bookings = impute_booking_data_for_gifting(raw_data)
+        bookings['cancellation_probability'] = cancel_probs
+        bookings['predicted_to_cancel'] = (cancel_probs >= threshold).astype(int)
+        bookings['loaded_threshold'] = threshold
 
-        # 4. Estadísticas básicas
-        n_bookings = len(bookings)
-        n_predicted_cancel = bookings['prediction'].sum()
-        print(
-            f"Reservas con predicción de cancelación: {n_predicted_cancel} de {n_bookings} ({n_predicted_cancel / n_bookings * 100:.1f}%)")
+        num_bookings = len(bookings)
+        num_predicted_cancel = bookings['predicted_to_cancel'].sum()
+        print(f"\nEstadísticas de Predicción:")
+        print(f"  Total reservas: {num_bookings}")
+        print(f"  Predicción de cancelación: {num_predicted_cancel} "
+              f"({num_predicted_cancel / num_bookings * 100:.1f}%)")
 
-        # 5. Aplicar estrategia de regalos a cada reserva
-        print("\nAplicando estrategia de regalos...")
-        bookings['gift'] = bookings.apply(lambda row: select_best_gift(row), axis=1)
+        print("\nSeleccionando regalos óptimos...")
+        gift_results = bookings.apply(
+            lambda row: select_optimal_gift(row, threshold), axis=1, result_type='expand'
+        )
+        gift_results.columns = ['gift', 'cost_of_selected_gift',
+                                'final_ev_with_gift_decision', 'ev_no_intervention']
 
-        # 6. Analizar distribución de regalos
-        gift_counts = bookings['gift'].value_counts(dropna=False)
-        print("\nDistribución de regalos:")
-        gift_names = {
-            'A': 'Desayuno',
-            'B': 'Mejora habitación',
-            'C': 'Parking',
-            'D': 'Spa',
-            np.nan: 'Sin regalo'
-        }
-        for gift, count in gift_counts.items():
-            gift_name = gift_names.get(gift, 'Sin regalo')
-            print(f"- {gift_name}: {count} ({count / n_bookings * 100:.1f}%)")
+        results_df = pd.concat([bookings, gift_results], axis=1)
 
-        # 7. Crear y guardar archivo de predicciones con formato solicitado
-        output_dir = os.environ.get("OUTPUT_DIR", "data")
-        os.makedirs(output_dir, exist_ok=True)
+        perform_economic_analysis(results_df)
 
-        # Crear el DataFrame final con las tres columnas solicitadas
-        output_df = pd.DataFrame({
-            'prediction': bookings['prediction'],
-            'cancellation_probability': bookings['cancellation_probability'],
-            'gift': bookings['gift']
-        })
+        output_df = export_results(results_df)
 
-        # Guardar resultados en CSV
-        output_predictions_path = os.path.join(output_dir, "output_predictions.csv")
-        output_df.to_csv(output_predictions_path, index=False)
-        print(f"\nPredicciones y asignación de regalos guardadas en {output_predictions_path}")
+        elapsed_time = (datetime.now() - start_time).total_seconds()
+        print(f"\nProceso completado en {elapsed_time:.2f} segundos.")
 
-        # 8. Tiempo total de ejecución
-        end_time = datetime.now()
-        elapsed_time = (end_time - start_time).total_seconds()
-        print(f"\nProceso completado en {elapsed_time:.2f} segundos")
+        if 'predicted_to_cancel' in results_df.columns:
+            total_cancel = results_df['predicted_to_cancel'].sum()
+            total_gifts = results_df['gift'].notna().sum()
+
+            print("\nEstadísticas adicionales:")
+            print(f"  Reservas con predicción de cancelación: {total_cancel}")
+            print(f"  Regalos asignados: {total_gifts}")
+
+            if total_cancel > 0:
+                coverage = total_gifts / total_cancel * 100
+                print(f"  Cobertura de regalos: {coverage:.1f}%")
+
+                print("\nDistribución por probabilidad de cancelación:")
+                segments = [
+                    (threshold, 0.6),
+                    (0.6, 0.7),
+                    (0.7, 0.8),
+                    (0.8, 0.9),
+                    (0.9, 1.0)
+                ]
+
+                for low, high in segments:
+                    segment = results_df[(results_df['cancellation_probability'] >= low) &
+                                         (results_df['cancellation_probability'] < high)]
+                    if len(segment) > 0:
+                        gifts = segment['gift'].notna().sum()
+                        print(f"  - Prob [{low:.2f}-{high:.2f}]: {len(segment)} reservas, "
+                              f"{gifts} regalos ({gifts / len(segment) * 100:.1f}%)")
+
+        return 0
 
     except Exception as e:
-        print(f"Error en el proceso: {str(e)}")
+        print(f"Error: {str(e)}")
         import traceback
         traceback.print_exc()
         return 1
 
-    return 0
-
-
 if __name__ == "__main__":
-    main()
+    exit_code = main()
+    if exit_code == 0:
+        print("Ejecución finalizada con éxito.")
+    else:
+        print(f"Ejecución finalizada con errores (código: {exit_code}).")
