@@ -8,9 +8,9 @@ WORKDIR /app
 RUN mkdir -p /app/data /app/model
 
 # Copiar requirements y archivos necesarios
-COPY ensembled/requirements.txt /app/
+COPY xgboost/requirements.txt /app/
 COPY data/*.csv /app/data/
-COPY ensembled/*.py /app/
+COPY xgboost/*.py /app/
 
 # Instalar dependencias
 RUN pip install --no-cache-dir -r requirements.txt
@@ -19,7 +19,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 ENV INFERENCE_DATA_PATH=/app/data/bookings_test.csv
 ENV HOTELS_DATA_PATH=/app/data/hotels.csv
 ENV TRAIN_DATA_PATH=/app/data/bookings_train.csv
-ENV MODEL_PATH=/app/model/pipeline.cloudpkl
+ENV MODEL_PATH=/app/models/pipeline.cloudpkl
 ENV OUTPUT_PATH=/app/data/output_predictions.csv
 
 # Comando principal

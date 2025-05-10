@@ -14,7 +14,7 @@ DEFAULT_GUESTS = 2
 DEFAULT_RATE = 250.0
 DEFAULT_BOARD = "SC"
 CAMPAIGN_COST_PER_OFFER = 5.0
-DEFAULT_FALLBACK_THRESHOLD = 0.4193
+DEFAULT_FALLBACK_THRESHOLD = 0.4236
 
 # Costes de regalos
 COST = {
@@ -257,11 +257,15 @@ def perform_economic_analysis(results_df):
             print(f"    * Prob. media cancelación: {avg_prob:.2f}")
             print(f"    * Coste medio: {avg_cost:.2f} €")
 
-def export_results(results_df, output_path="data/output_predictions.csv"):
+
+def export_results(results_df, output_path=None):
     """Exporta resultados en formato requerido."""
+    if output_path is None:
+        output_path = os.getenv("OUTPUT_PATH", "data/output_predictions.csv")
+
     output_df = pd.DataFrame({
         'prediction': results_df['predicted_to_cancel'],
-        'cancellation_probability': results_df['cancellation_probability'],
+        'probability': results_df['cancellation_probability'],
         'gift': results_df['gift']
     })
 
