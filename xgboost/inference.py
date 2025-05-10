@@ -35,6 +35,8 @@ def get_X():
     data = pd.merge(inference_data, hotels_data, on="hotel_id", how="left")
     original_data_for_gifting = data.copy()
 
+    data['reservation_status'].replace('No-Show', 'Check-Out', inplace=True)
+
     date_cols = ["arrival_date", "booking_date"]
     for col in date_cols:
         if col in data.columns:
@@ -123,16 +125,16 @@ def check_gift_eligibility(row, gift_type):
     """Verifica si una reserva puede recibir un regalo específico."""
     if gift_type == 'A':
         return (row.get('board', DEFAULT_BOARD) not in ['BB', 'FB', 'HB'] and
-                row.get('restaurant', 0) == 1)
+                row.get('restaurant', 0) == True)
 
     elif gift_type == 'B':
         return row.get('total_rooms', 0) > 80
 
     elif gift_type == 'C':
-        return row.get('parking', 0) == 1
+        return row.get('parking', 0) == True
 
     elif gift_type == 'D':
-        return row.get('pool_and_spa', 0) == 1
+        return row.get('pool_and_spa', 0) == True
 
     return False
 
@@ -236,9 +238,9 @@ def perform_economic_analysis(results_df):
 
     if gifts_offered > 0:
         avg_cost = total_gift_costs / gifts_offered
-        roi = (net_impact / total_gift_costs) * 100 if total_gift_costs > 0 else 0
+        roi = (net_impact / total_gift_costs) if total_gift_costs > 0 else 0
         print(f"  Coste Medio por Regalo: {avg_cost:,.2f} €")
-        print(f"  ROI de Campaña: {roi:.2f}%")
+        print(f"  ROI de Campaña: {roi:.2f}")
 
     print("\nDistribución de regalos:")
     gift_counts = results_df['gift'].value_counts(dropna=False)
