@@ -88,7 +88,7 @@ def get_pipeline(X_sample):
 
     pipeline = ImbPipeline(steps=[
         ('preprocessor', preprocessor),
-        ('smote', SMOTE(random_state=42, k_neighbors=5)),
+        ('smote', SMOTE(random_state=42, k_neighbors=5, sampling_strategy=0.8)),
         ('classifier', model)
     ])
 
